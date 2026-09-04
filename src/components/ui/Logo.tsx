@@ -35,7 +35,9 @@ export function Logo({ width = 126, className, blend = true }: LogoProps) {
         width={127}
         height={24}
         priority
-        className={cn("absolute top-[20.7%] left-0 w-full", blend && "mix-blend-difference")}
+        // `h-auto` alongside `w-full` keeps the declared 127x24 ratio — without
+        // it Next warns that one axis is overridden and the other is not.
+        className={cn("absolute top-[20.7%] left-0 h-auto w-full", blend && "mix-blend-difference")}
       />
       <Image
         src="/logos/atomapps-orbit.png"

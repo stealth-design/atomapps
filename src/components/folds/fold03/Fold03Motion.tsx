@@ -265,7 +265,14 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
           const timeline = gsap.timeline({
             scrollTrigger: {
               trigger: stage,
-              start: "top top",
+              // Lock the stage to the middle of the viewport, not its top.
+              // The stage is shorter than a tall window, so pinning at the top
+              // dumped all the slack below it as one empty band; centring
+              // splits it above and below, which reads as margin instead of a
+              // hole. Falls back to `top top` when the stage is taller than the
+              // window, where centring would hang its top and bottom off
+              // screen.
+              start: () => (stage.offsetHeight < window.innerHeight ? "center center" : "top top"),
               end: () => `+=${Math.round(window.innerHeight * SCROLL_VIEWPORTS)}`,
               pin: stage,
               // No `anticipatePin`: it pins ahead of the trigger point, which
