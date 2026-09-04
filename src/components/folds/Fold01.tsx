@@ -15,11 +15,18 @@ import { HeroPhone } from "@/components/folds/fold01/HeroPhone";
  * The background plate is deliberately oversized and offset (desktop 1643x912
  * at -98,-44; mobile 976x910 at -292,-64) — that framing is part of the design.
  *
- * Mobile follows Figma 1326:5953 (395x610) exactly: plate, moon, copy, phone
+ * Mobile follows Figma 1326:5953 (395x610): plate, moon, phone
  * and the foot gradient are that frame's own numbers, so the phone overlay and
  * the device photographed into the plate line up by construction rather than
  * by a shared nudge. That is why the shifted group below applies from `tablet`
  * up only.
+ *
+ * The copy is the one departure from that frame. The artboard puts it at
+ * 92px, which leaves 42px between the header and the title against 75px
+ * between the subtitle and the phone. Its top is now derived from the phone's
+ * instead — half the space between the header and the device, less half the
+ * copy's own 120px — so the two gaps stay equal as the phone rises with
+ * viewport width past 395px.
  */
 export default function Fold01() {
   return (
@@ -98,9 +105,9 @@ export default function Fold01() {
             {/* ---------- copy ---------- */}
             <div
               data-hero="copy"
-              className="absolute top-[92px] right-0 left-0 flex flex-col items-center gap-[12px] px-5 desktop-sm:top-[68px] desktop-sm:gap-[9px]"
+              className="absolute top-[min(108.5px,calc(160.25px-13.091vw))] right-0 left-0 flex flex-col items-center gap-[12px] px-5 tablet:top-[92px] desktop-sm:top-[68px] desktop-sm:gap-[9px]"
             >
-              <h1 className="max-w-[355px] text-center text-[40px] leading-[43px] font-bold text-white tablet:max-w-[440px] tablet:text-[48px] tablet:leading-[52px] desktop-sm:max-w-[527px] desktop-sm:text-[60px] desktop-sm:leading-[62px]">
+              <h1 className="max-w-[355px] text-center text-[40px] leading-[43px] font-bold text-white max-mobile-sm:text-[35px] max-mobile-sm:leading-[38px] tablet:max-w-[440px] tablet:text-[48px] tablet:leading-[52px] desktop-sm:max-w-[527px] desktop-sm:text-[60px] desktop-sm:leading-[62px]">
                 <span className="block overflow-hidden pb-[0.14em] -mb-[0.14em]">
                   <span data-hero-line className="block">
                     Everyday tasks

@@ -82,12 +82,19 @@ export function Header() {
             type="button"
             onClick={() => setIsMenuOpen(true)}
             aria-label="Open menu"
-            // The design's button is a 33px circle; the pseudo-element pads the
-            // hit area out to 45px for thumbs without enlarging the circle.
-            className="relative flex size-[33px] items-center justify-center rounded-full bg-[#111116] before:absolute before:-inset-[6px] before:content-[''] tablet:hidden"
+            // Three bare rules, no disc behind them. The 33px box stays even
+            // without the circle: the menu's close button mirrors it so the
+            // control does not shift when the panel opens. The pseudo-element
+            // pads the hit area out to 45px for thumbs.
+            className="relative flex size-[33px] items-center justify-center before:absolute before:-inset-[6px] before:content-[''] tablet:hidden"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none">
-              <path d="M2.5 5.5h15M2.5 10h15M2.5 14.5h15" stroke="#fff" strokeWidth="1.6" />
+            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+              <path
+                d="M3 6.5h18M3 12h18M3 17.5h18"
+                stroke="#111116"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
         </div>

@@ -76,23 +76,30 @@ export function Footer() {
 
       {/* ---------- legal ---------- */}
       <div className="absolute top-[502px] right-5 left-5 flex flex-col gap-[24px] text-[14px] leading-[17px] text-white tablet:top-[746px] tablet:right-10 tablet:left-10 tablet:flex-row tablet:items-center tablet:gap-0">
-        {siteConfig.legal.map((item, index) => (
-          <a
-            key={item.label}
-            href={item.href}
-            // A 14px line box is a 17px-tall touch target, under the 24px WCAG
-            // 2.5.8 floor. The pseudo-element grows the hit area into the 24px
-            // stack gap without moving anything: 11px a side lands at 39px and
-            // still leaves 2px between the two, so neither steals the other's
-            // taps.
-            className={`relative before:absolute before:inset-x-0 before:-inset-y-[11px] before:content-[''] ${
-              index > 0 ? "tablet:ml-[103px]" : ""
-            }`}
-          >
-            {item.label}
-          </a>
-        ))}
-        <p className="mt-[8px] tablet:mt-0 tablet:ml-auto">{siteConfig.copyright}</p>
+        {/* `tablet:contents` dissolves this row above the breakpoint, so the
+            desktop layout still lays both links out as direct children of the
+            flex row with its own spacing. */}
+        <div className="flex gap-[28px] tablet:contents">
+          {siteConfig.legal.map((item, index) => (
+            <a
+              key={item.label}
+              href={item.href}
+              // A 14px line box is a 17px-tall touch target, under the 24px WCAG
+              // 2.5.8 floor. The pseudo-element grows the hit area into the 24px
+              // stack gap without moving anything: 11px a side lands at 39px and
+              // still leaves 2px between the two, so neither steals the other's
+              // taps.
+              className={`relative before:absolute before:inset-x-0 before:-inset-y-[11px] before:content-[''] ${
+                index > 0 ? "tablet:ml-[103px]" : ""
+              }`}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+        <p className="mt-[8px] tablet:mt-0 tablet:ml-auto">
+          {siteConfig.copyright}
+        </p>
       </div>
     </footer>
   );
