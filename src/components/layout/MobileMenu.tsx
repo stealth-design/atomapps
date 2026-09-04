@@ -87,18 +87,29 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         />
       </div>
 
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close menu"
-        // The design draws a bare 10px X in a 24px box, no circle. The
-        // pseudo-element pads the hit area to 44px for thumbs.
-        className="absolute top-[9.65%] left-[85.73%] flex size-[24px] items-center justify-center before:absolute before:-inset-[10px] before:content-['']"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" fill="none">
-          <path d="M1.5 1.5l11 11M12.5 1.5l-11 11" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      </button>
+      {/*
+       * The close button reuses the header's own row — 50px tall, the same
+       * `px-5` gutter, right-aligned, and the same 33px box as the menu
+       * button — so the X lands exactly on the burger it replaces and the
+       * control does not jump under the thumb when the panel opens.
+       *
+       * The artboard places it lower (9.65% down, 1136:6414); matching the
+       * burger is the deliberate departure.
+       */}
+      <div className="absolute top-0 right-0 left-0 flex h-[50px] items-center justify-end px-5">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close menu"
+          // A bare X as the design draws it, no circle. The pseudo-element
+          // pads the hit area past the 33px box for thumbs.
+          className="relative flex size-[33px] items-center justify-center before:absolute before:-inset-[6px] before:content-['']"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" fill="none">
+            <path d="M1.5 1.5l11 11M12.5 1.5l-11 11" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
 
       {/* 45px apart on the artboard -> 60px here, less the 26px line box. */}
       <nav className="absolute top-[53.89%] left-[14.3%] flex flex-col gap-[34px]">

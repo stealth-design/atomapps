@@ -29,7 +29,6 @@ export function HeroMotion({ children }: { children: ReactNode }) {
       const bg = pick("bg");
       const phone = pick("phone");
       const lines = root.querySelectorAll<HTMLElement>("[data-hero-line]");
-      const stage = root.firstElementChild ?? root;
 
       const mm = gsap.matchMedia();
 
@@ -50,13 +49,13 @@ export function HeroMotion({ children }: { children: ReactNode }) {
           .from(lines, { opacity: 0, yPercent: 40, duration: 0.9, stagger: 0.08 }, 0.15)
           .from(phone, { opacity: 0, y: 80, scale: 0.97, duration: 1.2 }, 0.3);
 
-        // Scroll parallax — background drifts slower than the phone.
-        gsap
-          .timeline({
-            scrollTrigger: { trigger: stage, start: "top top", end: "bottom top", scrub: true },
-          })
-          .to(bg, { yPercent: 6, ease: "none" }, 0)
-          .to(phone, { yPercent: -8, ease: "none" }, 0);
+        // No scroll parallax here, deliberately. It used to drift the plate
+        // down 6% and the phone up 8% as the hero scrolled, which pulled them
+        // apart: the phone is only a screen overlay sitting on the device
+        // photographed into that plate, so 14% of relative travel slid the lit
+        // screen clean off the device. Any parallax in this fold has to move
+        // the plate and the overlay by the same amount — which is what the
+        // shifted group in Fold01 does — or not move them at all.
       });
 
       return () => mm.revert();

@@ -3,51 +3,46 @@
  *
  * Figma: desktop 1136:2559 (1440x1137), mobile 1136:2479 (393x685).
  *
- * The partner strip is one row of five on desktop and wraps to 3 + 2 on
- * mobile — and the artboards order it differently, with Google leading on
- * desktop but sitting fourth on mobile. Hence an explicit order per logo.
+ * The partner strip is one row of five at every breakpoint. The mobile
+ * artboard wrapped it to 3 + 2 at smaller sizes and in a different order
+ * (Google fourth rather than first), but it now runs as a single row that
+ * scroll drives sideways, so there is one order — this array's — and one set
+ * of widths.
  */
 
 export interface PartnerLogo {
   name: string;
   /** Asset in `public/images/fold08/`. */
   src: string;
-  /** Figma widths — the logos are optically sized, not uniform. */
-  width: { mobile: number; desktop: number };
-  /** 1-based position in the strip at each breakpoint. */
-  order: { mobile: number; desktop: number };
+  /** Figma width — the logos are optically sized, not uniform. */
+  width: number;
 }
 
 export const PARTNERS: PartnerLogo[] = [
   {
     name: "Google",
     src: "logo-google.svg",
-    width: { mobile: 64, desktop: 142 },
-    order: { mobile: 4, desktop: 1 },
+    width: 142,
   },
   {
     name: "Meta",
     src: "logo-meta.svg",
-    width: { mobile: 63, desktop: 141 },
-    order: { mobile: 1, desktop: 2 },
+    width: 141,
   },
   {
     name: "Sensor Tower",
     src: "logo-sensortower.png",
-    width: { mobile: 94, desktop: 209 },
-    order: { mobile: 2, desktop: 3 },
+    width: 209,
   },
   {
     name: "RevenueCat",
     src: "logo-revenuecat.png",
-    width: { mobile: 73, desktop: 162 },
-    order: { mobile: 3, desktop: 4 },
+    width: 162,
   },
   {
     name: "Adjust",
     src: "logo-adjust.png",
-    width: { mobile: 68, desktop: 151 },
-    order: { mobile: 5, desktop: 5 },
+    width: 151,
   },
 ];
 
