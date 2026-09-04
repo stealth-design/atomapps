@@ -19,16 +19,19 @@ import { siteConfig } from "@/data/site";
  * decides legibility, so the nav, CTA and menu button carry explicit dark
  * colours instead.
  *
- * The wordmark keeps a blend of its own — `Logo`'s default — which is what
- * Figma specifies (wordmark difference-blended, colour orbit normal). Against
- * this light bar that renders it dark at every scroll position.
+ * The wordmark is inverted rather than blended (`Logo`'s `dark`). Figma
+ * specifies a difference blend there, and that held while the bar was 72%
+ * white, but thinning the bar to 50% for a glassier read drove the blended
+ * mark toward the hero's own mid-tone and it faded out. An invert is
+ * backdrop-independent. The colour orbit stays NORMAL either way, as Figma
+ * has it.
  */
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.72] backdrop-blur-[24px]">
+      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.5] backdrop-blur-[28px]">
         <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
           {/* Full header height so the home link is a 50px target rather than
               the wordmark's own 24px — the logo still sits where it did. */}
@@ -39,10 +42,10 @@ export function Header() {
           >
             {/* 132 on mobile against the artboard's 104: at phone size the
                 wordmark read as an afterthought. 132 x 30px still clears the
-                50px bar. `blend` is left at its default now that the header
-                itself no longer blends — that is what darkens the white
-                wordmark against the frosted bar. */}
-            <Logo width={132} className="tablet:w-[126px]" />
+                50px bar. `dark` inverts the white wordmark rather than
+                blending it: at this bar opacity a difference blend faded the
+                mark out over the dark hero. */}
+            <Logo width={132} dark className="tablet:w-[126px]" />
           </a>
 
           <nav className="hidden items-center gap-14 tablet:flex">

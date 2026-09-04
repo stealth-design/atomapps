@@ -18,10 +18,21 @@ interface LogoProps {
    * therefore blends as a whole and passes `blend={false}` here.
    */
   blend?: boolean;
+  /**
+   * Renders the white wordmark near-black instead of blending it, for use on
+   * light backgrounds.
+   *
+   * The blend only holds while its backdrop stays near-white or near-black. On
+   * the header's glass bar it does not: as that bar's white was thinned to let
+   * more of the page through, the difference blend drove the mark toward the
+   * backdrop's own mid-tone and it faded out over the dark hero. An invert is
+   * backdrop-independent, so the mark reads the same at any bar opacity.
+   */
+  dark?: boolean;
 }
 
 /** AtomApps lockup — white wordmark with the colour orbit mark over the "o". */
-export function Logo({ width = 126, className, blend = true }: LogoProps) {
+export function Logo({ width = 126, className, blend = true, dark = false }: LogoProps) {
   return (
     <span
       className={cn("relative block w-[var(--logo-w)]", className)}
@@ -37,7 +48,11 @@ export function Logo({ width = 126, className, blend = true }: LogoProps) {
         priority
         // `h-auto` alongside `w-full` keeps the declared 127x24 ratio — without
         // it Next warns that one axis is overridden and the other is not.
-        className={cn("absolute top-[20.7%] left-0 h-auto w-full", blend && "mix-blend-difference")}
+        className={cn(
+          "absolute top-[20.7%] left-0 h-auto w-full",
+          blend && !dark && "mix-blend-difference",
+        )}
+        style={dark ? { filter: "invert(1)" } : undefined}
       />
       <Image
         src="/logos/atomapps-orbit.png"
