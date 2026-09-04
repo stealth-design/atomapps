@@ -6,17 +6,29 @@ import { MobileMenu } from "@/components/layout/MobileMenu";
 import { siteConfig } from "@/data/site";
 
 /**
- * Site header (Figma: desktop 1136:3519, mobile 1136:2531) — 50px tall, fixed
- * over the hero with a 2% white wash. The nav, CTA and wordmark use
- * `mix-blend-mode: difference` exactly as the design does, which is what keeps
- * them legible over both the dark hero and the light folds underneath.
+ * Site header (Figma: desktop 1136:3519, mobile 1136:2531) — 50px tall, fixed,
+ * a frosted white bar at every scroll position.
+ *
+ * It used to be a 2% wash with `mix-blend-mode: difference` on the whole
+ * header, which inverted everything behind it to stay legible over both the
+ * dark hero and the light folds. That blend is why the bar could not simply be
+ * made whiter: difference *inverts*, so raising the white wash turned the bar
+ * grey over the light folds, and adding backdrop blur flattened the backdrop
+ * to a mid-tone that the blended text then disappeared into (measured over the
+ * Fold 05 photos). The bar is now opaque enough that the backdrop no longer
+ * decides legibility, so the nav, CTA and menu button carry explicit dark
+ * colours instead.
+ *
+ * The wordmark keeps a blend of its own — `Logo`'s default — which is what
+ * Figma specifies (wordmark difference-blended, colour orbit normal). Against
+ * this light bar that renders it dark at every scroll position.
  */
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.02] backdrop-blur-[18px] tablet:backdrop-blur-none tablet:mix-blend-difference">
+      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.72] backdrop-blur-[24px]">
         <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
           {/* Full header height so the home link is a 50px target rather than
               the wordmark's own 24px — the logo still sits where it did. */}
@@ -27,8 +39,10 @@ export function Header() {
           >
             {/* 132 on mobile against the artboard's 104: at phone size the
                 wordmark read as an afterthought. 132 x 30px still clears the
-                50px bar. */}
-            <Logo width={132} blend={false} className="tablet:w-[126px]" />
+                50px bar. `blend` is left at its default now that the header
+                itself no longer blends — that is what darkens the white
+                wordmark against the frosted bar. */}
+            <Logo width={132} className="tablet:w-[126px]" />
           </a>
 
           <nav className="hidden items-center gap-14 tablet:flex">
@@ -36,7 +50,7 @@ export function Header() {
               <a
                 key={item.label}
                 href={item.href}
-                className="text-[15px] leading-[20px] text-white"
+                className="text-[15px] leading-[20px] text-[#111116]"
               >
                 {item.label}
               </a>
@@ -45,7 +59,7 @@ export function Header() {
 
           <a
             href={siteConfig.cta.href}
-            className="hidden h-[33px] items-center justify-center rounded-full bg-white px-[14px] text-[15px] leading-[20px] text-black tablet:inline-flex"
+            className="hidden h-[33px] items-center justify-center rounded-full bg-[#111116] px-[14px] text-[15px] leading-[20px] text-white tablet:inline-flex"
           >
             {siteConfig.cta.label}
           </a>
@@ -56,10 +70,10 @@ export function Header() {
             aria-label="Open menu"
             // The design's button is a 33px circle; the pseudo-element pads the
             // hit area out to 45px for thumbs without enlarging the circle.
-            className="relative flex size-[33px] items-center justify-center rounded-full bg-white before:absolute before:-inset-[6px] before:content-[''] tablet:hidden"
+            className="relative flex size-[33px] items-center justify-center rounded-full bg-[#111116] before:absolute before:-inset-[6px] before:content-[''] tablet:hidden"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none">
-              <path d="M2.5 5.5h15M2.5 10h15M2.5 14.5h15" stroke="#1d1b20" strokeWidth="1.6" />
+              <path d="M2.5 5.5h15M2.5 10h15M2.5 14.5h15" stroke="#fff" strokeWidth="1.6" />
             </svg>
           </button>
         </div>

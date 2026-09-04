@@ -31,9 +31,9 @@ export default function Fold03() {
   // *plus* Fold 04's own padding, and the scatter here starts hard against the
   // stage's top edge, so equal padding does not read as equal space — it came
   // out 42px above against 103px below on a phone. These values put the run in
-  // from Fold 02 at roughly 150px on mobile and 205px from tablet up.
+  // from Fold 02 at roughly 170px on mobile and 225px from tablet up.
   return (
-    <Section fold="03" className="bg-white pt-[140px] tablet:pt-[130px]">
+    <Section fold="03" className="bg-white pt-[160px] tablet:pt-[150px]">
       <Fold03Motion>
         <div
           data-f03="stage"
