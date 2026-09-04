@@ -1,5 +1,6 @@
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
+import { CountUp } from "@/components/folds/fold02/CountUp";
 import { cn } from "@/lib/utils";
 
 /**
@@ -13,19 +14,26 @@ import { cn } from "@/lib/utils";
  * both variants are in the markup; `display: none` keeps the unused one out of
  * the accessibility tree.
  */
+/**
+ * Each figure is split into the number that counts up and the wording either
+ * side of it, so "Top 10" animates its 10 while "Top " stays put.
+ */
 const STATS = [
   {
-    value: "160K+",
+    to: 160,
+    suffix: "K+",
     label: "4 + Star Reviews",
     labelMobile: "4 + Star Reviews",
   },
   {
-    value: "Top 10",
+    prefix: "Top ",
+    to: 10,
     label: "Publisher in downloads on US GooglePlay Store",
     labelMobile: "Downloads on US Google Play Store",
   },
   {
-    value: "35M",
+    to: 35,
+    suffix: "M",
     label: "US Downloads",
     labelMobile: "Million Downloads",
   },
@@ -42,14 +50,14 @@ export default function Fold02() {
       >
         {STATS.map((stat, index) => (
           <div
-            key={stat.value}
+            key={stat.label}
             className={cn(
               "flex flex-col items-center tablet:flex-1 tablet:justify-center",
               index > 0 && "tablet:border-l tablet:border-[#e5e7eb]",
             )}
           >
             <p className="text-[40px] leading-[44px] font-bold text-[#111111] tablet:text-[72px] tablet:leading-[76px] tablet:tracking-[-1.44px] tablet:text-black">
-              {stat.value}
+              <CountUp to={stat.to} prefix={stat.prefix} suffix={stat.suffix} />
             </p>
 
             <p className="mt-2 text-center text-[11px] leading-[14px] font-bold tracking-[1px] text-[#61616a] uppercase tablet:mt-4 tablet:text-[13px] tablet:leading-[17px] tablet:tracking-normal tablet:text-black">
