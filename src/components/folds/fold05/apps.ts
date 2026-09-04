@@ -1,11 +1,10 @@
 /**
  * Fold 05 — the four app panels in the scroll stack.
  *
- * Each background is a pre-composed scene (the room/park/lounge/bedside shot
- * plus the phone and its floating UI panels, all baked in), so a panel is
- * just its scene plus the frosted card. Two cuts per app: the landscape
- * export from Figma at 4x the 1440x886 artboard, and a portrait one shaped to
- * the mobile panel.
+ * Each background is a pre-composed scene exported from Figma at 4x the
+ * 1440x886 artboard (the room/park/lounge/bedside shot plus the phone and its
+ * floating UI panels, all baked in), so a panel is just its scene plus the
+ * frosted card.
  *
  * The four cards are deliberately not the same shape — Steppy swaps the CTA for
  * a "Coming soon" badge and adds a feature list, Volume Control drops the
@@ -24,18 +23,23 @@ export interface Feature {
 
 export interface AppPanel {
   id: string;
-  /** Pre-composed scene behind the card, landscape (1.625) for desktop. */
+  /** Pre-composed scene behind the card. */
   background: string;
   /**
-   * Portrait cut of the same scene, for mobile.
+   * Horizontal focal point of the scene, as a percentage of its width.
    *
-   * These replace a per-scene focal point that used to steer `object-cover`
-   * across the landscape art: at the mobile panel's ~0.46 aspect only a
-   * 28%-wide window of a 1.625 source was ever visible, so each scene's device
-   * had to be hunted down and centred by hand. At 0.465 these need no such
-   * steering — they are the panel's own shape, so nothing is cropped away.
+   * The scenes are landscape (1.625) and the mobile panel is portrait (~0.46),
+   * so `object-cover` only ever shows a ~28%-wide window of the source. Where
+   * that window sits has to follow each scene's device, which is composed in a
+   * different place every time (measured off the source art):
+   *
+   *   image-1  phone 57–79%    image-2  phone 55–72%
+   *   image-3  phone 57–79%    image-4  phone 72–88%
+   *
+   * A single shared value sliced the White Noise phone clean in half.
+   * Desktop is unaffected — there the scene is centred and barely cropped.
    */
-  backgroundMobile: string;
+  mobileFocal: string;
   /** App icon shown on the frosted card. */
   icon: string;
   title: string;
@@ -55,7 +59,7 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "find-my-phone",
     background: "/images/image-1.jpg",
-    backgroundMobile: "/images/phone-image-1.jpg",
+    mobileFocal: "68%",
     icon: "/images/fold03/icon-05.jpg",
     title: "Find My Phone",
     question: "Can't find your phone when you need it most?",
@@ -67,7 +71,7 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "steppy",
     background: "/images/image-2.jpg",
-    backgroundMobile: "/images/phone-image-2.jpg",
+    mobileFocal: "64%",
     icon: "/images/apps/steppy.png",
     title: "Steppy",
     question: "Need a push to start walking more? Walk with Steppy.",
@@ -84,7 +88,7 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "volume-control",
     background: "/images/image-3.jpg",
-    backgroundMobile: "/images/phone-image-3.jpg",
+    mobileFocal: "66%",
     icon: "/images/fold03/icon-02.jpg",
     title: "Volume Control",
     description:
@@ -97,7 +101,7 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "white-noise",
     background: "/images/image-4.jpg",
-    backgroundMobile: "/images/phone-image-4.jpg",
+    mobileFocal: "80%",
     icon: "/images/fold03/icon-15.jpg",
     title: "White Noise",
     // Figma reads "Cat’t sleep?" — a typo for "Can't", corrected here.

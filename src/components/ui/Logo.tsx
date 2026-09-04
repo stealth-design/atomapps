@@ -54,12 +54,17 @@ export function Logo({ width = 126, className, blend = true, dark = false }: Log
         )}
         style={dark ? { filter: "invert(1)" } : undefined}
       />
+      {/* The footer's mark, not `atomapps-orbit.png`. The two assets are
+          different logos: the 114px one is an older rainbow gradient
+          (orange -> pink -> purple -> blue -> cyan), while this is the current
+          orange/teal/blue orbit the footer already used. */}
       <Image
-        src="/logos/atomapps-orbit.png"
+        src="/logos/atomapps-orbit-large.png"
         alt=""
-        width={114}
-        height={114}
+        width={640}
+        height={640}
         priority
+        sizes="40px"
         className="absolute top-0 left-[15.1%] w-[22.2%]"
       />
     </span>

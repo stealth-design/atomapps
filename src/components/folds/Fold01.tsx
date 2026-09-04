@@ -19,7 +19,7 @@ export default function Fold01() {
   return (
     <Section fold="01">
       <HeroMotion>
-        <div className="relative h-[761px] w-full overflow-hidden bg-black tablet:h-[700px] desktop-sm:h-[800px]">
+        <div className="relative h-[600px] w-full overflow-hidden bg-black tablet:h-[700px] desktop-sm:h-[800px]">
           {/*
            * Everything that makes up the scene sits in one shifted group so it
            * moves as a unit. The phone is only a screen overlay sitting on the
@@ -43,7 +43,7 @@ export default function Fold01() {
               without it they would size against a zero-height div and the
               plate's `inset-0` and the phone's percentage top would both
               collapse to the stage's top edge. */}
-          <div className="absolute inset-0 translate-y-[34px]">
+          <div className="absolute inset-0 translate-y-[38px] tablet:translate-y-[34px]">
             {/* ---------- background plate ---------- */}
             <div data-hero="bg" className="absolute inset-0">
               <div className="absolute top-[-8.41%] left-[-74.3%] h-[119.6%] w-[248.35%] tablet:hidden">
@@ -107,7 +107,7 @@ export default function Fold01() {
                 </span>
               </h1>
 
-              <p className="overflow-hidden pb-[0.14em] -mb-[0.14em] text-center text-[16px] leading-[20px] text-[#acacac] tablet:text-[20px] tablet:leading-[24px] desktop-sm:text-[24px] desktop-sm:leading-[26px] desktop-sm:text-white">
+              <p className="overflow-hidden pb-[0.14em] -mb-[0.14em] text-center text-[16px] leading-[20px] text-white tablet:text-[20px] tablet:leading-[24px] desktop-sm:text-[24px] desktop-sm:leading-[26px]">
                 <span data-hero-line className="block">
                   Through apps that people love
                 </span>
