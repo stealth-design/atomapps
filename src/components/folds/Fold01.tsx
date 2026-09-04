@@ -14,12 +14,18 @@ import { HeroPhone } from "@/components/folds/fold01/HeroPhone";
  * percentage of the artboard, so the composition holds at any viewport width.
  * The background plate is deliberately oversized and offset (desktop 1643x912
  * at -98,-44; mobile 976x910 at -292,-64) — that framing is part of the design.
+ *
+ * Mobile follows Figma 1326:5953 (395x610) exactly: plate, moon, copy, phone
+ * and the foot gradient are that frame's own numbers, so the phone overlay and
+ * the device photographed into the plate line up by construction rather than
+ * by a shared nudge. That is why the shifted group below applies from `tablet`
+ * up only.
  */
 export default function Fold01() {
   return (
     <Section fold="01">
       <HeroMotion>
-        <div className="relative h-[600px] w-full overflow-hidden bg-black tablet:h-[700px] desktop-sm:h-[800px]">
+        <div className="relative h-[610px] w-full overflow-hidden bg-[#0d0d0d] tablet:h-[700px] desktop-sm:h-[800px]">
           {/*
            * Everything that makes up the scene sits in one shifted group so it
            * moves as a unit. The phone is only a screen overlay sitting on the
@@ -43,10 +49,10 @@ export default function Fold01() {
               without it they would size against a zero-height div and the
               plate's `inset-0` and the phone's percentage top would both
               collapse to the stage's top edge. */}
-          <div className="absolute inset-0 translate-y-[38px] tablet:translate-y-[34px]">
+          <div className="absolute inset-0 tablet:translate-y-[34px]">
             {/* ---------- background plate ---------- */}
             <div data-hero="bg" className="absolute inset-0">
-              <div className="absolute top-[-8.41%] left-[-74.3%] h-[119.6%] w-[248.35%] tablet:hidden">
+              <div className="absolute top-[-10.574%] left-[-73.797%] h-[149.18%] w-[247.114%] tablet:hidden">
                 <Image
                   src="/images/fold01/hero-bg-mobile.jpg"
                   alt=""
@@ -86,7 +92,7 @@ export default function Fold01() {
               height={190}
               priority
               aria-hidden="true"
-              className="absolute top-[30.09%] left-[77.86%] h-auto w-[17.05%] tablet:hidden"
+              className="absolute top-[37.574%] left-[77.519%] h-auto w-[16.911%] tablet:hidden"
             />
 
             {/* ---------- copy ---------- */}
@@ -142,7 +148,7 @@ export default function Fold01() {
              */}
             <div
               data-hero="phone"
-              className="absolute top-[37.7%] left-[calc(50%-90.5px)] w-[186px] tablet:left-[calc(50%-119px)] tablet:w-[250px] desktop-sm:top-[min(298px,calc(412px-7.921vw))] desktop-sm:left-[min(calc(50%-148px),39.73vw)] desktop-sm:w-[max(312px,21.6667vw)]"
+              className="absolute top-[min(287px,calc(390.5px-26.182vw))] left-[min(calc(49.76%-90.65px),26.828vw)] w-[max(186px,47.052vw)] tablet:top-[37.7%] tablet:left-[calc(50%-119px)] tablet:w-[250px] desktop-sm:top-[min(298px,calc(412px-7.921vw))] desktop-sm:left-[min(calc(50%-148px),39.73vw)] desktop-sm:w-[max(312px,21.6667vw)]"
             >
               <HeroPhone />
             </div>
@@ -151,10 +157,14 @@ export default function Fold01() {
           {/* ---------- bottom fade into the next fold ---------- */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 tablet:hidden"
+            // Artboard's own foot gradient (1326:5972): a 407px band starting
+            // at 58% of the stage, opaque black at its bottom and clear by
+            // 81.7% of the way up. It runs past the stage's foot, so on screen
+            // it only ever reaches about 55% — the previous full-strength fade
+            // from 56% is what buried the lower half of the phone.
+            className="pointer-events-none absolute inset-x-0 top-[58.033%] h-[66.721%] tablet:hidden"
             style={{
-              backgroundImage:
-                "linear-gradient(to bottom, transparent 56.3%, #000 100%)",
+              backgroundImage: "linear-gradient(to top, #000000 0%, rgba(0,0,0,0) 81.7%)",
             }}
           />
           <div

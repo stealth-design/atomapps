@@ -52,17 +52,17 @@ export default function Fold07() {
       <div className="px-5 pb-[var(--fold-gap-y)] tablet:px-16">
         <div className="mx-auto flex max-w-[var(--content-max-width)] flex-col desktop-md:flex-row desktop-md:gap-[64px]">
           {/* ---------- heading ---------- */}
-          {/* Below the two-column layout the description sits beside the
-              heading rather than under it — the heading's longest line is
-              165px of a 350px column on a phone, so there is 185px going
-              spare to its right, and using it takes ~70px off the fold's
-              height. It stacks again at desktop-md, where the heading and
-              quotes are already side by side. */}
-          <Reveal
-            variant="stagger"
-            className="flex items-start gap-[20px] desktop-md:block desktop-md:w-[460px] desktop-md:shrink-0"
-          >
-            <h2 className="shrink-0 text-[26px] leading-[27px] font-extrabold text-[#111116] tablet:text-[44px] tablet:leading-[51px]">
+          <Reveal variant="stagger" className="desktop-md:w-[460px] desktop-md:shrink-0">
+            {/* Mobile runs it as one sentence that simply wraps, with no
+                forced breaks and no subtext under it. The two colours are the
+                artboard's: near-black lead-ins, #2774c1 on the two nouns. */}
+            <h2 className="text-[26px] leading-[34px] font-extrabold text-[#111116] tablet:hidden">
+              Millions of <span className="text-[#2774c1]">Downloads.</span> Millions of{" "}
+              <span className="text-[#2774c1]">Experiences.</span>
+            </h2>
+
+            {/* tablet up keeps the artboard's two stacked blocks */}
+            <h2 className="hidden text-[26px] leading-[27px] font-extrabold text-[#111116] tablet:block tablet:text-[44px] tablet:leading-[51px]">
               <span className="block">
                 Millions of
                 <br />
@@ -75,7 +75,7 @@ export default function Fold07() {
               </span>
             </h2>
 
-            <p className="min-w-0 flex-1 text-[15px] leading-[23px] text-[#61616a] tablet:text-[16px] tablet:leading-[24px] desktop-md:mt-[29px] desktop-md:max-w-[275px]">
+            <p className="mt-[29px] hidden max-w-[275px] text-[15px] leading-[23px] text-[#61616a] tablet:block tablet:text-[16px] tablet:leading-[24px]">
               Real feedback from teams and users who ship faster with Atom.
             </p>
           </Reveal>

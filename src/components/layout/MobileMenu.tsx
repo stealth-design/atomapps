@@ -125,16 +125,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         ))}
       </nav>
 
-      {/* The full-colour lockup rather than the `Logo` lockup used in the
-          header: this artboard shows the orbit in the brand's orange/teal/blue,
-          which is what `atomapps-color.png` carries — `Logo` composes the
-          rainbow `atomapps-orbit.png` instead. Its 4.32 aspect matches the
-          design group's 209.3x48.4 exactly. */}
+      {/* `logo-final.png` as supplied — a white wordmark for dark grounds,
+          which is exactly this panel. Its 4.32 aspect matches the design
+          group's 209.3x48.4. */}
       <Image
-        src="/logos/atomapps-color.png"
+        src="/images/logo-final.png"
         alt={siteConfig.name}
-        width={942}
-        height={218}
+        width={1600}
+        height={370}
         sizes="72vw"
         className="absolute top-[83.24%] left-[14.3%] h-auto w-[71.43%]"
       />

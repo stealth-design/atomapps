@@ -49,10 +49,10 @@ export function HeroPhone() {
 
       {/* AtomApps lockup on the screen */}
       <Image
-        src="/logos/atomapps-color.png"
+        src="/images/logo-final.png"
         alt="AtomApps"
-        width={940}
-        height={216}
+        width={1600}
+        height={370}
         priority
         className="absolute top-[16.9%] left-1/2 h-auto w-[75.3%] -translate-x-1/2"
       />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Logo } from "@/components/ui/Logo";
+import Image from "next/image";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { siteConfig } from "@/data/site";
 
@@ -19,10 +19,8 @@ import { siteConfig } from "@/data/site";
  * decides legibility, so the nav, CTA and menu button carry explicit dark
  * colours instead.
  *
- * The wordmark is inverted rather than blended (`Logo`'s `dark`) — a
- * difference blend needs a near-white or near-black backdrop to read, and on
- * a solid white bar an invert is simply the direct way to get a black mark.
- * The colour orbit stays NORMAL, as Figma has it.
+ * The mark is `logo-final-dark.png` — see the note at the element for why a
+ * derived file rather than a CSS filter.
  */
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,10 +36,24 @@ export function Header() {
             aria-label={`${siteConfig.name} — home`}
             className="flex h-full items-center"
           >
-            {/* 132 on mobile against the artboard's 104: at phone size the
-                wordmark read as an afterthought. 132 x 30px still clears the
-                50px bar. */}
-            <Logo width={132} dark className="tablet:w-[126px]" />
+            {/* `logo-final.png` is the current lockup, but it ships as a white
+                wordmark for dark grounds — on this white bar only its orbit
+                would have shown. `logo-final-dark.png` is that same file with
+                the greyscale ink inverted and the coloured orbit left alone,
+                so the mark reads black here without the orbit turning into
+                its complement (a flat `invert()` would have).
+
+                132 wide on mobile against the artboard's 104: at phone size
+                the wordmark read as an afterthought. */}
+            <Image
+              src="/images/logo-final-dark.png"
+              alt={siteConfig.name}
+              width={1600}
+              height={370}
+              priority
+              sizes="140px"
+              className="h-auto w-[132px] tablet:w-[126px]"
+            />
           </a>
 
           <nav className="hidden items-center gap-14 tablet:flex">
