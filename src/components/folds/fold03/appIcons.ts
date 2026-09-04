@@ -124,15 +124,9 @@ export const END_GRID: { desktop: GridConfig; mobile: GridConfig } = {
   mobile: { rows: [5, 5, 5], size: 58, gap: 12, rowGap: 16, reference: 393 },
 };
 
-/**
- * Where the phone's face sits inside its plate image, as fractions of the
- * plate box — used to aim the convergence at the phone screen rather than at
- * the plate's centre (the plate is mostly the white fade above the device).
- */
-export const PHONE_FACE = { cx: 0.5015, cy: 0.605, width: 0.473 };
-
-/** Cluster width as a share of the phone face, when icons collect on-screen. */
-export const CLUSTER_FILL = 0.66;
+/* PHONE_FACE / CLUSTER_FILL used to live here, aiming the icons at the phone
+   screen mid-sequence. The icons now travel straight from the scatter to the
+   grid, so nothing needs the face geometry. */
 
 /** The white fade Figma lays over the phone plate (gradient stops preserved). */
 export const PHONE_FADE =

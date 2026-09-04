@@ -21,31 +21,39 @@ import { DESKTOP_STAGE, MOBILE_STAGE, PHONE_FADE } from "@/components/folds/fold
  * heading is deliberately untouched by the timeline so it stays put.
  */
 export default function Fold03() {
-  // Uses the shared --fold-gap-y rhythm. The icons Figma lets bleed past the
-  // frame (icon-03 sits at y=-145) are clipped by the stage instead of being
-  // given svh clearance, which is what used to bloat the gap to Fold 04.
+  // Only a top gap: the stage already ends in whitespace below the settled
+  // grid, so a bottom gap on top of that is what made the run into Fold 04
+  // read as a void.
   return (
-    <Section fold="03" className="bg-white py-[var(--fold-gap-y)]">
+    <Section fold="03" className="bg-white pt-[var(--fold-gap-y)]">
       <Fold03Motion>
         <div
           data-f03="stage"
-          // Mobile is pinned to the artboard's own 626px height rather than a
-          // full viewport. Every position in here is a percentage of the stage
-          // (heading 34.35%, phone plate 39%), so on an 844px phone a `svh`
-          // stage stretched them all and left 270px of dead space under the
-          // settled grid — the "too much space" before Fold 04. At 626px the
-          // percentages land exactly where Figma put them and the slack goes
-          // away. Desktop keeps `svh`: its artboard is 886 tall, which is
-          // already about a viewport.
-          className="relative h-[626px] w-full overflow-clip bg-white tablet:h-svh tablet:min-h-[626px]"
+          // The stage is aspect-locked rather than viewport-height.
+          //
+          // Everything in here is positioned as a percentage of the stage, but
+          // icon *sizes* are percentages of its width — so the two only stay in
+          // step while the stage keeps a fixed aspect. A `svh` stage broke that
+          // (the composition stretched at one height and squashed at another)
+          // and, being taller than the composition needs, left 337px of dead
+          // white under the settled grid on desktop: the gap to Fold 04
+          // measured 507px. These ratios are the artboards trimmed to what the
+          // end frame actually occupies, which holds the gap near the standard
+          // fold rhythm at every width.
+          className="relative aspect-[393/545] w-full overflow-clip bg-white tablet:aspect-[1440/560]"
         >
           {/* ---------- phone plate + white fade (mobile) ---------- */}
+          {/* Anchored by its bottom, not its top. The plate's upper half is
+              painted out by PHONE_FADE, so only its lower edge is actually
+              visible — pinning that edge keeps the device where the artboard
+              has it (bottom at 90% mobile / 93.8% desktop) while the shorter
+              stage crops only the part nobody can see. */}
           <div
             data-f03="phone"
             className="absolute tablet:hidden"
             style={{
               left: `${(-58 / MOBILE_STAGE.width) * 100}%`,
-              top: `${(244 / MOBILE_STAGE.height) * 100}%`,
+              bottom: `${((MOBILE_STAGE.height - (244 + 319)) / MOBILE_STAGE.height) * 100}%`,
               width: `${(510 / MOBILE_STAGE.width) * 100}%`,
               aspectRatio: "510 / 319",
             }}
@@ -66,7 +74,7 @@ export default function Fold03() {
             className="absolute hidden tablet:block"
             style={{
               left: `${(201 / DESKTOP_STAGE.width) * 100}%`,
-              top: `${(187 / DESKTOP_STAGE.height) * 100}%`,
+              bottom: `${((DESKTOP_STAGE.height - (187 + 644)) / DESKTOP_STAGE.height) * 100}%`,
               width: `${(1030 / DESKTOP_STAGE.width) * 100}%`,
               aspectRatio: "1030 / 644",
             }}
@@ -90,9 +98,12 @@ export default function Fold03() {
             height={256}
             aria-hidden="true"
             className="absolute tablet:hidden"
+            // Bottom-anchored to stay on the phone's screen, which is now
+            // bottom-anchored too (the reflection is square, so its height
+            // follows its width).
             style={{
               left: `${(136 / MOBILE_STAGE.width) * 100}%`,
-              top: `${(333 / MOBILE_STAGE.height) * 100}%`,
+              bottom: `${((MOBILE_STAGE.height - (333 + 122)) / MOBILE_STAGE.height) * 100}%`,
               width: `${(122 / MOBILE_STAGE.width) * 100}%`,
               height: "auto",
               opacity: 0.22,
@@ -109,7 +120,7 @@ export default function Fold03() {
             className="absolute hidden tablet:block"
             style={{
               left: `${(613 / DESKTOP_STAGE.width) * 100}%`,
-              top: `${(406 / DESKTOP_STAGE.height) * 100}%`,
+              bottom: `${((DESKTOP_STAGE.height - (406 + 205)) / DESKTOP_STAGE.height) * 100}%`,
               width: `${(205 / DESKTOP_STAGE.width) * 100}%`,
               height: "auto",
               opacity: 0.22,

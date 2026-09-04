@@ -3,32 +3,32 @@
 import { useRef, type ReactNode } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
-import { CLUSTER_FILL, END_GRID, END_ORDER, PHONE_FACE, type GridConfig } from "./appIcons";
+import { END_GRID, END_ORDER, type GridConfig } from "./appIcons";
 
 /**
- * Fold 03 — pinned, scrubbed scatter → converge → grid sequence.
+ * Fold 03 — pinned, scrubbed scatter → grid sequence.
  *
  * One element per icon travels the whole way: its CSS box is the START
- * position (see IconScatter) and the timeline drives transforms from there to
- * a cluster on the phone screen, then out to the final grid. Nothing is
- * duplicated, faded out and replaced by a second set.
+ * position (see IconScatter) and the timeline drives transforms from there
+ * straight to the icon's slot in the final grid. Nothing is duplicated, faded
+ * out and replaced by a second set.
  *
- *   0.00–0.15  start frame, ambient float easing off
- *   0.15–0.55  icons pulled toward the phone, blur clearing — staggered so the
- *              furthest icons set off first
- *   0.55–0.65  collected on the screen while the phone dissolves out from
- *              under them — fully gone before the grid expands
- *   0.65–0.95  icons expand into the grid, decelerating into their slots
+ *   0.00–0.10  start frame, ambient float easing off
+ *   0.05–0.35  the phone dissolves out
+ *   0.05–0.92  icons travel to the grid, shrinking and clearing their blur
  *
- * Cluster slots mirror the final grid order, so the expansion is a coherent
- * unfold instead of 15 crossing paths.
+ * The path is deliberately direct. It used to collect every icon onto the
+ * phone screen first, which meant each one shrank hard into the middle and
+ * then grew again on the way out — two changes of direction that read as a
+ * glitch rather than a transition. Now each icon moves once, and because the
+ * grid slots are in END_ORDER the whole set resolves as a single settle.
  *
  * Geometry is measured from the laid-out DOM and rebuilt on every refresh
  * (`invalidateOnRefresh` + `onRefreshInit`), so resizes and the breakpoint
  * swap stay correct.
  */
 
-const PHASE = { pull: 0.15, collected: 0.55, expand: 0.65 } as const;
+const PHASE = { settle: 0.1, phoneOut: 0.35, arrive: 0.92 } as const;
 
 /**
  * Length of the pinned scroll, in viewport heights. ~1.35 works out to roughly
@@ -40,6 +40,17 @@ const SCROLL_VIEWPORTS = 1.35;
 /** Hover grow once the grid has settled. */
 const HOVER_SCALE = 1.08;
 const HOVER_DURATION = 0.32;
+
+/**
+ * Smallest gap kept between an icon's start box and the stage edge.
+ *
+ * Figma lets several icons bleed off the top of the frame (icon-03 sits at
+ * y=-145 of its own 167px), which the stage's `overflow-clip` then sliced flat
+ * — a row of half-icons along the top edge that read as broken images rather
+ * than as bleed. Side bleed is kept, because a cut at the viewport edge reads
+ * as intentional; a cut mid-fold does not.
+ */
+const EDGE_GAP = 10;
 
 interface Box {
   cx: number;
@@ -106,6 +117,35 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
       if (icons.length === 0) return;
 
       /**
+       * Pull any start box that overhangs the top or bottom edge back inside.
+       *
+       * This has to happen here rather than in IconScatter's stylesheet: an
+       * icon's width is a percentage of the stage's width while its `top` is a
+       * percentage of the stage's height, so the two only stay in step while
+       * the stage keeps the artboard's aspect. Clamping against the measured
+       * box instead holds at any stage height. The unclamped `top` is kept per
+       * element as a fraction of stage height so a resize re-clamps from the
+       * design value rather than from the last clamp.
+       */
+      const originalTop = new WeakMap<HTMLElement, number>();
+      const fitScatter = () => {
+        const stageHeight = stage.offsetHeight;
+        if (stageHeight === 0) return;
+        icons.forEach((el) => {
+          let fraction = originalTop.get(el);
+          if (fraction === undefined) {
+            fraction = el.offsetTop / stageHeight;
+            originalTop.set(el, fraction);
+          }
+          const height = el.offsetHeight;
+          const lowest = Math.max(EDGE_GAP, stageHeight - height - EDGE_GAP);
+          const target = gsap.utils.clamp(EDGE_GAP, lowest, fraction * stageHeight);
+          el.style.top = `${Math.round(target)}px`;
+        });
+      };
+      fitScatter();
+
+      /**
        * Hover grow, active only once the icons have settled into the grid.
        * It scales the float element rather than the icon box, because the box
        * carries the timeline's own transform — GSAP composes the ambient `y`
@@ -145,42 +185,6 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
           el.removeEventListener("pointerleave", onLeave);
         });
 
-      /** The plate for the active breakpoint — the other one is display:none. */
-      const visiblePlate = () => phoneParts.find((el) => el.offsetParent !== null) ?? null;
-
-      /** Grid + on-screen cluster geometry for the active breakpoint. */
-      const measureGeometry = (config: GridConfig) => {
-        const grid = gridBoxes(config, stage, heading);
-        const plate = visiblePlate();
-
-        // Aim at the phone's face, not the plate centre — the plate is mostly
-        // the white fade sitting above the device.
-        const faceCx = plate
-          ? plate.offsetLeft + PHONE_FACE.cx * plate.offsetWidth
-          : stage.offsetWidth / 2;
-        const faceCy = plate
-          ? plate.offsetTop + PHONE_FACE.cy * plate.offsetHeight
-          : stage.offsetHeight * 0.65;
-        const faceWidth = plate ? PHONE_FACE.width * plate.offsetWidth : stage.offsetWidth * 0.34;
-
-        // Shrink the grid onto the face, preserving its relative shape.
-        const k = stage.offsetWidth / config.reference;
-        const widest = Math.max(...config.rows);
-        const gridWidth = (widest * config.size + (widest - 1) * config.gap) * k;
-        const clusterScale = (CLUSTER_FILL * faceWidth) / gridWidth;
-
-        const gridCx = stage.offsetWidth / 2;
-        const gridCy = grid.reduce((sum, box) => sum + box.cy, 0) / grid.length;
-
-        const cluster = grid.map((box) => ({
-          cx: faceCx + (box.cx - gridCx) * clusterScale,
-          cy: faceCy + (box.cy - gridCy) * clusterScale,
-          size: box.size * clusterScale,
-        }));
-
-        return { grid, cluster, faceCx, faceCy };
-      };
-
       const mm = gsap.matchMedia();
 
       mm.add(
@@ -195,7 +199,7 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
 
           // Reduced motion: no pin, no scrub — just present the finished grid.
           if (reduce) {
-            const { grid } = measureGeometry(config);
+            const grid = gridBoxes(config, stage, heading);
             icons.forEach((el, index) => {
               const from = layoutBox(el);
               gsap.set(el, {
@@ -212,7 +216,7 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
             return;
           }
 
-          // Ambient float — restrained, and scrubbed to nothing as the pull starts.
+          // Ambient float — restrained, and scrubbed to nothing as the travel starts.
           const amp = { value: 1 };
           floats.forEach((el, index) => {
             gsap.to(el, {
@@ -226,16 +230,13 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
             });
           });
 
-          let geo = measureGeometry(config);
+          let grid = gridBoxes(config, stage, heading);
           let starts = icons.map(layoutBox);
-          let distances = starts.map((box) => Math.hypot(box.cx - geo.faceCx, box.cy - geo.faceCy));
-          let furthest = Math.max(...distances);
 
           const remeasure = () => {
-            geo = measureGeometry(config);
+            fitScatter();
+            grid = gridBoxes(config, stage, heading);
             starts = icons.map(layoutBox);
-            distances = starts.map((box) => Math.hypot(box.cx - geo.faceCx, box.cy - geo.faceCy));
-            furthest = Math.max(...distances);
           };
 
           const timeline = gsap.timeline({
@@ -267,47 +268,36 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
           });
 
           // PHASE 1 — ambient float settles.
-          timeline.to(amp, { value: 0, duration: PHASE.pull, ease: "power1.out" }, 0);
+          timeline.to(amp, { value: 0, duration: PHASE.settle, ease: "power1.out" }, 0);
 
-          // PHASE 2 + 3 — pulled in, blur clearing, collected on the screen.
-          timeline.to(
-            icons,
-            {
-              x: (index: number) => geo.cluster[index].cx - starts[index].cx,
-              y: (index: number) => geo.cluster[index].cy - starts[index].cy,
-              scale: (index: number) => geo.cluster[index].size / starts[index].size,
-              opacity: 1,
-              filter: "blur(0px)",
-              duration: PHASE.collected - PHASE.pull - 0.12,
-              ease: "power2.inOut",
-              // Furthest icons set off first.
-              stagger: (index: number) => (1 - distances[index] / furthest) * 0.12,
-            },
-            PHASE.pull,
-          );
-
-          // PHASE 4 — the phone dissolves the moment the last icon lands, so
-          // the collected state reads as "apps remain, device is gone" rather
-          // than icons sitting on a still-solid phone. Fully clear before the
-          // grid starts expanding.
+          // PHASE 2 — the phone dissolves early, so the icons are travelling
+          // across an empty stage rather than over a still-solid device.
           timeline.to(
             phoneParts,
-            { opacity: 0, scale: 0.96, duration: PHASE.expand - PHASE.collected, ease: "power2.inOut" },
-            PHASE.collected,
+            {
+              opacity: 0,
+              duration: PHASE.phoneOut - PHASE.settle / 2,
+              ease: "power2.inOut",
+            },
+            PHASE.settle / 2,
           );
 
-          // PHASE 5 — expand into the grid, decelerating into place.
+          // PHASE 3 — one move per icon: start box straight to its grid slot,
+          // shrinking and clearing its blur on the way. `power2.inOut` keeps
+          // the travel monotonic, so nothing doubles back.
           timeline.to(
             icons,
             {
-              x: (index: number) => geo.grid[index].cx - starts[index].cx,
-              y: (index: number) => geo.grid[index].cy - starts[index].cy,
-              scale: (index: number) => geo.grid[index].size / starts[index].size,
-              duration: 1 - PHASE.expand - 0.05,
-              ease: "power2.out",
-              stagger: 0.0035,
+              x: (index: number) => grid[index].cx - starts[index].cx,
+              y: (index: number) => grid[index].cy - starts[index].cy,
+              scale: (index: number) => grid[index].size / starts[index].size,
+              opacity: 1,
+              filter: "blur(0px)",
+              duration: PHASE.arrive - PHASE.settle / 2,
+              ease: "power2.inOut",
+              stagger: 0.004,
             },
-            PHASE.expand,
+            PHASE.settle / 2,
           );
         },
       );
