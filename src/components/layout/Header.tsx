@@ -21,8 +21,8 @@ import { siteConfig } from "@/data/site";
  *
  * The wordmark is inverted rather than blended (`Logo`'s `dark`). Figma
  * specifies a difference blend there, and that held while the bar was 72%
- * white, but thinning the bar to 50% for a glassier read drove the blended
- * mark toward the hero's own mid-tone and it faded out. An invert is
+ * white, but thinning the bar for a glassier read drove the blended mark
+ * toward the hero's own mid-tone and it faded out. An invert is
  * backdrop-independent. The colour orbit stays NORMAL either way, as Figma
  * has it.
  */
@@ -31,7 +31,7 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.5] backdrop-blur-[28px]">
+      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.4] backdrop-blur-[28px]">
         <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
           {/* Full header height so the home link is a 50px target rather than
               the wordmark's own 24px — the logo still sits where it did. */}
