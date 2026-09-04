@@ -68,17 +68,37 @@ export default function Fold08() {
             <ul className="mt-[32px] flex justify-center gap-[13px] tablet:mt-[54px] tablet:gap-[20px]">
               {TEAM.map((member) => (
                 <li key={member.name} className="w-[109px] tablet:w-[376px]">
-                  <Image
-                    src={`/images/fold08/${member.photo}`}
-                    alt={member.name}
-                    width={752}
-                    height={658}
-                    // Three across on mobile (~105px each) against a 376px slot
-                    // on desktop. Without this the 752px intrinsic made Next
-                    // serve a 1920w variant into a 105px box.
-                    sizes="(min-width: 768px) 380px, 33vw"
-                    className="aspect-square w-full rounded-[12px] object-cover tablet:aspect-[376/329] tablet:rounded-[5px]"
-                  />
+                  {/* The frame keeps the artboard's crop and corner radius; the
+                      photo inside it is what moves. Off below 480px, where the
+                      portraits are 109px thumbnails and the travel would read
+                      as a wobble rather than depth. */}
+                  <div
+                    data-parallax="trigger"
+                    data-parallax-disable="mobile"
+                    data-parallax-start="8"
+                    data-parallax-end="-8"
+                    className="relative aspect-square overflow-hidden rounded-[12px] tablet:aspect-[376/329] tablet:rounded-[5px]"
+                  >
+                    {/* 124% tall, hung 12% above the frame, so ±8% of the
+                        photo's own height — about ±10% of the frame — always
+                        has image behind it and the crop never shows through. */}
+                    <div
+                      data-parallax="target"
+                      className="absolute inset-x-0 top-[-12%] h-[124%]"
+                    >
+                      <Image
+                        src={`/images/fold08/${member.photo}`}
+                        alt={member.name}
+                        width={752}
+                        height={658}
+                        // Three across on mobile (~105px each) against a 376px
+                        // slot on desktop. Without this the 752px intrinsic
+                        // made Next serve a 1920w variant into a 105px box.
+                        sizes="(min-width: 768px) 380px, 33vw"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  </div>
                   <p className="mt-[18px] text-center text-[17.4px] leading-[24px] font-bold text-[#111116] tablet:mt-[25px] tablet:text-left tablet:text-[24px] tablet:leading-[31px]">
                     {member.name}
                   </p>

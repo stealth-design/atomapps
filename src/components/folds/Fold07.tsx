@@ -52,33 +52,52 @@ export default function Fold07() {
       <div className="px-5 pb-[var(--fold-gap-y)] tablet:px-16">
         <div className="mx-auto flex max-w-[var(--content-max-width)] flex-col desktop-md:flex-row desktop-md:gap-[64px]">
           {/* ---------- heading ---------- */}
-          <Reveal variant="stagger" className="desktop-md:w-[460px] desktop-md:shrink-0">
-            {/* Mobile runs it as one sentence that simply wraps, with no
-                forced breaks and no subtext under it. The two colours are the
-                artboard's: near-black lead-ins, #2774c1 on the two nouns. */}
-            <h2 className="text-[26px] leading-[34px] font-extrabold text-[#111116] tablet:hidden">
-              Millions of <span className="text-[#2774c1]">Downloads.</span> Millions of{" "}
-              <span className="text-[#2774c1]">Experiences.</span>
-            </h2>
+          {/* The quote tracks beside this are already drifting, so the heading
+              drifts against them — the column sizing moves to the trigger so
+              the wrapper is a layout no-op. Off below `tablet`, where the
+              heading sits above the quotes rather than beside them and the
+              two would just move together.
 
-            {/* tablet up keeps the artboard's two stacked blocks */}
-            <h2 className="hidden text-[26px] leading-[27px] font-extrabold text-[#111116] tablet:block tablet:text-[44px] tablet:leading-[51px]">
-              <span className="block">
-                Millions of
-                <br />
-                <span className="text-[#2774c1]">Downloads.</span>
-              </span>
-              <span className="mt-[16px] block tablet:mt-[18px]">
-                Millions of
-                <br />
+              The percentage is small because this box is not the size it
+              looks: as a flex child it stretches to the row's full 645px, not
+              the ~300px the type occupies, so 5% here is the ~32px it reads
+              as. Anything near the 20% default slid the heading clean out of
+              line with the quotes. */}
+          <div
+            data-parallax="trigger"
+            data-parallax-disable="mobileLandscape"
+            data-parallax-start="5"
+            data-parallax-end="-5"
+            className="desktop-md:w-[460px] desktop-md:shrink-0"
+          >
+            <Reveal variant="stagger">
+              {/* Mobile runs it as one sentence that simply wraps, with no
+                  forced breaks and no subtext under it. The two colours are the
+                  artboard's: near-black lead-ins, #2774c1 on the two nouns. */}
+              <h2 className="text-[26px] leading-[34px] font-extrabold text-[#111116] tablet:hidden">
+                Millions of <span className="text-[#2774c1]">Downloads.</span> Millions of{" "}
                 <span className="text-[#2774c1]">Experiences.</span>
-              </span>
-            </h2>
+              </h2>
 
-            <p className="mt-[29px] hidden max-w-[275px] text-[15px] leading-[23px] text-[#61616a] tablet:block tablet:text-[16px] tablet:leading-[24px]">
-              Real feedback from teams and users who ship faster with Atom.
-            </p>
-          </Reveal>
+              {/* tablet up keeps the artboard's two stacked blocks */}
+              <h2 className="hidden text-[26px] leading-[27px] font-extrabold text-[#111116] tablet:block tablet:text-[44px] tablet:leading-[51px]">
+                <span className="block">
+                  Millions of
+                  <br />
+                  <span className="text-[#2774c1]">Downloads.</span>
+                </span>
+                <span className="mt-[16px] block tablet:mt-[18px]">
+                  Millions of
+                  <br />
+                  <span className="text-[#2774c1]">Experiences.</span>
+                </span>
+              </h2>
+
+              <p className="mt-[29px] hidden max-w-[275px] text-[15px] leading-[23px] text-[#61616a] tablet:block tablet:text-[16px] tablet:leading-[24px]">
+                Real feedback from teams and users who ship faster with Atom.
+              </p>
+            </Reveal>
+          </div>
 
           {/* ---------- quotes ---------- */}
           <div className="mt-[24px] min-w-0 flex-1 tablet:mt-[40px] desktop-md:mt-0">

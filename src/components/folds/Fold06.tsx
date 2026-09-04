@@ -22,14 +22,27 @@ export default function Fold06() {
   return (
     <Section fold="06" className="relative overflow-hidden bg-white">
       {/* ---------- decorative arcs (Figma: one masked circle group at 20%) ---------- */}
-      <Image
-        src="/images/fold06/bg-arcs.svg"
-        alt=""
-        width={1510}
-        height={1510}
+      {/* The trigger spans the fold rather than sitting on the arcs
+          themselves, so the drift is timed to the section the reader is
+          looking at instead of to the arc field's own 1510px box. Its
+          `inset-0` matches the box the arcs were already positioned against,
+          so their offsets below are unchanged. */}
+      <div
+        data-parallax="trigger"
+        data-parallax-start="6"
+        data-parallax-end="-6"
         aria-hidden="true"
-        className="pointer-events-none absolute top-[-14%] left-[-141.7%] w-[383.5%] max-w-none tablet:top-[10.95%] tablet:left-[-2.88%] tablet:w-[104.86%]"
-      />
+        className="pointer-events-none absolute inset-0"
+      >
+        <Image
+          data-parallax="target"
+          src="/images/fold06/bg-arcs.svg"
+          alt=""
+          width={1510}
+          height={1510}
+          className="absolute top-[-14%] left-[-141.7%] w-[383.5%] max-w-none tablet:top-[10.95%] tablet:left-[-2.88%] tablet:w-[104.86%]"
+        />
+      </div>
 
       <div className="relative py-[var(--fold-gap-y)]">
         <Reveal variant="stagger" className="px-5 text-center tablet:px-10">
