@@ -91,9 +91,34 @@ export default function Fold01() {
           </div>
 
           {/* ---------- phone mockup ---------- */}
+          {/*
+           * The screen overlay has to track the device photographed in the
+           * background plate, and above ~1399px that device grows with the
+           * viewport: the plate box is 114.1% wide by a fixed 912px tall, and
+           * past that width `object-cover` switches from height- to
+           * width-constrained, so the image scales by viewport width. A fixed
+           * 312px overlay therefore drifted — by 1920 the device was a third
+           * larger than the black screen sitting on it, and at 2560 the
+           * overlay covered barely half of it.
+           *
+           * The three values below are the plate's own geometry solved for the
+           * screen aperture, so they scale exactly with it (derived against
+           * the 1344x768 asset, not Figma's 1643x912 layer):
+           *
+           *   width  312px at 1440  ->  21.6667vw
+           *   left   plate left (-6.81vw) + aperture offset  ->  39.73vw
+           *   top    plate top + half the vertical crop      ->  412px - 7.921vw
+           *
+           * Each is paired with the pre-crossover constant via min()/max(),
+           * which switches over at ~1440 on its own. Explicit `left` rather
+           * than a centring translate: GSAP owns this element's transform for
+           * the entrance and parallax, and a Tailwind translate on the same
+           * property gets folded into that on init and then never updates on
+           * resize.
+           */}
           <div
             data-hero="phone"
-            className="absolute top-[37.7%] left-1/2 ml-[2.5px] w-[186px] -translate-x-1/2 tablet:w-[250px] tablet:ml-[6px] desktop-sm:top-[37.25%] desktop-sm:ml-[8px] desktop-sm:w-[312px]"
+            className="absolute top-[37.7%] left-[calc(50%-90.5px)] w-[186px] tablet:left-[calc(50%-119px)] tablet:w-[250px] desktop-sm:top-[min(298px,calc(412px-7.921vw))] desktop-sm:left-[min(calc(50%-148px),39.73vw)] desktop-sm:w-[max(312px,21.6667vw)]"
           >
             <HeroPhone />
           </div>
