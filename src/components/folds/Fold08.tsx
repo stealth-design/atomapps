@@ -51,7 +51,10 @@ export default function Fold08() {
           </Reveal>
 
           {/* ---------- leadership ---------- */}
-          <Reveal variant="fade-up" start="top 85%" className="mt-[119px] tablet:mt-[235px]">
+          {/* Artboard has 119/235px here; trimmed about a quarter, since that
+              much air read as a break between two folds rather than two blocks
+              of one. */}
+          <Reveal variant="fade-up" start="top 85%" className="mt-[92px] tablet:mt-[176px]">
             <p className="text-center text-[12px] leading-[16px] font-bold text-[#111116] uppercase tablet:hidden">
               Leadership
             </p>
