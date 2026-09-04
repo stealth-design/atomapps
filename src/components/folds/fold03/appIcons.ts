@@ -45,14 +45,20 @@ export const DESKTOP_ICONS: IconPlacement[] = [
   { icon: "icon-01", x: 161, y: 354, size: 132 },
   { icon: "icon-02", x: 266, y: 75, size: 135 },
   { icon: "icon-03", x: 1036, y: -145, size: 167, blur: 6 },
-  { icon: "icon-04", x: 812, y: 113, size: 75, blur: 3, opacity: 0.66 },
+  // Lifted from y=113 so it clears the heading's first line: at the rendered
+  // stage height its box reached 14px into the text.
+  { icon: "icon-04", x: 812, y: 71, size: 75, blur: 3, opacity: 0.66 },
   { icon: "icon-05", x: -203, y: 279, size: 291, blur: 29 },
   { icon: "icon-06", x: 1204, y: 509, size: 123, blur: 4 },
   { icon: "icon-07", x: 351, y: 270, size: 80, blur: 4 },
   { icon: "icon-08", x: 62, y: 738, size: 78, blur: 4 },
   { icon: "icon-10", x: 1328, y: 48, size: 380, blur: 40 },
   { icon: "icon-11", x: 1063, y: 680, size: 242, blur: 34 },
-  { icon: "icon-13", x: 551, y: -16, size: 143, blur: 16, opacity: 0.64 },
+  // Dropped below the heading instead of Figma's y=-16. At 143px tall it
+  // cannot clear the text upwards (the edge clamp floors it at 34px, and it
+  // would need to sit at -11), and both horizontal gaps either side of the
+  // text are under 90px — so down is the only direction that frees the type.
+  { icon: "icon-13", x: 551, y: 370, size: 143, blur: 16, opacity: 0.64 },
   { icon: "icon-14", x: 1009, y: 262, size: 158, opacity: 0.83 },
   { icon: "icon-15", x: 114, y: -22, size: 94, blur: 4 },
 ];

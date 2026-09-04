@@ -143,8 +143,26 @@ export default function Fold03() {
           {/* top: 215/626 mobile, 209/886 desktop */}
           <h2
             data-f03="heading"
-            className="absolute top-[34.35%] left-1/2 w-[276px] -translate-x-1/2 text-center text-[18px] leading-[23px] font-extrabold text-black capitalize tablet:top-[23.59%] tablet:w-[462px] tablet:text-[24px] tablet:leading-[31px] desktop-sm:text-[30px] desktop-sm:leading-[39px]"
+            className="absolute top-[34.35%] left-1/2 isolate w-[276px] -translate-x-1/2 text-center text-[18px] leading-[23px] font-extrabold text-black capitalize tablet:top-[23.59%] tablet:w-[462px] tablet:text-[24px] tablet:leading-[31px] desktop-sm:text-[30px] desktop-sm:leading-[39px]"
           >
+            {/*
+             * A soft white pool behind the type. The heading already paints
+             * above the icons, but that is not enough on its own: icons cross
+             * it on their way to the grid and covered 87% of the text at the
+             * midpoint on mobile, which left black type sitting on app
+             * artwork. This hides whatever passes immediately behind the
+             * words and fades out before it reads as a shape — invisible
+             * against the fold's white, since it is white.
+             */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -inset-x-[10%] -inset-y-[100%] -z-10"
+              style={{
+                backgroundImage:
+                  "radial-gradient(ellipse at center, #fff 42%, rgba(255,255,255,0.92) 58%, rgba(255,255,255,0) 80%)",
+              }}
+            />
+
             {/* Figma has a hard break here: "A family of apps \ndesigned with purpose" */}
             <span className="block">A family of apps</span>
             <span className="block">designed with purpose</span>
