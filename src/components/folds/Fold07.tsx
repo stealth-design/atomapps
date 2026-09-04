@@ -29,7 +29,12 @@ const ROW_FADE =
 export default function Fold07() {
   return (
     <Section fold="07" className="bg-white">
-      <div className="px-5 py-[var(--fold-gap-y)] tablet:px-16">
+      {/* Bottom gap only. Every fold after 04 carries the inter-fold space on
+          its bottom edge alone, so each boundary is exactly one
+          --fold-gap-y: two folds each contributing the token would double it,
+          which is what made the run of boundaries here uneven (60/60/120/120/60
+          on desktop). The space above this fold comes from Fold 06's bottom. */}
+      <div className="px-5 pb-[var(--fold-gap-y)] tablet:px-16">
         <div className="mx-auto flex max-w-[var(--content-max-width)] flex-col desktop-md:flex-row desktop-md:gap-[64px]">
           {/* ---------- heading ---------- */}
           <Reveal variant="stagger" className="desktop-md:w-[460px] desktop-md:shrink-0">

@@ -18,7 +18,9 @@ import { PARTNERS, TEAM } from "@/components/folds/fold08/leadership";
 export default function Fold08() {
   return (
     <Section fold="08" className="bg-white">
-      <div className="px-5 py-[var(--fold-gap-y)] tablet:px-10">
+      {/* Bottom gap only — see Fold 07. The space above comes from Fold 07's
+          bottom, and this fold's bottom is what separates it from the footer. */}
+      <div className="px-5 pb-[var(--fold-gap-y)] tablet:px-10">
         <div className="mx-auto max-w-[var(--content-max-width)]">
           {/* ---------- partners ---------- */}
           <Reveal variant="stagger">
