@@ -25,19 +25,15 @@ export default function Fold03() {
   // grid, so a bottom gap on top of that is what made the run into Fold 04
   // read as a void.
   //
-  // That whitespace is also why the top gap is not the plain fold token. The
-  // space *below* this fold is its leftover stage plus Fold 04's own padding
-  // (170px at 1440), while the space above was only Fold 02's padding plus
-  // ours, and the scatter starts hard against the stage's top edge — 134px at
-  // 1440, and just 42px on a phone. The larger top values below even the two
-  // sides up at the breakpoints the artboards actually specify. Exact parity
-  // at every width isn't reachable with static padding, because the gap below
-  // scales with the stage's aspect while the heading's type size doesn't.
+  // The top gap is a deliberate one-off rather than the plain fold token, and
+  // it is bigger than the gap below. Two reasons it has to be measured by eye
+  // rather than by the token: the space below this fold is its leftover stage
+  // *plus* Fold 04's own padding, and the scatter here starts hard against the
+  // stage's top edge, so equal padding does not read as equal space — it came
+  // out 42px above against 103px below on a phone. These values put the run in
+  // from Fold 02 at roughly 150px on mobile and 205px from tablet up.
   return (
-    <Section
-      fold="03"
-      className="bg-white pt-[96px] tablet:pt-[var(--fold-gap-y)] desktop-md:pt-[80px]"
-    >
+    <Section fold="03" className="bg-white pt-[140px] tablet:pt-[130px]">
       <Fold03Motion>
         <div
           data-f03="stage"
