@@ -32,23 +32,28 @@ export function Header() {
   return (
     <>
       <header
-        className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.08]"
-        // The filter does the work the white used to. `contrast(0.45)` pulls
-        // the backdrop toward mid-grey — which also drops its saturation —
-        // and `brightness(1.6)` then lifts it, so the bar lightens whatever
-        // is behind it instead of covering it. That is why the white could go
-        // from 28% to 8% and contrast *improve*: over the hero the bar
-        // samples rgb(125,154,180) at 7.2:1 against black type, where 28%
-        // flat white managed 4.65:1, and its saturation drops from 0.46 to
-        // 0.31 so it reads more neutral rather than bluer.
+        className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.07]"
+        // The filter does the work a heavier white used to: `contrast(0.55)`
+        // pulls the backdrop toward mid-grey, which also drops its
+        // saturation, and `brightness(1.5)` then lifts it — so the bar
+        // lightens what is behind it instead of covering it, and the white
+        // can stay at 7%.
+        //
+        // These numbers are the transparency limit for black nav type, found
+        // by measuring at each link rather than at the bar's centre. The
+        // hero darkens to the right, so "About Us" is always the worst case
+        // and a centre reading flatters it badly — one candidate measured
+        // 4.7:1 mid-bar and 3.5:1 under that link. Here the three links come
+        // out at 7.0 / 6.2 / 4.7:1. Letting more of the backdrop through than
+        // this puts the rightmost link under 4.5:1.
         //
         // Written out rather than assembled from `backdrop-*` utilities
         // because filter order changes the result: Tailwind composes
         // brightness before contrast, which lifts first and then pulls the
         // lifted values back toward grey, undoing most of the gain.
         style={{
-          backdropFilter: "blur(28px) contrast(0.45) brightness(1.6) saturate(0.7)",
-          WebkitBackdropFilter: "blur(28px) contrast(0.45) brightness(1.6) saturate(0.7)",
+          backdropFilter: "blur(26px) contrast(0.55) brightness(1.5) saturate(0.78)",
+          WebkitBackdropFilter: "blur(26px) contrast(0.55) brightness(1.5) saturate(0.78)",
         }}
       >
         <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
