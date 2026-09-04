@@ -31,7 +31,7 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.4] backdrop-blur-[28px]">
+      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.28] backdrop-blur-[28px]">
         <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
           {/* Full header height so the home link is a 50px target rather than
               the wordmark's own 24px — the logo still sits where it did. */}
@@ -53,7 +53,11 @@ export function Header() {
               <a
                 key={item.label}
                 href={item.href}
-                className="text-[15px] leading-[20px] text-[#111116]"
+                // Pure black rather than the #111116 foreground: at this bar
+                // opacity the hero shows through enough that the near-black
+                // fell under 4.5:1, and the extra 15% of contrast black buys
+                // is what keeps the nav at AA.
+                className="text-[15px] leading-[20px] text-black"
               >
                 {item.label}
               </a>
