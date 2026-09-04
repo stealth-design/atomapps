@@ -17,7 +17,13 @@ export function Header() {
   return (
     <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white/[0.02] backdrop-blur-[18px] tablet:backdrop-blur-none tablet:mix-blend-difference">
       <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
-        <a href="#fold-01" aria-label={`${siteConfig.name} — home`}>
+        {/* Full header height so the home link is a 50px target rather than
+            the wordmark's own 24px — the logo still sits where it did. */}
+        <a
+          href="#fold-01"
+          aria-label={`${siteConfig.name} — home`}
+          className="flex h-full items-center"
+        >
           <Logo width={104} blend={false} className="tablet:w-[126px]" />
         </a>
 
@@ -40,7 +46,9 @@ export function Header() {
           type="button"
           onClick={() => setIsMenuOpen(true)}
           aria-label="Open menu"
-          className="flex size-[33px] items-center justify-center rounded-full bg-white tablet:hidden"
+          // The design's button is a 33px circle; the pseudo-element pads the
+          // hit area out to 45px for thumbs without enlarging the circle.
+          className="relative flex size-[33px] items-center justify-center rounded-full bg-white before:absolute before:-inset-[6px] before:content-[''] tablet:hidden"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none">
             <path d="M2.5 5.5h15M2.5 10h15M2.5 14.5h15" stroke="#1d1b20" strokeWidth="1.6" />

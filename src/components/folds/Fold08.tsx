@@ -68,6 +68,10 @@ export default function Fold08() {
                     alt={member.name}
                     width={752}
                     height={658}
+                    // Three across on mobile (~105px each) against a 376px slot
+                    // on desktop. Without this the 752px intrinsic made Next
+                    // serve a 1920w variant into a 105px box.
+                    sizes="(min-width: 768px) 380px, 33vw"
                     className="aspect-square w-full rounded-[12px] object-cover tablet:aspect-[376/329] tablet:rounded-[5px]"
                   />
                   <p className="mt-[18px] text-center text-[17.4px] leading-[24px] font-bold text-[#111116] tablet:mt-[25px] tablet:text-left tablet:text-[24px] tablet:leading-[31px]">

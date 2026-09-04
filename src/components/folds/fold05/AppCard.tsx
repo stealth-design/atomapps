@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { StarRating } from "./StarRating";
 import type { AppPanel } from "./apps";
 
@@ -27,6 +28,9 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
   return (
     <div
       data-f05-card
+      // `--focal` is the scene's own horizontal focal point, consumed by both
+      // the scene and its blurred copy below so the two stay in register.
+      style={{ "--focal": panel.mobileFocal } as CSSProperties}
       className="relative h-full w-full overflow-hidden rounded-[20px] shadow-[0_-8px_40px_rgba(0,0,0,0.18)] tablet:rounded-[28px]"
     >
       <Image
@@ -35,7 +39,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
         fill
         priority={index === 0}
         sizes="100vw"
-        className="object-cover object-[68%_center] tablet:object-center"
+        className="object-cover object-[var(--focal)_center] tablet:object-center"
       />
 
       {/* dims as the next panel slides over this one */}
@@ -57,7 +61,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 alt=""
                 fill
                 sizes="100vw"
-                className="object-cover object-[68%_center] tablet:object-center"
+                className="object-cover object-[var(--focal)_center] tablet:object-center"
               />
             </div>
             <div className="absolute inset-0 bg-white/[0.72]" />

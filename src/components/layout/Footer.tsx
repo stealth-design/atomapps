@@ -65,6 +65,9 @@ export function Footer() {
             alt=""
             width={640}
             height={640}
+            // Renders at 16.43% of the wordmark block — ~64px on a phone, so
+            // the 640px intrinsic was pulling a 1920w variant onto mobile.
+            sizes="16vw"
             aria-hidden="true"
             className="absolute top-[-7.03%] left-[19.5%] h-auto w-[16.43%]"
           />
@@ -74,7 +77,18 @@ export function Footer() {
       {/* ---------- legal ---------- */}
       <div className="absolute top-[502px] right-5 left-5 flex flex-col gap-[24px] text-[14px] leading-[17px] text-white tablet:top-[746px] tablet:right-10 tablet:left-10 tablet:flex-row tablet:items-center tablet:gap-0">
         {siteConfig.legal.map((item, index) => (
-          <a key={item.label} href={item.href} className={index > 0 ? "tablet:ml-[103px]" : undefined}>
+          <a
+            key={item.label}
+            href={item.href}
+            // A 14px line box is a 17px-tall touch target, under the 24px WCAG
+            // 2.5.8 floor. The pseudo-element grows the hit area into the 24px
+            // stack gap without moving anything: 11px a side lands at 39px and
+            // still leaves 2px between the two, so neither steals the other's
+            // taps.
+            className={`relative before:absolute before:inset-x-0 before:-inset-y-[11px] before:content-[''] ${
+              index > 0 ? "tablet:ml-[103px]" : ""
+            }`}
+          >
             {item.label}
           </a>
         ))}

@@ -27,7 +27,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           type="button"
           onClick={onClose}
           aria-label="Close menu"
-          className="flex size-[33px] items-center justify-center rounded-full bg-white"
+          // Matches the open button: 33px circle, 45px hit area.
+          className="relative flex size-[33px] items-center justify-center rounded-full bg-white before:absolute before:-inset-[6px] before:content-['']"
         >
           <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" fill="none">
             <path d="M4 4l10 10M14 4L4 14" stroke="#1d1b20" strokeWidth="1.6" />
