@@ -5,19 +5,28 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 
 /**
- * Fold 07 — the two quote columns drift in opposite directions.
+ * Fold 07 — the quote tracks drift in opposite directions.
  *
- * Each track renders its cards twice, so translating by exactly -50% lands the
- * second copy where the first began and the loop is seamless. Direction comes
- * from `data-f07-track` ("up" | "down"); markup stays a server component and
- * this only reaches in via that hook.
+ * Desktop runs two vertical columns, mobile two horizontal rows. Both work the
+ * same way: each track renders its cards twice, so translating by exactly -50%
+ * lands the second copy where the first began and the loop is seamless.
  *
- * The animation is a single `yPercent` tween per column — one transform, no
- * layout work — and it only runs where the two-column grid exists (768px up).
+ * Direction comes from `data-f07-track` — "up" | "down" | "left" | "right" —
+ * which keeps the markup a server component; this only reaches in via that
+ * hook. Each track is a single `xPercent`/`yPercent` tween: one transform, no
+ * layout work.
+ *
+ * The two breakpoints are separate matchMedia blocks rather than one pass over
+ * every track, because both sets of markup are in the DOM at all times (one
+ * hidden by `tablet:hidden`, the other by `hidden tablet:flex`). Animating the
+ * hidden set would burn frames on something nobody can see.
  */
 
 /** Seconds for one full cycle. Long on purpose: this should barely register. */
 const CYCLE = 55;
+
+/** Rows are shorter than the columns are tall, so they need less time to read as the same speed. */
+const ROW_CYCLE = 38;
 
 export function MarqueeMotion({ children }: { children: ReactNode }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -27,25 +36,31 @@ export function MarqueeMotion({ children }: { children: ReactNode }) {
       const root = rootRef.current;
       if (!root) return;
 
-      const tracks = gsap.utils.toArray<HTMLElement>("[data-f07-track]", root);
-      if (tracks.length === 0) return;
-
       const mm = gsap.matchMedia();
 
-      mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
+      /** One seamless loop per track, on whichever axis it declares. */
+      const drift = (selector: string, axis: "x" | "y", cycle: number) => {
+        const tracks = gsap.utils.toArray<HTMLElement>(selector, root);
         tracks.forEach((track) => {
-          const up = track.dataset.f07Track !== "down";
+          // "up" and "left" travel negative; "down" and "right" start shifted
+          // and travel back, which is what puts the pair in opposition.
+          const forward =
+            track.dataset.f07Track === "up" || track.dataset.f07Track === "left";
+          const prop = axis === "x" ? "xPercent" : "yPercent";
           gsap.fromTo(
             track,
-            { yPercent: up ? 0 : -50 },
-            {
-              yPercent: up ? -50 : 0,
-              duration: CYCLE,
-              ease: "none",
-              repeat: -1,
-            },
+            { [prop]: forward ? 0 : -50 },
+            { [prop]: forward ? -50 : 0, duration: cycle, ease: "none", repeat: -1 },
           );
         });
+      };
+
+      mm.add("(max-width: 767px) and (prefers-reduced-motion: no-preference)", () => {
+        drift("[data-f07-track='left'], [data-f07-track='right']", "x", ROW_CYCLE);
+      });
+
+      mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
+        drift("[data-f07-track='up'], [data-f07-track='down']", "y", CYCLE);
       });
 
       return () => mm.revert();

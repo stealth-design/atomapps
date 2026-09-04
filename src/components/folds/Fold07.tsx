@@ -2,7 +2,7 @@ import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { TestimonialCard } from "@/components/folds/fold07/TestimonialCard";
 import { MarqueeMotion } from "@/components/folds/fold07/MarqueeMotion";
-import { DESKTOP_COLUMNS, MOBILE_COLUMN } from "@/components/folds/fold07/testimonials";
+import { DESKTOP_COLUMNS, MOBILE_ROWS } from "@/components/folds/fold07/testimonials";
 
 /**
  * Fold 07 — Testimonials
@@ -12,14 +12,19 @@ import { DESKTOP_COLUMNS, MOBILE_COLUMN } from "@/components/folds/fold07/testim
  *   mobile   1136:2451   393 x 729
  *
  * Heading on the left, quotes on the right. Desktop runs two columns that
- * drift in opposite directions — Figma names them "masonry-track-1/2" and
- * fades their last card, which is how a mockup shows a moving list. Mobile
- * shows a different three in one static column, clipped at 411px with a white
- * gradient over the foot, exactly as the mobile artboard has it.
+ * drift vertically in opposite directions — Figma names them
+ * "masonry-track-1/2" and fades their last card, which is how a mockup shows a
+ * moving list. Mobile runs the same six quotes as two rows drifting sideways,
+ * also in opposite directions, rather than the artboard's single static
+ * column.
  */
-/** Softens the top and bottom of the drifting columns. */
+/** Softens the top and bottom of the vertical columns. */
 const EDGE_FADE =
   "linear-gradient(to bottom, transparent 0%, #000 7%, #000 88%, transparent 100%)";
+
+/** Softens the left and right ends of the horizontal rows. */
+const ROW_FADE =
+  "linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%)";
 
 export default function Fold07() {
   return (
@@ -48,25 +53,40 @@ export default function Fold07() {
 
           {/* ---------- quotes ---------- */}
           <div className="mt-[24px] min-w-0 flex-1 tablet:mt-[40px] desktop-md:mt-0">
-            {/* mobile: one clipped column with a fade at its foot */}
-            <div className="relative h-[411px] overflow-hidden tablet:hidden">
-              <div className="flex flex-col gap-[8px]">
-                {MOBILE_COLUMN.map((testimonial, index) => (
-                  <TestimonialCard
-                    key={testimonial.id}
-                    testimonial={testimonial}
-                    faded={index === MOBILE_COLUMN.length - 1}
-                  />
+            {/* mobile: two rows drifting sideways in opposite directions.
+                Each row bleeds past the page gutter so cards run to both
+                screen edges, with the edges masked so they arrive and leave
+                softly rather than popping at a hard cut. */}
+            <MarqueeMotion>
+              <div className="-mx-5 flex flex-col gap-[10px] tablet:hidden">
+                {MOBILE_ROWS.map((row, rowIndex) => (
+                  <div
+                    key={rowIndex}
+                    className="overflow-hidden"
+                    style={{ maskImage: ROW_FADE, WebkitMaskImage: ROW_FADE }}
+                  >
+                    <div
+                      data-f07-track={rowIndex === 0 ? "left" : "right"}
+                      className="flex w-max will-change-transform"
+                    >
+                      {/* Doubled so a -50% shift lands copy two exactly where
+                          copy one began. Spacing is a right margin per card,
+                          not a flex gap — a gap would make the track two
+                          copies PLUS one gap wide and the loop would slip. */}
+                      {[...row, ...row].map((testimonial, index) => (
+                        <div
+                          key={`${testimonial.id}-${index}`}
+                          className="w-[262px] shrink-0 pr-[10px]"
+                          aria-hidden={index >= row.length || undefined}
+                        >
+                          <TestimonialCard testimonial={testimonial} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-[108px]"
-                style={{
-                  backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
-                }}
-              />
-            </div>
+            </MarqueeMotion>
 
             {/* desktop: two columns drifting in opposite directions.
                 Each track holds its cards twice so a -50% shift loops

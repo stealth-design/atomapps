@@ -3,9 +3,8 @@
  *
  * Figma: desktop 1136:2631 (1440x757), mobile 1136:2451 (393x729).
  *
- * Desktop lays six quotes across two masonry columns; mobile shows three in a
- * single clipped column. Both fade their last card out — desktop by dropping it
- * to 40% opacity, mobile with a white gradient over the foot of the list.
+ * Desktop lays six quotes across two masonry columns that drift vertically;
+ * mobile runs the same six across two rows that drift sideways.
  *
  * The app chips reuse the Fold 03 sprite crops, so no new artwork is needed.
  */
@@ -73,9 +72,12 @@ export const DESKTOP_COLUMNS: Testimonial[][] = [
   [TESTIMONIALS.notes, TESTIMONIALS.seriesA, TESTIMONIALS.legacy],
 ];
 
-/** Mobile shows a different three, in a single column. */
-export const MOBILE_COLUMN: Testimonial[] = [
-  TESTIMONIALS.notes,
-  TESTIMONIALS.agencies,
-  TESTIMONIALS.concept,
+/**
+ * Mobile runs the same six across two rows that drift sideways in opposite
+ * directions — three each, so both rows carry the same amount of track and
+ * therefore travel at the same apparent speed.
+ */
+export const MOBILE_ROWS: Testimonial[][] = [
+  [TESTIMONIALS.notes, TESTIMONIALS.agencies, TESTIMONIALS.concept],
+  [TESTIMONIALS.findMyPhone, TESTIMONIALS.seriesA, TESTIMONIALS.legacy],
 ];
