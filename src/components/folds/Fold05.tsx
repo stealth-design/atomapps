@@ -22,9 +22,9 @@ export default function Fold05() {
   return (
     <Section fold="05" className="bg-white">
       <StackMotion>
-        {APP_PANELS.map((panel, index) => (
+        {APP_PANELS.map((panel) => (
           <div key={panel.id} className="sticky top-0 h-svh min-h-[640px] w-full">
-            <AppCard panel={panel} index={index} />
+            <AppCard panel={panel} />
           </div>
         ))}
       </StackMotion>

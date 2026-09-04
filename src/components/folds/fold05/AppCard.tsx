@@ -1,5 +1,4 @@
 import Image from "next/image";
-import type { CSSProperties } from "react";
 import { StarRating } from "./StarRating";
 import type { AppPanel } from "./apps";
 
@@ -14,7 +13,9 @@ import type { AppPanel } from "./apps";
  * 43px gutters, a 65px icon beside the title, then 35/30/30 between blocks,
  * with the closing block anchored to the bottom padding.
  *
- * `index` only drives image priority — the first panel is above the fold.
+ * The scenes are no longer preloaded: this fold sits several viewports down,
+ * so `priority` on the first panel was competing with the hero for bandwidth
+ * on every load. They lazy-load with everything else now.
  *
  * The frosted card deliberately avoids `backdrop-filter`: four stacked panels
  * each blurring a full-bleed photo was the single thing making this page drop
@@ -24,22 +25,35 @@ import type { AppPanel } from "./apps";
  * just composites. The percentages below invert the card's own box
  * (left 2.569% / width 32.222% etc.) so the copy lines up with the original.
  */
-export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
+export function AppCard({ panel }: { panel: AppPanel }) {
   return (
     <div
       data-f05-card
-      // `--focal` is the scene's own horizontal focal point, consumed by both
-      // the scene and its blurred copy below so the two stay in register.
-      style={{ "--focal": panel.mobileFocal } as CSSProperties}
       className="relative h-full w-full overflow-hidden rounded-[20px] shadow-[0_-8px_40px_rgba(0,0,0,0.18)] tablet:rounded-[28px]"
     >
+      {/*
+       * Two cuts of the same scene rather than one steered by `object-position`:
+       * the portrait cut is 0.465 against the mobile panel's ~0.462, so it
+       * fills without cropping anything away, where the landscape original
+       * only ever showed a 28%-wide window of itself here.
+       *
+       * Both are in the DOM at both breakpoints, so each carries a `sizes` that
+       * collapses to 1px on the breakpoint where it is hidden — Next then picks
+       * its smallest variant there instead of a full-width one.
+       */}
+      <Image
+        src={panel.backgroundMobile}
+        alt=""
+        fill
+        sizes="(max-width: 767px) 100vw, 1px"
+        className="object-cover object-center tablet:hidden"
+      />
       <Image
         src={panel.background}
         alt=""
         fill
-        priority={index === 0}
-        sizes="100vw"
-        className="object-cover object-[var(--focal)_center] tablet:object-center"
+        sizes="(min-width: 768px) 100vw, 1px"
+        className="hidden object-cover object-center tablet:block"
       />
 
       {/* dims as the next panel slides over this one */}
@@ -50,21 +64,33 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
 
       <div className="absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.738%] tablet:bottom-auto tablet:left-[2.569%] tablet:h-[77.765%] tablet:max-h-none tablet:w-[32.222%]">
         <div className="relative isolate h-auto w-full overflow-hidden rounded-[14px] tablet:h-full tablet:rounded-[19px]">
-          {/* frosted backing: the same scene, pre-blurred and aligned to it */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 z-0 overflow-hidden"
-          >
-            <div className="absolute top-[-118.8%] left-[-5.664%] h-[227.4%] w-[111.328%] scale-[1.08] blur-[22px] tablet:top-[-15.09%] tablet:left-[-79.73%] tablet:h-[128.59%] tablet:w-[310.35%]">
-              <Image
-                src={panel.background}
-                alt=""
-                fill
-                sizes="100vw"
-                className="object-cover object-[var(--focal)_center] tablet:object-center"
-              />
+          {/*
+           * Frosted backing. Desktop holds a pre-blurred copy of the scene
+           * aligned to the card, which is what gives the glass its tint; the
+           * percentages invert the card's own box (left 2.569% / width
+           * 32.222%) so the copy lines up with the original.
+           *
+           * Mobile is a flat wash instead. Aligning a copy there was never
+           * exact — the card's height is content-driven and differs per app,
+           * so no fixed percentage can track it — and at 22px of blur the
+           * tint was doing little. Dropping it also saves decoding a second
+           * full-panel image per card on the breakpoint that can least
+           * afford it.
+           */}
+          <div aria-hidden="true" className="absolute inset-0 z-0 overflow-hidden">
+            <div className="absolute inset-0 bg-white/[0.86] tablet:hidden" />
+            <div className="hidden tablet:block">
+              <div className="absolute top-[-15.09%] left-[-79.73%] h-[128.59%] w-[310.35%] blur-[22px]">
+                <Image
+                  src={panel.background}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  className="object-cover object-center"
+                />
+              </div>
+              <div className="absolute inset-0 bg-white/[0.72]" />
             </div>
-            <div className="absolute inset-0 bg-white/[0.72]" />
           </div>
 
           <div className="relative z-10 flex h-full w-full flex-col px-[6.799%] py-[24px] tablet:px-[9.267%] tablet:py-[44px]">
