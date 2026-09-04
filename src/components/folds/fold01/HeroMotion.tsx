@@ -49,13 +49,18 @@ export function HeroMotion({ children }: { children: ReactNode }) {
           .from(lines, { opacity: 0, yPercent: 40, duration: 0.9, stagger: 0.08 }, 0.15)
           .from(phone, { opacity: 0, y: 80, scale: 0.97, duration: 1.2 }, 0.3);
 
-        // No scroll parallax here, deliberately. It used to drift the plate
-        // down 6% and the phone up 8% as the hero scrolled, which pulled them
-        // apart: the phone is only a screen overlay sitting on the device
-        // photographed into that plate, so 14% of relative travel slid the lit
-        // screen clean off the device. Any parallax in this fold has to move
-        // the plate and the overlay by the same amount — which is what the
-        // shifted group in Fold01 does — or not move them at all.
+        // The scroll parallax is not here: it lives on the two
+        // `data-parallax` layers in Fold01, driven by GlobalParallax.
+        //
+        // It stays out of this timeline on purpose. An earlier attempt here
+        // drifted the plate down 6% and the phone up 8% as the hero scrolled,
+        // which pulled them apart — the phone is only a screen overlay sitting
+        // on the device photographed into that plate, so 14% of relative
+        // travel slid the lit screen clean off the device. Any parallax in
+        // this fold has to move the plate and the overlay by the same amount,
+        // which is why Fold01 gives the two layers identical numbers, and why
+        // the entrance above still owns the phone's `y` alone: a scroll tween
+        // on the same property would fight it on load.
       });
 
       return () => mm.revert();

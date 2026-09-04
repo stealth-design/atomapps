@@ -24,9 +24,9 @@ export default function Fold04() {
       className="bg-white py-[var(--fold-gap-y)]"
     >
       {/* Small numbers on purpose: this band is only ~120px tall, so the
-          offset comes to a few pixels either way — enough to keep it from
-          sitting dead still between two folds that move. */}
-      <div data-parallax="trigger" data-parallax-start="8" data-parallax-end="-8">
+          offset still only comes to ~24px either way — enough to read as
+          motion, not enough to unseat a centred band. */}
+      <div data-parallax="trigger" data-parallax-start="14" data-parallax-end="-14">
         <Reveal
           variant="stagger"
           className="mx-auto max-w-[var(--content-max-width)] px-5 text-center tablet:px-10"

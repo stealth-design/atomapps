@@ -28,6 +28,19 @@ import { HeroPhone } from "@/components/folds/fold01/HeroPhone";
  * copy's own 120px — so the two gaps stay equal as the phone rises with
  * viewport width past 395px.
  */
+/**
+ * How far the scene falls behind the page over one stage height, as a share of
+ * that height — so the background leaves at 65% of scroll speed. It reads as a
+ * percentage of the stage because both parallax targets are stage-sized boxes.
+ *
+ * It can go up to (but not reach) 100 without opening a gap. The bare strip the
+ * scene leaves behind its top edge travels at HERO_LAG% of scroll while the
+ * stage's own top leaves at 100%, so that strip stays above the viewport the
+ * whole way; at the foot the scene simply hangs further past the stage than it
+ * already did.
+ */
+const HERO_LAG = 35;
+
 export default function Fold01() {
   return (
     <Section fold="01">
@@ -57,50 +70,80 @@ export default function Fold01() {
               plate's `inset-0` and the phone's percentage top would both
               collapse to the stage's top edge. */}
           <div className="absolute inset-0 tablet:translate-y-[34px]">
-            {/* ---------- background plate ---------- */}
-            <div data-hero="bg" className="absolute inset-0">
-              <div className="absolute top-[-10.574%] left-[-73.797%] h-[149.18%] w-[247.114%] tablet:hidden">
-                <Image
-                  src="/images/fold01/hero-bg-mobile.jpg"
-                  alt=""
-                  fill
-                  priority
-                  sizes="250vw"
-                  className="object-cover"
+            {/*
+             * The scene behind the copy lags the scroll, so Fold 02 rises over
+             * a background that is still on its way out.
+             *
+             * It is two layers rather than one because the copy has to sit
+             * between them in paint order, exactly as it did before: plate and
+             * moon under it, phone over it. Both carry the same numbers, which
+             * is the constraint HeroMotion documents — the phone is only a
+             * screen overlay on the device photographed into the plate, so any
+             * difference between the two slides the lit screen off the device.
+             *
+             * The copy is deliberately left out of both, in the flow: that is
+             * what keeps it leaving at the page's own speed, together with
+             * Fold 02, while the scene behind it falls back.
+             *
+             * Each trigger is an untransformed stage-sized box and only the
+             * target inside it moves, so ScrollTrigger never measures an
+             * element it is also animating.
+             */}
+            <div
+              data-parallax="trigger"
+              data-parallax-start="0"
+              data-parallax-end={HERO_LAG}
+              data-parallax-scroll-start="top top"
+              data-parallax-scroll-end="bottom top"
+              className="pointer-events-none absolute inset-0"
+            >
+              <div data-parallax="target" className="absolute inset-0">
+                {/* ---------- background plate ---------- */}
+                <div data-hero="bg" className="absolute inset-0">
+                  <div className="absolute top-[-10.574%] left-[-73.797%] h-[149.18%] w-[247.114%] tablet:hidden">
+                    <Image
+                      src="/images/fold01/hero-bg-mobile.jpg"
+                      alt=""
+                      fill
+                      priority
+                      sizes="250vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="absolute top-[-5.5%] left-[-6.81%] hidden h-[114%] w-[114.1%] tablet:block">
+                    <Image
+                      src="/images/fold01/hero-bg-desktop.jpg"
+                      alt=""
+                      fill
+                      priority
+                      sizes="115vw"
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* ---------- soft light wash behind the phone (desktop only) ---------- */}
+                <div
+                  aria-hidden="true"
+                  className="absolute top-[43.75%] left-[5.07%] hidden h-[51.75%] w-[89.86%] tablet:block"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(ellipse at 50% 50%, rgba(217,217,217,0.10) 0%, rgba(217,217,217,0) 70%)",
+                  }}
                 />
-              </div>
-              <div className="absolute top-[-5.5%] left-[-6.81%] hidden h-[114%] w-[114.1%] tablet:block">
+
+                {/* ---------- small moon (mobile only; the desktop moon is in the plate) ---------- */}
                 <Image
-                  src="/images/fold01/hero-bg-desktop.jpg"
+                  src="/images/fold01/hero-moon.png"
                   alt=""
-                  fill
+                  width={204}
+                  height={190}
                   priority
-                  sizes="115vw"
-                  className="object-cover"
+                  aria-hidden="true"
+                  className="absolute top-[37.574%] left-[77.519%] h-auto w-[16.911%] tablet:hidden"
                 />
               </div>
             </div>
-
-            {/* ---------- soft light wash behind the phone (desktop only) ---------- */}
-            <div
-              aria-hidden="true"
-              className="absolute top-[43.75%] left-[5.07%] hidden h-[51.75%] w-[89.86%] tablet:block"
-              style={{
-                backgroundImage:
-                  "radial-gradient(ellipse at 50% 50%, rgba(217,217,217,0.10) 0%, rgba(217,217,217,0) 70%)",
-              }}
-            />
-
-            {/* ---------- small moon (mobile only; the desktop moon is in the plate) ---------- */}
-            <Image
-              src="/images/fold01/hero-moon.png"
-              alt=""
-              width={204}
-              height={190}
-              priority
-              aria-hidden="true"
-              className="absolute top-[37.574%] left-[77.519%] h-auto w-[16.911%] tablet:hidden"
-            />
 
             {/* ---------- copy ---------- */}
             <div
@@ -127,37 +170,49 @@ export default function Fold01() {
               </p>
             </div>
 
-            {/* ---------- phone mockup ---------- */}
-            {/*
-             * The screen overlay has to track the device photographed in the
-             * background plate, and above ~1399px that device grows with the
-             * viewport: the plate box is 114.1% wide by a fixed 912px tall, and
-             * past that width `object-cover` switches from height- to
-             * width-constrained, so the image scales by viewport width. A fixed
-             * 312px overlay therefore drifted — by 1920 the device was a third
-             * larger than the black screen sitting on it, and at 2560 the
-             * overlay covered barely half of it.
-             *
-             * The three values below are the plate's own geometry solved for the
-             * screen aperture, so they scale exactly with it (derived against
-             * the 1344x768 asset, not Figma's 1643x912 layer):
-             *
-             *   width  312px at 1440  ->  21.6667vw
-             *   left   plate left (-6.81vw) + aperture offset  ->  39.73vw
-             *   top    plate top + half the vertical crop      ->  412px - 7.921vw
-             *
-             * Each is paired with the pre-crossover constant via min()/max(),
-             * which switches over at ~1440 on its own. Explicit `left` rather
-             * than a centring translate: GSAP owns this element's transform for
-             * the entrance and parallax, and a Tailwind translate on the same
-             * property gets folded into that on init and then never updates on
-             * resize.
-             */}
+            {/* Layer B — the phone, on the same numbers as the scene above. */}
             <div
-              data-hero="phone"
-              className="absolute top-[min(287px,calc(390.5px-26.182vw))] left-[min(calc(49.76%-90.65px),26.828vw)] w-[max(186px,47.052vw)] tablet:top-[37.7%] tablet:left-[calc(50%-119px)] tablet:w-[250px] desktop-sm:top-[min(298px,calc(412px-7.921vw))] desktop-sm:left-[min(calc(50%-148px),39.73vw)] desktop-sm:w-[max(312px,21.6667vw)]"
+              data-parallax="trigger"
+              data-parallax-start="0"
+              data-parallax-end={HERO_LAG}
+              data-parallax-scroll-start="top top"
+              data-parallax-scroll-end="bottom top"
+              className="pointer-events-none absolute inset-0"
             >
-              <HeroPhone />
+              <div data-parallax="target" className="absolute inset-0">
+                {/* ---------- phone mockup ---------- */}
+                {/*
+                 * The screen overlay has to track the device photographed in the
+                 * background plate, and above ~1399px that device grows with the
+                 * viewport: the plate box is 114.1% wide by a fixed 912px tall, and
+                 * past that width `object-cover` switches from height- to
+                 * width-constrained, so the image scales by viewport width. A fixed
+                 * 312px overlay therefore drifted — by 1920 the device was a third
+                 * larger than the black screen sitting on it, and at 2560 the
+                 * overlay covered barely half of it.
+                 *
+                 * The three values below are the plate's own geometry solved for the
+                 * screen aperture, so they scale exactly with it (derived against
+                 * the 1344x768 asset, not Figma's 1643x912 layer):
+                 *
+                 *   width  312px at 1440  ->  21.6667vw
+                 *   left   plate left (-6.81vw) + aperture offset  ->  39.73vw
+                 *   top    plate top + half the vertical crop      ->  412px - 7.921vw
+                 *
+                 * Each is paired with the pre-crossover constant via min()/max(),
+                 * which switches over at ~1440 on its own. Explicit `left` rather
+                 * than a centring translate: GSAP owns this element's transform for
+                 * the entrance and parallax, and a Tailwind translate on the same
+                 * property gets folded into that on init and then never updates on
+                 * resize.
+                 */}
+                <div
+                  data-hero="phone"
+                  className="absolute top-[min(287px,calc(390.5px-26.182vw))] left-[min(calc(49.76%-90.65px),26.828vw)] w-[max(186px,47.052vw)] tablet:top-[37.7%] tablet:left-[calc(50%-119px)] tablet:w-[250px] desktop-sm:top-[min(298px,calc(412px-7.921vw))] desktop-sm:left-[min(calc(50%-148px),39.73vw)] desktop-sm:w-[max(312px,21.6667vw)]"
+                >
+                  <HeroPhone />
+                </div>
+              </div>
             </div>
           </div>
 

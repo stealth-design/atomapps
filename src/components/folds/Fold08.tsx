@@ -75,16 +75,18 @@ export default function Fold08() {
                   <div
                     data-parallax="trigger"
                     data-parallax-disable="mobile"
-                    data-parallax-start="8"
-                    data-parallax-end="-8"
+                    data-parallax-start="12"
+                    data-parallax-end="-12"
                     className="relative aspect-square overflow-hidden rounded-[12px] tablet:aspect-[376/329] tablet:rounded-[5px]"
                   >
-                    {/* 124% tall, hung 12% above the frame, so ±8% of the
-                        photo's own height — about ±10% of the frame — always
-                        has image behind it and the crop never shows through. */}
+                    {/* 136% tall, hung 18% above the frame, so ±12% of the
+                        photo's own height — about ±16% of the frame — always
+                        has image behind it and the crop never shows through.
+                        Overhang has to stay ahead of travel: raising one
+                        without the other is what opens a gap at the edge. */}
                     <div
                       data-parallax="target"
-                      className="absolute inset-x-0 top-[-12%] h-[124%]"
+                      className="absolute inset-x-0 top-[-18%] h-[136%]"
                     >
                       <Image
                         src={`/images/fold08/${member.photo}`}
