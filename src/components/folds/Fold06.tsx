@@ -81,14 +81,29 @@ export default function Fold06() {
                 {step.body}
               </p>
 
+              {/*
+               * `unoptimized` is required, not a shortcut: the image optimizer
+               * has no animated output, so a GIF routed through it comes back
+               * as a single still frame. It also means the bytes are served
+               * as-authored, which is why these stay lazy — they sit well
+               * below the fold and together weigh far more than the rest of
+               * the page.
+               */}
               <Image
-                src={`/images/fold06/${step.illustration.src}.png`}
+                src={step.illustration.src}
                 alt=""
-                width={step.illustration.width * 3}
-                height={step.illustration.height * 3}
+                width={step.illustration.width * 2}
+                height={step.illustration.height * 2}
+                unoptimized
+                loading="lazy"
                 aria-hidden="true"
                 className="absolute top-[228px] left-[28px] h-auto"
-                style={{ width: step.illustration.width }}
+                // The GIFs are matted on #fcfcfc, three values off the card's
+                // white, which showed as a faint rectangle around each one.
+                // 1.2% of brightness maps 252 to exactly 255 so the matte
+                // disappears; the artwork shifts by the same 1.2%, which is
+                // not perceptible and avoids re-encoding 241 frames.
+                style={{ width: step.illustration.width, filter: "brightness(1.0119)" }}
               />
             </article>
           ))}

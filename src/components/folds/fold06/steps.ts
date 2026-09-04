@@ -14,7 +14,11 @@ export interface ApproachStep {
   body: string;
   /** Figma's body text width — card 1 is narrower than the other two. */
   bodyWidth: number;
-  /** Illustration basename and its Figma box, drawn at the foot of the card. */
+  /**
+   * Animated illustration and its Figma box, drawn at the foot of the card.
+   * `src` is a full public path; the GIFs are authored at exactly 2x the box
+   * below, so the declared intrinsic size is width/height doubled.
+   */
   illustration: { src: string; width: number; height: number };
 }
 
@@ -25,7 +29,7 @@ export const APPROACH_STEPS: ApproachStep[] = [
     title: "Find the Need",
     body: "We start by identifying a real problem, frustration, or task that technology can make easier.",
     bodyWidth: 217,
-    illustration: { src: "illus-need", width: 274, height: 280 },
+    illustration: { src: "/videos/1st-frame.gif", width: 274, height: 280 },
   },
   {
     id: "design-around-it",
@@ -33,7 +37,7 @@ export const APPROACH_STEPS: ApproachStep[] = [
     title: "Design Around It",
     body: "We focus on the features that matter most and build an experience that feels intuitive and easy to use.",
     bodyWidth: 253,
-    illustration: { src: "illus-design", width: 274, height: 299 },
+    illustration: { src: "/videos/2nd-frame.gif", width: 274, height: 299 },
   },
   {
     id: "keep-making-it-better",
@@ -41,6 +45,6 @@ export const APPROACH_STEPS: ApproachStep[] = [
     title: "Keep Making It Better",
     body: "We learn from how people use our apps and continue refining the experience over time.",
     bodyWidth: 253,
-    illustration: { src: "illus-refine", width: 279, height: 272 },
+    illustration: { src: "/videos/3rd-frame.gif", width: 279, height: 272 },
   },
 ];
