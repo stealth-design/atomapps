@@ -27,9 +27,12 @@ export default function Fold01() {
            * it off that device — the plate has to travel with it, and the copy
            * with both to keep the composition's spacing.
            *
-           * The plate is oversized (912px tall against an 800px stage, starting
-           * 44px above it), so a shift of this size still covers the stage with
-           * no black edge appearing at the top.
+           * How far this can travel is set by the plate's overhang above the
+           * stage, and the tablet breakpoint is the tight one: its plate is
+           * 798px against a 700px stage, so it starts only 38px high. 34px of
+           * that is spent here, which leaves 4px in hand — going much further
+           * would expose the stage's black along the top edge at 768px before
+           * anywhere else.
            *
            * The bottom fades stay outside the group: they blend the stage into
            * the next fold and are anchored to its bottom edge, so moving them
@@ -40,7 +43,7 @@ export default function Fold01() {
               without it they would size against a zero-height div and the
               plate's `inset-0` and the phone's percentage top would both
               collapse to the stage's top edge. */}
-          <div className="absolute inset-0 translate-y-[22px]">
+          <div className="absolute inset-0 translate-y-[34px]">
             {/* ---------- background plate ---------- */}
             <div data-hero="bg" className="absolute inset-0">
               <div className="absolute top-[-8.41%] left-[-74.3%] h-[119.6%] w-[248.35%] tablet:hidden">
