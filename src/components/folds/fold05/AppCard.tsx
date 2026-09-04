@@ -33,14 +33,29 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
       style={{ "--focal": panel.mobileFocal } as CSSProperties}
       className="relative h-full w-full overflow-hidden rounded-[20px] shadow-[0_-8px_40px_rgba(0,0,0,0.18)] tablet:rounded-[28px]"
     >
-      <Image
-        src={panel.background}
-        alt=""
-        fill
-        priority={index === 0}
-        sizes="100vw"
-        className="object-cover object-[var(--focal)_center] tablet:object-center"
-      />
+      {/*
+       * Two boxes, because the scene both drifts and needs somewhere to drift
+       * to. The outer one is the panel's own box and belongs to StackMotion,
+       * which owns its transform; the inner one carries the zoom that puts
+       * 3% of the panel's height off each edge, so the drift never pulls a
+       * blank strip into frame.
+       *
+       * The zoom sits on the inner box rather than the image so `object-cover`
+       * still resolves against the panel's true box — the framing is the one
+       * the focal points were measured against, just 6% closer in.
+       */}
+      <div data-f05-scene className="absolute inset-0">
+        <div className="absolute inset-0 scale-[1.06]">
+          <Image
+            src={panel.background}
+            alt=""
+            fill
+            priority={index === 0}
+            sizes="100vw"
+            className="object-cover object-[var(--focal)_center] tablet:object-center"
+          />
+        </div>
+      </div>
 
       {/* dims as the next panel slides over this one */}
       <div
@@ -48,13 +63,23 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
         className="pointer-events-none absolute inset-0 bg-black opacity-0"
       />
 
-      <div className="absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.738%] tablet:bottom-auto tablet:left-[2.569%] tablet:h-[77.765%] tablet:max-h-none tablet:w-[32.222%]">
+      {/* The card drifts against the scene, which is where the depth in this
+          panel comes from — see StackMotion for the three coupled amounts. */}
+      <div
+        data-f05-glass
+        className="absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.738%] tablet:bottom-auto tablet:left-[2.569%] tablet:h-[77.765%] tablet:max-h-none tablet:w-[32.222%]"
+      >
         <div className="relative isolate h-auto w-full overflow-hidden rounded-[14px] tablet:h-full tablet:rounded-[19px]">
           {/* frosted backing: the same scene, pre-blurred and aligned to it */}
           <div
             aria-hidden="true"
             className="absolute inset-0 z-0 overflow-hidden"
           >
+            {/* A plain box for StackMotion to move: the card it sits in is
+                drifting, so this has to travel back by the difference to stay
+                over the same part of the scene it is a copy of. The zoom and
+                the blur stay on the inner box, out of GSAP's way. */}
+            <div data-f05-frost className="absolute inset-0">
             <div className="absolute top-[-118.8%] left-[-5.664%] h-[227.4%] w-[111.328%] scale-[1.08] blur-[22px] tablet:top-[-15.09%] tablet:left-[-79.73%] tablet:h-[128.59%] tablet:w-[310.35%]">
               <Image
                 src={panel.background}
@@ -63,6 +88,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 sizes="100vw"
                 className="object-cover object-[var(--focal)_center] tablet:object-center"
               />
+            </div>
             </div>
             <div className="absolute inset-0 bg-white/[0.72]" />
           </div>
