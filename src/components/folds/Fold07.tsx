@@ -21,15 +21,21 @@ import { DESKTOP_COLUMNS, MOBILE_ROWS } from "@/components/folds/fold07/testimon
 /**
  * Softens the top and bottom of the vertical columns.
  *
- * The bottom stop finishes at 93%, not 100%: reaching transparent only at the
- * container's edge left faded-but-readable card text within 68px of Fold 08's
- * "OUR PARTNERS", so that boundary looked tighter than the others even though
- * the 60px fold gap is identical. Ending the fade early leaves ~45px of clean
- * whitespace, which mirrors the 7% fade-in at the top and matches how the
- * Fold 06 boundary reads.
+ * The bottom stop is 98% rather than 100% so the fade finishes just clear of
+ * the container's edge: at 100% half-faded card text ran right up to Fold
+ * 08's gap, which is what made that boundary read as tight. It cannot go much
+ * further than this, though — the white band a viewer actually sees was
+ * measured against the fade stop, and because the cards are drifting it
+ * varies with them:
+ *
+ *    100% -> 67px    98% -> 78px    96% -> 91px    93% -> 120px
+ *
+ * against ~62px at every other boundary after Fold 04. 98% keeps this one in
+ * that company while still ending cleanly; 93% made it the widest gap on the
+ * page by a factor of two.
  */
 const EDGE_FADE =
-  "linear-gradient(to bottom, transparent 0%, #000 7%, #000 86%, transparent 93%)";
+  "linear-gradient(to bottom, transparent 0%, #000 7%, #000 92%, transparent 98%)";
 
 /** Softens the left and right ends of the horizontal rows. */
 const ROW_FADE =
