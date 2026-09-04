@@ -18,9 +18,18 @@ import { DESKTOP_COLUMNS, MOBILE_ROWS } from "@/components/folds/fold07/testimon
  * also in opposite directions, rather than the artboard's single static
  * column.
  */
-/** Softens the top and bottom of the vertical columns. */
+/**
+ * Softens the top and bottom of the vertical columns.
+ *
+ * The bottom stop finishes at 93%, not 100%: reaching transparent only at the
+ * container's edge left faded-but-readable card text within 68px of Fold 08's
+ * "OUR PARTNERS", so that boundary looked tighter than the others even though
+ * the 60px fold gap is identical. Ending the fade early leaves ~45px of clean
+ * whitespace, which mirrors the 7% fade-in at the top and matches how the
+ * Fold 06 boundary reads.
+ */
 const EDGE_FADE =
-  "linear-gradient(to bottom, transparent 0%, #000 7%, #000 88%, transparent 100%)";
+  "linear-gradient(to bottom, transparent 0%, #000 7%, #000 86%, transparent 93%)";
 
 /** Softens the left and right ends of the horizontal rows. */
 const ROW_FADE =
