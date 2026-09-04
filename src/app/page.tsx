@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { FooterParallax } from "@/components/layout/FooterParallax";
 import Fold01 from "@/components/folds/Fold01";
 import Fold02 from "@/components/folds/Fold02";
 import Fold03 from "@/components/folds/Fold03";
@@ -25,7 +26,9 @@ export default function Home() {
         <Fold08 /> {/* Leadership & Partners */}
       </main>
 
-      <Footer />
+      <FooterParallax>
+        <Footer />
+      </FooterParallax>
     </>
   );
 }
