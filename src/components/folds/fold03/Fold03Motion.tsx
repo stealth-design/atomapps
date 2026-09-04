@@ -52,6 +52,18 @@ const HOVER_DURATION = 0.32;
  */
 const EDGE_GAP = 10;
 
+/**
+ * How far past its own box a blurred icon actually paints, as a multiple of
+ * the CSS blur radius.
+ *
+ * Clamping the layout box alone was not enough: a blur puts visible pixels
+ * outside the box, so icon-13 (8px blur, clamped to 10px from the edge) still
+ * had 14px of halo sliced off, and icon-10 (20px) lost 30px. A Gaussian is
+ * effectively out of ink by 3 sigma, which is what stops the cut being
+ * visible rather than merely faint.
+ */
+const BLUR_REACH = 3;
+
 interface Box {
   cx: number;
   cy: number;
@@ -128,6 +140,7 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
        * design value rather than from the last clamp.
        */
       const originalTop = new WeakMap<HTMLElement, number>();
+      const startBlur = new WeakMap<HTMLElement, number>();
       const fitScatter = () => {
         const stageHeight = stage.offsetHeight;
         if (stageHeight === 0) return;
@@ -137,9 +150,19 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
             fraction = el.offsetTop / stageHeight;
             originalTop.set(el, fraction);
           }
+
+          // Read the blur once, from the stylesheet value. Later reads would
+          // catch the timeline mid-clear and under-report the halo.
+          let blur = startBlur.get(el);
+          if (blur === undefined) {
+            blur = parseFloat(/blur\(([\d.]+)px\)/.exec(getComputedStyle(el).filter)?.[1] ?? "0");
+            startBlur.set(el, blur);
+          }
+
+          const margin = EDGE_GAP + blur * BLUR_REACH;
           const height = el.offsetHeight;
-          const lowest = Math.max(EDGE_GAP, stageHeight - height - EDGE_GAP);
-          const target = gsap.utils.clamp(EDGE_GAP, lowest, fraction * stageHeight);
+          const lowest = Math.max(margin, stageHeight - height - margin);
+          const target = gsap.utils.clamp(margin, lowest, fraction * stageHeight);
           el.style.top = `${Math.round(target)}px`;
         });
       };
