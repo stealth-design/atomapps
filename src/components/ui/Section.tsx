@@ -3,10 +3,11 @@ import { cn } from "@/lib/utils";
 import { getFold } from "@/data/folds";
 
 /**
- * Toggles the small on-page "FOLD 0X" corner labels used during development.
- * Flip to `false` (or wire up an env var) before shipping to production.
+ * Toggles the small on-page "FOLD 0X" corner labels used while building folds
+ * against the Figma artboards. Off for anything anyone else will see — flip to
+ * `true` to bring them back when working on a fold.
  */
-export const SHOW_FOLD_LABELS = true;
+export const SHOW_FOLD_LABELS = false;
 
 interface SectionProps {
   /** Two-digit fold number, e.g. "01". Drives both the id and data-fold attrs. */
