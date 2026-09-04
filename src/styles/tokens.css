@@ -1,0 +1,68 @@
+/* ==========================================================================
+   Design tokens.
+
+   Reference design: Figma "Atom apps Website", canvas `----> v7`
+     Desktop v7 — 1440 x 9772 (node 1136:2539)
+     Mweb v7    —  393 x 8303 (node 1136:1086)
+
+   The design is light-only (black/near-black type on white), so there is no
+   dark-mode inversion here. Per-fold colours land as each fold is built.
+   ========================================================================== */
+
+@theme {
+  /* Breakpoints (static — media queries can't read CSS custom properties) */
+  --breakpoint-mobile-sm: 360px;
+  --breakpoint-mobile-md: 375px;
+  --breakpoint-mobile-lg: 390px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop-sm: 1024px;
+  --breakpoint-desktop-md: 1280px;
+  --breakpoint-desktop-lg: 1440px;
+
+  /* Reusable vertical rhythm for section spacing */
+  --spacing-fold-y: 4rem;
+  --spacing-fold-y-tablet: 6rem;
+  --spacing-fold-y-desktop: 8rem;
+}
+
+:root {
+  /* Colour primitives — matched to the design's neutrals */
+  --background: #ffffff;
+  --foreground: #111116;
+  --surface: #f5f5f7;
+  --muted: #6b6b6b;
+  --border: #e5e5e5;
+
+  /* Layout — the design's desktop artboard is 1440 wide */
+  --content-max-width: 1440px;
+  --content-padding: 1.25rem;
+  --header-height: 50px;
+  /* Half the gap between two folds — every content fold uses it top and
+     bottom, so adjacent folds always sit 2x this apart. Full-bleed folds
+     (hero, app stack) carry none. */
+  --fold-gap-y: 32px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --content-padding: 2.5rem;
+    --fold-gap-y: 44px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --content-padding: 4rem;
+    --fold-gap-y: 60px;
+  }
+}
+
+/* Z-index scale — reference via z-[var(--z-x)] to keep stacking predictable */
+:root {
+  --z-base: 0;
+  --z-fold-label: 40;
+  --z-header: 50;
+  --z-mobile-menu: 60;
+  --z-overlay: 70;
+  --z-modal: 80;
+}
