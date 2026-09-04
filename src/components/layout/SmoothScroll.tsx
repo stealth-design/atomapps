@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { setLenis } from "@/lib/lenis";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 /**
@@ -25,6 +26,8 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     });
 
     lenis.on("scroll", ScrollTrigger.update);
+    // Published so overlays can freeze the page (see @/lib/lenis).
+    setLenis(lenis);
 
     const onTick = (time: number) => {
       lenis.raf(time * 1000);
@@ -35,6 +38,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
     return () => {
       gsap.ticker.remove(onTick);
+      setLenis(null);
       lenis.destroy();
     };
   }, [prefersReducedMotion]);

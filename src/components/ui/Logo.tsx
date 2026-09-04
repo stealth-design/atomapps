@@ -1,8 +1,14 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
-  /** Rendered width in px. Design uses 126 (desktop header) and 104 (mobile header). */
+  /**
+   * Base rendered width in px. Applied through `--logo-w` rather than an
+   * inline `width`, because an inline style outranks every utility class — a
+   * caller passing `tablet:w-[126px]` was silently ignored, which left the
+   * desktop header wearing the mobile width.
+   */
   width?: number;
   className?: string;
   /**
@@ -18,8 +24,8 @@ interface LogoProps {
 export function Logo({ width = 126, className, blend = true }: LogoProps) {
   return (
     <span
-      className={cn("relative block", className)}
-      style={{ width, aspectRatio: "126 / 29" }}
+      className={cn("relative block w-[var(--logo-w)]", className)}
+      style={{ "--logo-w": `${width}px`, aspectRatio: "126 / 29" } as CSSProperties}
       aria-label="AtomApps"
       role="img"
     >

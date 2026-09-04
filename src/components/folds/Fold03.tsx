@@ -29,7 +29,15 @@ export default function Fold03() {
       <Fold03Motion>
         <div
           data-f03="stage"
-          className="relative h-svh min-h-[626px] w-full overflow-clip bg-white"
+          // Mobile is pinned to the artboard's own 626px height rather than a
+          // full viewport. Every position in here is a percentage of the stage
+          // (heading 34.35%, phone plate 39%), so on an 844px phone a `svh`
+          // stage stretched them all and left 270px of dead space under the
+          // settled grid — the "too much space" before Fold 04. At 626px the
+          // percentages land exactly where Figma put them and the slack goes
+          // away. Desktop keeps `svh`: its artboard is 886 tall, which is
+          // already about a viewport.
+          className="relative h-[626px] w-full overflow-clip bg-white tablet:h-svh tablet:min-h-[626px]"
         >
           {/* ---------- phone plate + white fade (mobile) ---------- */}
           <div
