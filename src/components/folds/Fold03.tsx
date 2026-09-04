@@ -47,8 +47,11 @@ export default function Fold03() {
           // white under the settled grid on desktop: the gap to Fold 04
           // measured 507px. These ratios are the artboards trimmed to what the
           // end frame actually occupies, which holds the gap near the standard
-          // fold rhythm at every width.
-          className="relative aspect-[393/545] w-full overflow-clip bg-white tablet:aspect-[1440/560]"
+          // fold rhythm at every width. The heights carry the heading
+          // clearance added in END_GRID, so raising that clearance pushes the
+          // grid down without eating the trailing space that sets the gap into
+          // Fold 04.
+          className="relative aspect-[393/563] w-full overflow-clip bg-white tablet:aspect-[1440/584]"
         >
           {/* ---------- phone plate + white fade (mobile) ---------- */}
           {/* Anchored by its bottom, not its top. The plate's upper half is

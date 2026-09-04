@@ -31,6 +31,19 @@ import { END_GRID, END_ORDER, type GridConfig } from "./appIcons";
 const PHASE = { settle: 0.1, phoneOut: 0.35, arrive: 0.92 } as const;
 
 /**
+ * How much of the travel window is spent staggering rather than moving.
+ *
+ * With every icon in transit at once, the middle of the sequence was a jumble:
+ * measured at the halfway point, the 15 icons formed 8 ragged rows at 10
+ * different sizes with 13 pairs overlapping, and they crowded 12px past the
+ * heading. Spending most of the window on a stagger instead means icons land
+ * in END_ORDER — reading order, row by row — so at any point the rows that
+ * have arrived are square and the rest are still out in the scatter. Each icon
+ * still makes one direct, monotonic move; only the start times fan out.
+ */
+const TRAVEL_SPREAD = 0.42;
+
+/**
  * Length of the pinned scroll, in viewport heights. ~1.35 works out to roughly
  * three scroll gestures to play the whole sequence — raise it for a longer,
  * slower transformation, lower it for a snappier one.
@@ -93,7 +106,7 @@ function gridBoxes(config: GridConfig, stage: HTMLElement, heading: HTMLElement 
 
   // Prefer the artboard's optical centre, but never ride up into the heading.
   const headingBottom = heading ? heading.offsetTop + heading.offsetHeight : 0;
-  const top = Math.max((stageHeight - blockHeight) / 2, headingBottom + 34 * k);
+  const top = Math.max((stageHeight - blockHeight) / 2, headingBottom + config.headingGap * k);
 
   const boxes: Box[] = [];
   config.rows.forEach((count, rowIndex) => {
@@ -314,7 +327,10 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
 
           // PHASE 3 — one move per icon: start box straight to its grid slot,
           // shrinking and clearing its blur on the way. `power2.inOut` keeps
-          // the travel monotonic, so nothing doubles back.
+          // the travel monotonic, so nothing doubles back, and the stagger
+          // (see TRAVEL_SPREAD) builds the grid in reading order rather than
+          // moving all fifteen at once.
+          const travelWindow = PHASE.arrive - PHASE.settle / 2;
           timeline.to(
             icons,
             {
@@ -323,9 +339,9 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
               scale: (index: number) => grid[index].size / starts[index].size,
               opacity: 1,
               filter: "blur(0px)",
-              duration: PHASE.arrive - PHASE.settle / 2,
+              duration: travelWindow * (1 - TRAVEL_SPREAD),
               ease: "power2.inOut",
-              stagger: 0.004,
+              stagger: (travelWindow * TRAVEL_SPREAD) / Math.max(icons.length - 1, 1),
             },
             PHASE.settle / 2,
           );

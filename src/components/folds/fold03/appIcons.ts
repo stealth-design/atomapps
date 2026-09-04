@@ -124,13 +124,22 @@ export interface GridConfig {
   size: number;
   gap: number;
   rowGap: number;
+  /**
+   * Clearance kept between the heading's last line and the grid's first row,
+   * measured against `reference` width.
+   *
+   * Both breakpoints used to share 34px — the mobile artboard's value — which
+   * left the type sitting almost on the first row of icons. Desktop's artboard
+   * actually has ~58px, and mobile reads better with more than its own 34.
+   */
+  headingGap: number;
   reference: number;
 }
 
 /** Desktop matches the end-frame reference: two rows of 7 and 8. */
 export const END_GRID: { desktop: GridConfig; mobile: GridConfig } = {
-  desktop: { rows: [7, 8], size: 96, gap: 20, rowGap: 34, reference: 1440 },
-  mobile: { rows: [5, 5, 5], size: 58, gap: 12, rowGap: 16, reference: 393 },
+  desktop: { rows: [7, 8], size: 96, gap: 20, rowGap: 34, headingGap: 58, reference: 1440 },
+  mobile: { rows: [5, 5, 5], size: 58, gap: 12, rowGap: 16, headingGap: 52, reference: 393 },
 };
 
 /* PHONE_FACE / CLUSTER_FILL used to live here, aiming the icons at the phone
