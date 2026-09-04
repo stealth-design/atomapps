@@ -40,14 +40,17 @@ export const BLUR_SCALE = 0.5;
 
 /** START — desktop scatter, Figma 1136:2630 (1440x886). */
 export const DESKTOP_ICONS: IconPlacement[] = [
-  { icon: "icon-09", x: 665, y: 339, size: 100, blur: 2 },
+  // Below the device. The plate box is 1030 wide but the phone visible
+  // inside it only spans x 468-964, y 178-413 of the stage, leaving 147px
+  // clear underneath — Figma had this sitting on the screen.
+  { icon: "icon-09", x: 665, y: 677, size: 100, blur: 2 },
   { icon: "icon-12", x: 334, y: 522, size: 89, blur: 11, opacity: 0.54 },
   { icon: "icon-01", x: 161, y: 354, size: 132 },
   { icon: "icon-02", x: 266, y: 75, size: 135 },
   { icon: "icon-03", x: 1036, y: -145, size: 167, blur: 6 },
-  // Lifted from y=113 so it clears the heading's first line: at the rendered
-  // stage height its box reached 14px into the text.
-  { icon: "icon-04", x: 812, y: 71, size: 75, blur: 3, opacity: 0.66 },
+  // Moved below the device too, alongside icon-09. Its earlier home at
+  // y=113 put it over the heading's first line.
+  { icon: "icon-04", x: 812, y: 696, size: 75, blur: 3, opacity: 0.66 },
   { icon: "icon-05", x: -203, y: 279, size: 291, blur: 29 },
   { icon: "icon-06", x: 1204, y: 509, size: 123, blur: 4 },
   { icon: "icon-07", x: 351, y: 270, size: 80, blur: 4 },
@@ -72,7 +75,7 @@ export const DESKTOP_ICONS: IconPlacement[] = [
  */
 export const MOBILE_ICONS: IconPlacement[] = [
   { icon: "icon-12", x: 51, y: 476, size: 57, blur: 7, opacity: 0.54 },
-  { icon: "icon-09", x: 167, y: 292, size: 60, blur: 1 },
+  { icon: "icon-09", x: 167, y: 515, size: 60, blur: 1 },   // below the device (see desktop)
   { icon: "icon-01", x: -34, y: 279, size: 85 },
   { icon: "icon-02", x: 59, y: 29, size: 70 },
   { icon: "icon-07", x: 33, y: 150, size: 51, blur: 3 },
@@ -82,7 +85,7 @@ export const MOBILE_ICONS: IconPlacement[] = [
   { icon: "icon-06", x: 367, y: 172, size: 48, blur: 2 },
   { icon: "icon-11", x: 352, y: 489, size: 95, blur: 13 },
   { icon: "icon-14", x: 246, y: 126, size: 62, opacity: 0.83 },
-  { icon: "icon-04", x: 308, y: 352, size: 26, blur: 1, opacity: 0.66 },
+  { icon: "icon-04", x: 308, y: 521, size: 26, blur: 1, opacity: 0.66 },  // below the device
   { icon: "icon-13", x: 223, y: 29, size: 79, blur: 9, opacity: 0.64 },
   { icon: "icon-10", x: 354, y: 267, size: 73, blur: 8 },
   { icon: "icon-03", x: 296, y: -18, size: 88, blur: 6 },
