@@ -146,26 +146,31 @@ export default function Fold03() {
             className="absolute top-[34.35%] left-1/2 isolate w-[276px] -translate-x-1/2 text-center text-[18px] leading-[23px] font-extrabold text-black capitalize tablet:top-[23.59%] tablet:w-[462px] tablet:text-[24px] tablet:leading-[31px] desktop-sm:text-[30px] desktop-sm:leading-[39px]"
           >
             {/*
-             * A soft white pool behind the type. The heading already paints
-             * above the icons, but that is not enough on its own: icons cross
-             * it on their way to the grid and covered 87% of the text at the
-             * midpoint on mobile, which left black type sitting on app
-             * artwork. This hides whatever passes immediately behind the
-             * words and fades out before it reads as a shape — invisible
-             * against the fold's white, since it is white.
+             * A white halo hugging the glyphs. The heading already paints
+             * above the icons, but that alone is not enough: icons cross it on
+             * their way to the grid and covered 87% of the text at the
+             * midpoint on mobile, leaving black type on app artwork.
+             *
+             * This started as a radial pool behind the whole heading, which
+             * reached 78px past the type and washed the top of the settled
+             * grid's first row — that row begins only 30px below the text.
+             * Stacked text shadows stay tied to the letters instead: the
+             * furthest is 18px, so it clears the grid at both breakpoints,
+             * and on a white fold a white glow is invisible anyway.
              */}
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -inset-x-[10%] -inset-y-[100%] -z-10"
-              style={{
-                backgroundImage:
-                  "radial-gradient(ellipse at center, #fff 42%, rgba(255,255,255,0.92) 58%, rgba(255,255,255,0) 80%)",
-              }}
-            />
-
             {/* Figma has a hard break here: "A family of apps \ndesigned with purpose" */}
-            <span className="block">A family of apps</span>
-            <span className="block">designed with purpose</span>
+            <span
+              className="block"
+              style={{ textShadow: "0 0 4px #fff, 0 0 9px #fff, 0 0 14px #fff, 0 0 18px #fff" }}
+            >
+              A family of apps
+            </span>
+            <span
+              className="block"
+              style={{ textShadow: "0 0 4px #fff, 0 0 9px #fff, 0 0 14px #fff, 0 0 18px #fff" }}
+            >
+              designed with purpose
+            </span>
           </h2>
         </div>
       </Fold03Motion>
