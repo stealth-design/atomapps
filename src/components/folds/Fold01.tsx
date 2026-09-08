@@ -45,18 +45,29 @@ export default function Fold01() {
         {/*
          * The stage takes its height from whichever plate is showing.
          *
-         * Below the 640px switch that is the portrait asset's own ratio —
-         * 2556/1206, so `100vw * 2.11940` — which is what shows it end to end
-         * with nothing cropped off the top or the bottom. It re-derives per
-         * width instead of fixing a number, so a re-export of that asset only
-         * needs this ratio updated.
+         * Below the 640px switch the height is an `aspect-ratio`, and it is
+         * deliberately not derived from the viewport. It used to be
+         * `min(calc(100vw * 2.11940), 82dvh)` — the plate's own 2556/1206
+         * ratio, capped — which measured correctly in Chrome and resolved to
+         * something else entirely on iOS Safari: the fold came out around 383px
+         * tall on a 402px-wide phone, so `object-cover` cropped 55% of the
+         * plate and blew the phone up past the frame. Mixing a `vw`-derived
+         * `calc()` with `dvh` inside `min()` is what made it fragile, so none
+         * of that is left: `aspect-[1206/2280]` is width over height and
+         * nothing else, which every browser resolves the same way.
          *
-         * `82dvh` caps it, and the plate is `object-bottom` rather than
-         * `object-center` so what the cap takes comes off the top. The ratio
-         * alone put the fold at 833px against a 761px viewport, which was
-         * taller than the screen and left nothing of Fold 02 in view; the cap
-         * trims sky off the top and keeps the phone and the penguin sitting on
-         * the fold's foot, which is the half that carries the composition.
+         * 2280 rather than the plate's own 2556 is the crop. Paired with
+         * `object-bottom` on the image it takes the difference off the sky at
+         * the top and keeps the phone and the penguin on the fold's foot.
+         *
+         * 2280 is the shortest crop the composition survives, and the phone
+         * painted into the plate is what sets it. Its bezel sits at 55.5% of
+         * the asset's height, so cropping off the top raises it: at 1206/1900
+         * the fold was 633px and the phone's top landed at 254px, 33px above
+         * where the subtitle ends — the copy sat on the bezel. 2280 puts the
+         * fold at 760px and the phone's top at 381px, which leaves 94px of
+         * clear sky between the copy and the phone for the 68px moon to sit
+         * in. `min-[640px]:aspect-auto` hands the fixed heights back.
          *
          * `min-[640px]` puts the fixed heights back from the point the
          * landscape asset takes over — the ratio above would give a 1229px
@@ -75,7 +86,7 @@ export default function Fold01() {
          * `dvh` rather than `vh` so collapsing mobile browser chrome cannot
          * leave a strip under it.
          */}
-        <div className="relative h-[min(calc(100vw*2.11940),82dvh)] w-full overflow-hidden bg-[#0d0d0d] min-[640px]:h-[610px] tablet:h-[700px] desktop-sm:h-[100dvh]">
+        <div className="relative aspect-[1206/2280] w-full overflow-hidden bg-[#0d0d0d] min-[640px]:aspect-auto min-[640px]:h-[610px] tablet:h-[700px] desktop-sm:h-[100dvh]">
           {/*
            * Everything that makes up the scene sits in one shifted group so it
            * moves as a unit. The phone is only a screen overlay sitting on the
@@ -210,7 +221,7 @@ export default function Fold01() {
                   // 287px at every mobile size (its own `top` is px-based too), so
                   // 312 clears it by 25px and still sits inside the shortest stage
                   // this cap produces.
-                  className="absolute top-[312px] left-[77.519%] h-auto w-[16.911%] min-[640px]:hidden"
+                  className="absolute top-[300px] left-[77.519%] h-auto w-[16.911%] min-[640px]:hidden"
                 />
               </div>
             </div>
