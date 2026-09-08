@@ -125,14 +125,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         ))}
       </nav>
 
-      {/* `logo-final.png` as supplied — a white wordmark for dark grounds,
-          which is exactly this panel. Its 4.32 aspect matches the design
-          group's 209.3x48.4. */}
+      {/* `final-atom-logo-white.png` — the light cut of the final lockup, for
+          this dark panel. Its 4.32 aspect matches the design group's
+          209.3x48.4, as the previous lockup's did. */}
       <Image
-        src="/images/logo-final.png"
+        src="/logos/final-atom-logo-white.png"
         alt={siteConfig.name}
-        width={1600}
-        height={370}
+        width={14786}
+        height={3422}
         sizes="72vw"
         className="absolute top-[83.24%] left-[14.3%] h-auto w-[71.43%]"
       />

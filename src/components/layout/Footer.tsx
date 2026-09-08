@@ -70,26 +70,22 @@ export function Footer() {
             stays at the top, and the wordmark and legal row sit together on
             the foot however tall the panel ends up. */}
         <div className="mt-auto pt-[64px]">
-          <div className="relative">
-            <Image
-              src="/logos/atomapps-wordmark-large.svg"
-              alt={siteConfig.name}
-              width={1362}
-              height={255}
-              className="h-auto w-full"
-            />
-            <Image
-              src="/logos/atomapps-orbit-large.png"
-              alt=""
-              width={640}
-              height={640}
-              // Renders at 16.43% of the wordmark block — ~64px on a phone, so
-              // the 640px intrinsic was pulling a 1920w variant onto mobile.
-              sizes="16vw"
-              aria-hidden="true"
-              className="absolute top-[-7.03%] left-[19.5%] h-auto w-[16.43%]"
-            />
-          </div>
+          {/* The final lockup ships as a single asset with the orbit drawn
+              into it, so this no longer composes a wordmark plus an overlaid
+              glyph — and there is no longer a `relative` box to anchor that
+              overlay to. Light cut, for this #171717 panel.
+
+              It stands taller than what it replaces at the same width: 4.32
+              against the old wordmark's 5.34, because the orbit now lives
+              inside the asset's own box rather than hanging above it. */}
+          <Image
+            src="/logos/final-atom-logo-white.png"
+            alt={siteConfig.name}
+            width={14786}
+            height={3422}
+            sizes="100vw"
+            className="h-auto w-full"
+          />
 
           {/* ---------- legal ---------- */}
           <div className="mt-[26px] flex flex-col gap-[24px] text-[14px] leading-[17px] text-white tablet:mt-[18px] tablet:flex-row tablet:items-center tablet:gap-0">

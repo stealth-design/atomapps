@@ -19,7 +19,7 @@ import { siteConfig } from "@/data/site";
  * decides legibility, so the nav, CTA and menu button carry explicit dark
  * colours instead.
  *
- * The mark is `logo-final-dark.png` — see the note at the element for why a
+ * The mark is `final-atom-logo-dark.png` — see the note at the element for why a
  * derived file rather than a CSS filter.
  */
 export function Header() {
@@ -36,20 +36,18 @@ export function Header() {
             aria-label={`${siteConfig.name} — home`}
             className="flex h-full items-center"
           >
-            {/* `logo-final.png` is the current lockup, but it ships as a white
-                wordmark for dark grounds — on this white bar only its orbit
-                would have shown. `logo-final-dark.png` is that same file with
-                the greyscale ink inverted and the coloured orbit left alone,
-                so the mark reads black here without the orbit turning into
-                its complement (a flat `invert()` would have).
+            {/* `final-atom-logo-dark.png` — the dark-ink cut of the final
+                lockup, for this white bar. The light cut is
+                `final-atom-logo-white.png`; both share the 4.32 aspect the
+                previous lockup had, so the widths below are unchanged.
 
                 132 wide on mobile against the artboard's 104: at phone size
                 the wordmark read as an afterthought. */}
             <Image
-              src="/images/logo-final-dark.png"
+              src="/logos/final-atom-logo-dark.png"
               alt={siteConfig.name}
-              width={1600}
-              height={370}
+              width={8226}
+              height={1904}
               priority
               sizes="140px"
               className="h-auto w-[132px] tablet:w-[126px]"

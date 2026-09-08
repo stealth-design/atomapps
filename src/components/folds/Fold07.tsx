@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { TestimonialCard } from "@/components/folds/fold07/TestimonialCard";
@@ -96,6 +97,26 @@ export default function Fold07() {
               <p className="mt-[29px] hidden max-w-[275px] text-[15px] leading-[23px] text-[#61616a] tablet:block tablet:text-[16px] tablet:leading-[24px]">
                 Real feedback from teams and users who ship faster with Atom.
               </p>
+
+              {/* Squirrel, filling the column under the subtext.
+                *
+                * `desktop-md` only, which is the one breakpoint where this
+                * column stands beside the quotes and therefore has height to
+                * spare — below it the heading sits above the quotes and there
+                * is no empty column to fill, so the mascot would only push the
+                * cards down.
+                *
+                * 225px against the column's 460 is the reference frame's own
+                * proportion, left-aligned on the same edge as the type. */}
+              <Image
+                src="/fold-one/squirrel.png"
+                alt=""
+                width={726}
+                height={1065}
+                aria-hidden="true"
+                sizes="225px"
+                className="mt-[32px] hidden h-auto w-[225px] desktop-md:block"
+              />
             </Reveal>
           </div>
 

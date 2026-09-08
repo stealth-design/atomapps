@@ -57,11 +57,13 @@ export const DESKTOP_ICONS: IconPlacement[] = [
   { icon: "icon-08", x: 62, y: 738, size: 78, blur: 4 },
   { icon: "icon-10", x: 1328, y: 48, size: 380, blur: 40 },
   { icon: "icon-11", x: 1063, y: 680, size: 242, blur: 34 },
-  // Dropped below the heading instead of Figma's y=-16. At 143px tall it
-  // cannot clear the text upwards (the edge clamp floors it at 34px, and it
-  // would need to sit at -11), and both horizontal gaps either side of the
-  // text are under 90px — so down is the only direction that frees the type.
-  { icon: "icon-13", x: 551, y: 370, size: 143, blur: 16, opacity: 0.64 },
+  // Scanner. Figma had it at y=-16 over the heading's first line; dropping it
+  // to x=551 y=370 freed the type but landed it on the device, which spans
+  // x 468-964, y 178-413 (see icon-09 above). Now left of the device instead:
+  // its right edge is 293 against the device's 468, and at y=520 it clears
+  // icon-01 (ends y 486), icon-05 (ends x 88) and icon-12 (starts x 334) — the
+  // one 143px gap on that side that touches nothing.
+  { icon: "icon-13", x: 150, y: 520, size: 143, blur: 16, opacity: 0.64 },
   { icon: "icon-14", x: 1009, y: 262, size: 158, opacity: 0.83 },
   { icon: "icon-15", x: 114, y: -22, size: 94, blur: 4 },
 ];

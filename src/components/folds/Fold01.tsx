@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 import { HeroMotion } from "@/components/folds/fold01/HeroMotion";
-import { HeroPhone } from "@/components/folds/fold01/HeroPhone";
 
 /**
  * Fold 01 — Hero
@@ -10,23 +9,21 @@ import { HeroPhone } from "@/components/folds/fold01/HeroPhone";
  *   desktop  1136:2593  1440 x 800
  *   mobile   1136:1088   393 x 761
  *
- * Layout notes: every offset below is the design measurement expressed as a
- * percentage of the artboard, so the composition holds at any viewport width.
- * The background plate is deliberately oversized and offset (desktop 1643x912
- * at -98,-44; mobile 976x910 at -292,-64) — that framing is part of the design.
+ * The scene is now two flat assets — `bg-image-mobile.png` and
+ * `bg-image-desktop.png` — each carrying the whole composition: landscape,
+ * penguin and phone. So this fold no longer assembles anything. What is left
+ * on top of the plate is the moon (the mobile asset has no moon of its own;
+ * the desktop one does), the copy, and the two foot gradients.
  *
- * Mobile follows Figma 1326:5953 (395x610): plate, moon, phone
- * and the foot gradient are that frame's own numbers, so the phone overlay and
- * the device photographed into the plate line up by construction rather than
- * by a shared nudge. That is why the shifted group below applies from `tablet`
- * up only.
+ * That removed the live phone overlay and the penguin layer, and with them the
+ * geometry that existed only to serve them: the oversized/offset plate boxes,
+ * the `min()`/`max()` vw expressions that tracked a device photographed into
+ * the plate as it scaled, and the desktop light wash that lit that device.
  *
- * The copy is the one departure from that frame. The artboard puts it at
- * 92px, which leaves 42px between the header and the title against 75px
- * between the subtitle and the phone. Its top is now derived from the phone's
- * instead — half the space between the header and the device, less half the
- * copy's own 120px — so the two gaps stay equal as the phone rises with
- * viewport width past 395px.
+ * The copy keeps its own numbers. Its top was originally derived from the
+ * phone's — half the space between the header and the device, less half the
+ * copy's own 120px — but those resolve to plain constants, so the text sits
+ * where it always did over artwork that now supplies its own device.
  */
 /**
  * How far the scene falls behind the page over one stage height, as a share of
@@ -45,7 +42,18 @@ export default function Fold01() {
   return (
     <Section fold="01">
       <HeroMotion>
-        <div className="relative h-[610px] w-full overflow-hidden bg-[#0d0d0d] tablet:h-[700px] desktop-sm:h-[800px]">
+        {/*
+           * Past the 1440 artboard the stage grows with the viewport instead of
+           * staying 800px tall. The desktop asset is 1.802:1 and the stage is
+           * 1.8:1 at 1440, so the artwork lands essentially uncropped there —
+           * but at a fixed 800px a 2560 viewport is 3.2:1 and `object-cover`
+           * was discarding 44% of the image's height. Tracking 55.5vw (the
+           * asset's own ratio) holds that at ~6% instead, and the 1000px cap
+           * keeps the hero from turning into a full-screen billboard on very
+           * large monitors. `max()` pins it to exactly 800px at 1440 so the
+           * artboard width itself is unchanged.
+           */}
+          <div className="relative h-[610px] w-full overflow-hidden bg-[#0d0d0d] tablet:h-[700px] desktop-sm:h-[800px] desktop-lg:h-[max(800px,min(55.5vw,1000px))]">
           {/*
            * Everything that makes up the scene sits in one shifted group so it
            * moves as a unit. The phone is only a screen overlay sitting on the
@@ -99,38 +107,60 @@ export default function Fold01() {
             >
               <div data-parallax="target" className="absolute inset-0">
                 {/* ---------- background plate ---------- */}
-                <div data-hero="bg" className="absolute inset-0">
-                  <div className="absolute top-[-10.574%] left-[-73.797%] h-[149.18%] w-[247.114%] tablet:hidden">
-                    <Image
-                      src="/images/fold01/hero-bg-mobile.jpg"
-                      alt=""
-                      fill
-                      priority
-                      sizes="250vw"
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="absolute top-[-5.5%] left-[-6.81%] hidden h-[114%] w-[114.1%] tablet:block">
-                    <Image
-                      src="/images/fold01/hero-bg-desktop.jpg"
-                      alt=""
-                      fill
-                      priority
-                      sizes="115vw"
-                      className="object-cover"
-                    />
-                  </div>
+                {/*
+                 * Both assets are finished compositions — the landscape, the
+                 * penguin and the phone are all painted into them — so each is
+                 * simply the fold itself, laid full-bleed and framed by
+                 * `object-cover`. That replaces the oversized, offset boxes
+                 * this fold used to need (mobile 247% wide at -73.8%, desktop
+                 * 114% at -6.8%): those numbers existed to line a live overlay
+                 * up with a device photographed into the plate, and there is no
+                 * overlay left to line up.
+                 *
+                 * The swap is at 640px rather than `tablet`. The mobile asset
+                 * is portrait (1206x2085, 0.578) against a stage fixed at
+                 * 610px tall below `tablet`, so past ~353px wide the box is
+                 * already the shallower of the two and `object-cover` starts
+                 * discarding the artwork's height: 10% at 393px, 45% by 639px,
+                 * 54% at 767px if it ran that far.
+                 *
+                 * 640px is just past the crossover where the two assets lose
+                 * the same fraction (a stage aspect of 1.021, or 623px wide),
+                 * and it is also about the narrowest the landscape can go
+                 * before its own 42% horizontal crop starts eating the penguin
+                 * at the left. Equal fractions are not equal damage either —
+                 * cropping the landscape sideways keeps the sky the copy sits
+                 * on and the phone below it, where cropping the portrait takes
+                 * from both ends.
+                 */}
+                {/*
+                 * `top`/`bottom` rather than a translate: the group above
+                 * nudges the whole scene down 34px from `tablet` up, which the
+                 * old plate absorbed with its negative overhang and a
+                 * full-bleed one does not — it left 34px of the stage's own
+                 * black across the top. Cancelling it here keeps the artwork
+                 * flush with the stage while the copy stays where the nudge
+                 * puts it. It cannot be a `-translate-y`: GSAP writes this
+                 * node's `transform` for the entrance and would wipe it.
+                 */}
+                <div data-hero="bg" className="absolute inset-0 tablet:top-[-34px] tablet:bottom-[34px]">
+                  <Image
+                    src="/fold-one/bg-image-mobile.png"
+                    alt=""
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="object-cover object-center min-[640px]:hidden"
+                  />
+                  <Image
+                    src="/fold-one/bg-image-desktop.png"
+                    alt=""
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="hidden object-cover object-center min-[640px]:block"
+                  />
                 </div>
-
-                {/* ---------- soft light wash behind the phone (desktop only) ---------- */}
-                <div
-                  aria-hidden="true"
-                  className="absolute top-[43.75%] left-[5.07%] hidden h-[51.75%] w-[89.86%] tablet:block"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(ellipse at 50% 50%, rgba(217,217,217,0.10) 0%, rgba(217,217,217,0) 70%)",
-                  }}
-                />
 
                 {/* ---------- small moon (mobile only; the desktop moon is in the plate) ---------- */}
                 <Image
@@ -140,7 +170,7 @@ export default function Fold01() {
                   height={190}
                   priority
                   aria-hidden="true"
-                  className="absolute top-[37.574%] left-[77.519%] h-auto w-[16.911%] tablet:hidden"
+                  className="absolute top-[37.574%] left-[77.519%] h-auto w-[16.911%] min-[640px]:hidden"
                 />
               </div>
             </div>
@@ -148,7 +178,7 @@ export default function Fold01() {
             {/* ---------- copy ---------- */}
             <div
               data-hero="copy"
-              className="absolute top-[min(108.5px,calc(160.25px-13.091vw))] right-0 left-0 flex flex-col items-center gap-[12px] px-5 tablet:top-[92px] desktop-sm:top-[68px] desktop-sm:gap-[9px]"
+              className="absolute top-[min(108.5px,calc(160.25px-13.091vw))] right-0 left-0 flex flex-col items-center gap-[12px] px-5 tablet:top-[92px] desktop-sm:top-[98px] desktop-sm:gap-[9px]"
             >
               <h1 className="max-w-[355px] text-center text-[40px] leading-[43px] font-bold text-white max-mobile-sm:text-[35px] max-mobile-sm:leading-[38px] tablet:max-w-[440px] tablet:text-[48px] tablet:leading-[52px] desktop-sm:max-w-[527px] desktop-sm:text-[60px] desktop-sm:leading-[62px]">
                 <span className="block overflow-hidden pb-[0.14em] -mb-[0.14em]">
@@ -170,50 +200,6 @@ export default function Fold01() {
               </p>
             </div>
 
-            {/* Layer B — the phone, on the same numbers as the scene above. */}
-            <div
-              data-parallax="trigger"
-              data-parallax-start="0"
-              data-parallax-end={HERO_LAG}
-              data-parallax-scroll-start="top top"
-              data-parallax-scroll-end="bottom top"
-              className="pointer-events-none absolute inset-0"
-            >
-              <div data-parallax="target" className="absolute inset-0">
-                {/* ---------- phone mockup ---------- */}
-                {/*
-                 * The screen overlay has to track the device photographed in the
-                 * background plate, and above ~1399px that device grows with the
-                 * viewport: the plate box is 114.1% wide by a fixed 912px tall, and
-                 * past that width `object-cover` switches from height- to
-                 * width-constrained, so the image scales by viewport width. A fixed
-                 * 312px overlay therefore drifted — by 1920 the device was a third
-                 * larger than the black screen sitting on it, and at 2560 the
-                 * overlay covered barely half of it.
-                 *
-                 * The three values below are the plate's own geometry solved for the
-                 * screen aperture, so they scale exactly with it (derived against
-                 * the 1344x768 asset, not Figma's 1643x912 layer):
-                 *
-                 *   width  312px at 1440  ->  21.6667vw
-                 *   left   plate left (-6.81vw) + aperture offset  ->  39.73vw
-                 *   top    plate top + half the vertical crop      ->  412px - 7.921vw
-                 *
-                 * Each is paired with the pre-crossover constant via min()/max(),
-                 * which switches over at ~1440 on its own. Explicit `left` rather
-                 * than a centring translate: GSAP owns this element's transform for
-                 * the entrance and parallax, and a Tailwind translate on the same
-                 * property gets folded into that on init and then never updates on
-                 * resize.
-                 */}
-                <div
-                  data-hero="phone"
-                  className="absolute top-[min(287px,calc(390.5px-26.182vw))] left-[min(calc(49.76%-90.65px),26.828vw)] w-[max(186px,47.052vw)] tablet:top-[37.7%] tablet:left-[calc(50%-119px)] tablet:w-[250px] desktop-sm:top-[min(298px,calc(412px-7.921vw))] desktop-sm:left-[min(calc(50%-148px),39.73vw)] desktop-sm:w-[max(312px,21.6667vw)]"
-                >
-                  <HeroPhone />
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* ---------- bottom fade into the next fold ---------- */}
@@ -224,14 +210,14 @@ export default function Fold01() {
             // 81.7% of the way up. It runs past the stage's foot, so on screen
             // it only ever reaches about 55% — the previous full-strength fade
             // from 56% is what buried the lower half of the phone.
-            className="pointer-events-none absolute inset-x-0 top-[58.033%] h-[66.721%] tablet:hidden"
+            className="pointer-events-none absolute inset-x-0 top-[58.033%] h-[66.721%] min-[640px]:hidden"
             style={{
               backgroundImage: "linear-gradient(to top, #000000 0%, rgba(0,0,0,0) 81.7%)",
             }}
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 hidden tablet:block"
+            className="pointer-events-none absolute inset-0 hidden min-[640px]:block"
             style={{
               backgroundImage:
                 "linear-gradient(to bottom, transparent 82.5%, rgba(0,0,0,0.93) 100%)",
