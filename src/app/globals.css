@@ -99,23 +99,23 @@
      ======================================================================== */
 
   body {
-    font-size: clamp(1rem, 0.94rem + 0.3vw, 1.125rem);
+    font-size: clamp(1rem, 0.94rem + var(--locked-vw) * 0.003, 1.125rem);
   }
 
   h1 {
-    font-size: clamp(2rem, 1.6rem + 2vw, 3.5rem);
+    font-size: clamp(2rem, 1.6rem + var(--locked-vw) * 0.02, 3.5rem);
     line-height: 1.1;
     font-weight: 700;
   }
 
   h2 {
-    font-size: clamp(1.5rem, 1.3rem + 1vw, 2.5rem);
+    font-size: clamp(1.5rem, 1.3rem + var(--locked-vw) * 0.01, 2.5rem);
     line-height: 1.15;
     font-weight: 700;
   }
 
   h3 {
-    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
+    font-size: clamp(1.25rem, 1.1rem + var(--locked-vw) * 0.006, 1.75rem);
     line-height: 1.2;
     font-weight: 600;
   }

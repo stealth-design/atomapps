@@ -44,8 +44,15 @@ export default function Fold02() {
   // row — a margin would collapse straight through the section's top edge.
   return (
     <Section fold="02" className="h-[326px] bg-[#fafafa] tablet:h-[268px] tablet:pt-6">
+      {/* `top bottom` rather than Reveal's default `top 80%`. This fold sits
+          just under the hero, so on a phone it is already partly on screen at
+          scroll 0 — and the default fires only once its top reaches 80% of the
+          viewport, which on landing it never has. The stats stayed at opacity
+          0 and the band read as empty space rather than as content below the
+          fold. Firing on entry means it plays as the page settles. */}
       <Reveal
         variant="stagger"
+        start="top bottom"
         className="mx-auto flex h-full max-w-[var(--content-max-width)] flex-col justify-center gap-6 px-5 tablet:h-[180px] tablet:flex-row tablet:gap-0 tablet:px-10"
       >
         {STATS.map((stat, index) => (

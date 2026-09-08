@@ -18,10 +18,17 @@ import { Reveal } from "@/components/ui/Reveal";
  * of the accessibility tree.
  */
 export default function Fold04() {
+  // Past 1920 the whole section — its background included — is held to the
+  // nav's own edges, rather than only the copy inside it.
+  // `--content-max-width` less the 40px gutters is exactly the header's
+  // content row, so the two share a left and right edge.
+  //
+  // The band is `bg-white` on a white page, so today this moves an edge you
+  // cannot see; it matters the moment the fold takes a colour of its own.
   return (
     <Section
       fold="04"
-      className="bg-white py-[var(--fold-gap-y)]"
+      className="mx-auto bg-white py-[var(--fold-gap-y)] desktop-xl:max-w-[calc(var(--content-max-width)-80px)]"
     >
       {/* Small numbers on purpose: this band is only ~120px tall, so the
           offset still only comes to ~24px either way — enough to read as
@@ -29,9 +36,11 @@ export default function Fold04() {
       <div data-parallax="trigger" data-parallax-start="14" data-parallax-end="-14">
         <Reveal
           variant="stagger"
-          className="mx-auto max-w-[var(--content-max-width)] px-5 text-center tablet:px-10"
+          // `px-0` past 1920: the section itself is already on the nav's edges
+          // by then, so the gutter here would inset the copy a second time.
+          className="mx-auto max-w-[var(--content-max-width)] px-5 text-center tablet:px-10 desktop-xl:px-0"
         >
-          <h2 className="text-[28px] leading-[36px] font-bold text-[#111111] tablet:text-[clamp(38px,5vw,72px)] tablet:leading-[1.3] tablet:text-black tablet:capitalize">
+          <h2 className="text-[28px] leading-[36px] font-bold text-[#111111] tablet:text-[clamp(38px,calc(var(--locked-vw)*0.05),72px)] tablet:leading-[1.3] tablet:text-black tablet:capitalize">
             {/* Mobile breaks after "apps" so the second line reads "for
                 different needs" instead of orphaning "needs" on its own. The
                 spans go inline again on desktop, where it sets as one line. */}
@@ -39,7 +48,7 @@ export default function Fold04() {
             <span className="block tablet:inline">for different needs</span>
           </h2>
 
-          <p className="mt-3 text-[15px] leading-[20px] text-[#61616a] tablet:mt-[38px] tablet:text-[clamp(16px,2.01vw,29px)] tablet:leading-[1.31] tablet:font-semibold tablet:text-black">
+          <p className="mt-3 text-[15px] leading-[20px] text-[#61616a] tablet:mt-[38px] tablet:text-[clamp(16px,calc(var(--locked-vw)*0.0201),29px)] tablet:leading-[1.31] tablet:font-semibold tablet:text-black">
             <span className="tablet:hidden">Thoughtful designs built for real needs</span>
             <span className="hidden tablet:inline">
               Thoughtful designs create better experiences

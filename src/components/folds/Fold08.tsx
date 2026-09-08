@@ -68,26 +68,20 @@ export default function Fold08() {
             <ul className="mt-[32px] flex justify-center gap-[13px] tablet:mt-[54px] tablet:gap-[20px]">
               {TEAM.map((member) => (
                 <li key={member.name} className="w-[109px] tablet:w-[376px]">
-                  {/* The frame keeps the artboard's crop and corner radius; the
-                      photo inside it is what moves. Off below 480px, where the
-                      portraits are 109px thumbnails and the travel would read
-                      as a wobble rather than depth. */}
-                  <div
-                    data-parallax="trigger"
-                    data-parallax-disable="mobile"
-                    data-parallax-start="12"
-                    data-parallax-end="-12"
-                    className="relative aspect-square overflow-hidden rounded-[12px] tablet:aspect-[376/329] tablet:rounded-[5px]"
-                  >
-                    {/* 136% tall, hung 18% above the frame, so ±12% of the
-                        photo's own height — about ±16% of the frame — always
-                        has image behind it and the crop never shows through.
-                        Overhang has to stay ahead of travel: raising one
-                        without the other is what opens a gap at the edge. */}
-                    <div
-                      data-parallax="target"
-                      className="absolute inset-x-0 top-[-18%] h-[136%]"
-                    >
+                  {/* The frame keeps the artboard's crop and corner radius. */}
+                  <div className="relative aspect-square overflow-hidden rounded-[12px] tablet:aspect-[376/329] tablet:rounded-[5px]">
+                    {/* Flush with the frame, and the drift is gone with it.
+                        The photo used to sit in a box 136% tall hung 18% above,
+                        which is what gave the parallax room to travel — but it
+                        also meant the frame only ever showed rows 13% to 87% of
+                        the photo, and every head in this row starts inside that
+                        first 13%. There is no way to keep both: the crop only
+                        exists to be panned, so anchoring the photo costs the
+                        travel.
+                        It costs nothing else. The frame is 376x329 and the
+                        photos are 752x658 — the same 1.143 — so at `inset-0`
+                        `object-cover` shows each one whole, uncropped. */}
+                    <div className="absolute inset-0">
                       <Image
                         src={`/images/fold08/${member.photo}`}
                         alt={member.name}

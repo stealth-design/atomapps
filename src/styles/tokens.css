@@ -18,6 +18,10 @@
   --breakpoint-desktop-sm: 1024px;
   --breakpoint-desktop-md: 1280px;
   --breakpoint-desktop-lg: 1440px;
+  /* Past the widest layout the folds run end to end at (1920). Above this the
+     page sits in gutters, which is the only place the containment and hero
+     adjustments below apply. 1921 so 1920 itself still reads as end-to-end. */
+  --breakpoint-desktop-xl: 1921px;
 
   /* Reusable vertical rhythm for section spacing */
   --spacing-fold-y: 4rem;
@@ -35,6 +39,18 @@
 
   /* Layout — the design's desktop artboard is 1440 wide */
   --content-max-width: 1440px;
+  /* The artboard width, or the viewport when it is narrower. Viewport-relative
+     values read this instead of `100vw` so nothing keeps growing once the
+     layout is locked to the artboard: past 1440 every one of them is frozen.
+     Fold 01 and the footer are deliberately outside that lock — their
+     backgrounds still span the window — but their contents are not. */
+  --locked-vw: min(100vw, 1440px);
+  /* Fold 03's own cap. Its icon scatter is a full-bleed stage, not a content
+     band: the outermost icons are placed past the artboard's edges on purpose
+     so they bleed off screen. Capping that at 1440 put the bleed against a
+     white gutter instead, which reads as clipping — so the stage runs end to
+     end up to 1920 and only locks beyond it. */
+  --content-max-width-wide: 1920px;
   --content-padding: 1.25rem;
   --header-height: 50px;
   /* Half the gap between two folds — every content fold uses it top and

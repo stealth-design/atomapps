@@ -2,6 +2,7 @@ import Image from "next/image";
 import {
   BLUR_SCALE,
   DESKTOP_ICONS,
+  DESKTOP_ICONS_WIDE,
   DESKTOP_STAGE,
   END_ORDER,
   ICON_RADIUS,
@@ -45,6 +46,12 @@ function startRules(icons: IconPlacement[], stage: { width: number; height: numb
 const START_CSS = [
   startRules(MOBILE_ICONS, MOBILE_STAGE),
   `@media(min-width:768px){${startRules(DESKTOP_ICONS, DESKTOP_STAGE)}}`,
+  // Tied to the stage's own cap (--content-max-width-wide, 1920), not the
+  // layout lock at 1440: up to 1920 the stage still runs end to end, so the
+  // two side icons bleed off the screen's own edge exactly as the artboard
+  // intends. Only past 1920 does the stage centre inside gutters and turn
+  // those bleeds into visible cuts — see DESKTOP_ICONS_WIDE.
+  `@media(min-width:1921px){${startRules(DESKTOP_ICONS_WIDE, DESKTOP_STAGE)}}`,
 ].join("");
 
 export function IconScatter() {

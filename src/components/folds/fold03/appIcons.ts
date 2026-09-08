@@ -69,6 +69,40 @@ export const DESKTOP_ICONS: IconPlacement[] = [
 ];
 
 /**
+ * START — the two icons that bleed off the stage's sides, pulled inside for
+ * screens wider than the artboard.
+ *
+ * Sitting inside the stage is not enough on its own: `blur` puts a halo around
+ * each one that the stage's `overflow-clip` cuts just as visibly as the icon.
+ * icon-05 carries blur 29 and icon-10 blur 40 — 14.5px and 20px once halved
+ * for CSS — so both are inset well clear of the edge rather than up against
+ * it, and shrunk again to pay for the inset. Their haloes now land at 35 and
+ * 1410 against a stage running 0 to 1440.
+ *
+ * `icon-05` sits at x=-203 and `icon-10` runs to x=1708 against a 1440-wide
+ * artboard, so each is about 70% off-stage and shows as a sliver — 88px of 291
+ * on the left, 112px of 380 on the right. That is correct while the stage is
+ * the window: the cut lands on the screen's own edge and reads as a bleed,
+ * which is why the stage runs end to end up to 1920. Past that it centres
+ * inside gutters and both cuts fall in the middle of the screen against white,
+ * which reads as clipping instead.
+ *
+ * Each is shrunk to fit inside with that clearance and kept near its original
+ * centre, so the eye still finds it where it was. Both spots were checked
+ * against every other placement: icon-05 runs x 50-160 against icon-01's 161,
+ * and icon-10 runs x 1210-1390 against icon-03's 1203, clear of icon-14's x
+ * (ends 1167) and icon-06's y (starts 509).
+ *
+ * Coordinates stay in the artboard's 1440 space like every other placement —
+ * `startRules` turns them into percentages of whatever the stage measures, so
+ * they scale with it and stay inside at any capped width.
+ */
+export const DESKTOP_ICONS_WIDE: IconPlacement[] = [
+  { icon: "icon-05", x: 50, y: 370, size: 110, blur: 29 },
+  { icon: "icon-10", x: 1210, y: 148, size: 180, blur: 40 },
+];
+
+/**
  * START — mobile scatter, Figma 1136:1122 (393x626).
  *
  * icon-03 is absent from the mobile artboard, but the sequence needs all 15

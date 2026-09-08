@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { siteConfig } from "@/data/site";
 
 /**
@@ -36,16 +37,17 @@ export function Footer() {
       // above that it gives way rather than clipping the wordmark.
       className="relative min-h-[657px] w-full overflow-hidden bg-[#171717] tablet:min-h-[800px]"
     >
-      <div className="flex min-h-[657px] flex-col px-5 pt-[45px] pb-[38px] tablet:min-h-[800px] tablet:px-10 tablet:pt-[61px] tablet:pb-[54px]">
+      <div className="mx-auto flex min-h-[657px] w-full max-w-[var(--content-max-width)] flex-col px-5 pt-[45px] pb-[38px] tablet:min-h-[800px] tablet:px-10 tablet:pt-[61px] tablet:pb-[54px]">
         {/* ---------- call to action ---------- */}
         {/*
          * The ring and its gap are fractions of the call to action's own type
          * size, so the three stay in proportion at any width — the artboard's
          * 67 / 47 / 17px at 1440, and still that lockup at 2560.
          */}
-        <a
+        {/* `Link` for the same reason as the header's: /contact is a route. */}
+        <Link
           href={siteConfig.footerCta.href}
-          className="group flex w-fit items-center gap-[0.254em] self-end text-[32px] leading-[1.4] font-medium text-[#f5f5f7] tablet:text-[clamp(67px,4.653vw,104px)]"
+          className="group flex w-fit items-center gap-[0.254em] self-end text-[32px] leading-[1.4] font-medium text-[#f5f5f7] tablet:text-[clamp(67px,calc(var(--locked-vw)*0.04653),104px)]"
         >
           <span>{siteConfig.footerCta.label}</span>
 
@@ -63,7 +65,7 @@ export function Footer() {
             <Arrow className="translate-x-0 translate-y-0 group-hover:translate-x-[150%] group-hover:-translate-y-[150%]" />
             <Arrow className="-translate-x-[150%] translate-y-[150%] group-hover:translate-x-0 group-hover:translate-y-0" />
           </span>
-        </a>
+        </Link>
 
         {/* ---------- oversized wordmark ---------- */}
         {/* `mt-auto` is what holds the artboard's shape: the call to action

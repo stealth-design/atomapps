@@ -43,17 +43,38 @@ export default function Fold01() {
     <Section fold="01">
       <HeroMotion>
         {/*
-           * Past the 1440 artboard the stage grows with the viewport instead of
-           * staying 800px tall. The desktop asset is 1.802:1 and the stage is
-           * 1.8:1 at 1440, so the artwork lands essentially uncropped there —
-           * but at a fixed 800px a 2560 viewport is 3.2:1 and `object-cover`
-           * was discarding 44% of the image's height. Tracking 55.5vw (the
-           * asset's own ratio) holds that at ~6% instead, and the 1000px cap
-           * keeps the hero from turning into a full-screen billboard on very
-           * large monitors. `max()` pins it to exactly 800px at 1440 so the
-           * artboard width itself is unchanged.
-           */}
-          <div className="relative h-[610px] w-full overflow-hidden bg-[#0d0d0d] tablet:h-[700px] desktop-sm:h-[800px] desktop-lg:h-[max(800px,min(55.5vw,1000px))]">
+         * The stage takes its height from whichever plate is showing.
+         *
+         * Below the 640px switch that is the portrait asset's own ratio —
+         * 2556/1206, so `100vw * 2.11940` — which is what shows it end to end
+         * with nothing cropped off the top or the bottom. It re-derives per
+         * width instead of fixing a number, so a re-export of that asset only
+         * needs this ratio updated.
+         *
+         * There is no `dvh` cap on it any more, and that is a trade: the plate
+         * is 833px at 393 wide against a 761px viewport, so Fold 02 no longer
+         * shows on landing the way it did while this was capped at 85dvh.
+         * Showing the whole plate and leaving the next fold in view are not
+         * both available at this ratio — the artwork is taller than the screen.
+         *
+         * `min-[640px]` puts the fixed heights back from the point the
+         * landscape asset takes over — the ratio above would give a 1229px
+         * stage at 639px wide, which is right for a portrait plate and absurd
+         * for a landscape one.
+         *
+         * From `desktop-sm` the hero is the viewport instead: one screen, top
+         * to bottom, with the fixed 50px header over its own top edge rather
+         * than pushing it down. That replaced a fixed 800px, the 1440
+         * artboard's height, which only read correctly at that one size — a
+         * 2560x1400 window is 3.2:1 against 800px, and `object-cover` threw
+         * away 44% of the artwork's height to fill it. Full height tracks the
+         * desktop asset's 1.802 far more closely: 1.3% cropped at 1920x1080
+         * and 1.5% at 2560x1400, against 11% at 1440x900.
+         *
+         * `dvh` rather than `vh` so collapsing mobile browser chrome cannot
+         * leave a strip under it.
+         */}
+        <div className="relative h-[calc(100vw*2.11940)] w-full overflow-hidden bg-[#0d0d0d] min-[640px]:h-[610px] tablet:h-[700px] desktop-sm:h-[100dvh]">
           {/*
            * Everything that makes up the scene sits in one shifted group so it
            * moves as a unit. The phone is only a screen overlay sitting on the
@@ -117,21 +138,18 @@ export default function Fold01() {
                  * up with a device photographed into the plate, and there is no
                  * overlay left to line up.
                  *
-                 * The swap is at 640px rather than `tablet`. The mobile asset
-                 * is portrait (1206x2085, 0.578) against a stage fixed at
-                 * 610px tall below `tablet`, so past ~353px wide the box is
-                 * already the shallower of the two and `object-cover` starts
-                 * discarding the artwork's height: 10% at 393px, 45% by 639px,
-                 * 54% at 767px if it ran that far.
+                 * The swap is at 640px rather than `tablet`, and it is the
+                 * stage's height that makes it work: below 640 the stage
+                 * follows the portrait asset's 1206x2319 exactly, so
+                 * `object-cover` has nothing to crop there. Above it the stage
+                 * is a fixed height and the landscape asset is the one that
+                 * suits it.
                  *
-                 * 640px is just past the crossover where the two assets lose
-                 * the same fraction (a stage aspect of 1.021, or 623px wide),
-                 * and it is also about the narrowest the landscape can go
-                 * before its own 42% horizontal crop starts eating the penguin
-                 * at the left. Equal fractions are not equal damage either —
-                 * cropping the landscape sideways keeps the sky the copy sits
-                 * on and the phone below it, where cropping the portrait takes
-                 * from both ends.
+                 * 640 is about the narrowest the landscape can go before its
+                 * own 42% horizontal crop starts eating the penguin at the
+                 * left, which is what sets the floor. Cropping the landscape
+                 * sideways is the cheap direction anyway — it keeps the sky the
+                 * copy sits on and the phone below it.
                  */}
                 {/*
                  * `top`/`bottom` rather than a translate: the group above
@@ -143,7 +161,21 @@ export default function Fold01() {
                  * puts it. It cannot be a `-translate-y`: GSAP writes this
                  * node's `transform` for the entrance and would wipe it.
                  */}
-                <div data-hero="bg" className="absolute inset-0 tablet:top-[-34px] tablet:bottom-[34px]">
+                {/*
+                 * Past 1920 the plate lifts 40px: `top` goes to -74 while
+                 * `bottom` stays at 34, which makes the box 40px taller and
+                 * puts its top 40px higher. After the group's +34 the box runs
+                 * -40 to the stage's own foot, so it still covers the stage —
+                 * pulling the plate up without opening the stage's black along
+                 * the bottom, which a plain shift would have done.
+                 *
+                 * Only the plate moves. The copy above has its own `top` and
+                 * the moon is off by then, so the scene lifts under them.
+                 */}
+                <div
+                  data-hero="bg"
+                  className="absolute inset-0 tablet:top-[-34px] tablet:bottom-[34px] desktop-xl:top-[-74px]"
+                >
                   <Image
                     src="/fold-one/bg-image-mobile.png"
                     alt=""
@@ -176,11 +208,31 @@ export default function Fold01() {
             </div>
 
             {/* ---------- copy ---------- */}
+            {/*
+             * Past 1920 the copy is centred in the gap between the header and
+             * the phone rather than sitting on a fixed offset.
+             *
+             * The phone is painted into the plate, so its position has to be
+             * read off the asset: its top edge is at 50.3% of the image's own
+             * height. Resolved through `object-cover` against a 100dvh stage,
+             * that midpoint sits at a near-constant 26.3% of the stage — 26.6%
+             * at 1921x1080 through 26.1% at 2880x1620 — so the percentage is
+             * what tracks it.
+             *
+             * The 137.5px comes off it because `top` positions the block's top,
+             * not its centre: 103.5 is half the block's own height at these
+             * sizes (two 84px lines, a 9px gap and a 30px subtitle), and 34 is
+             * the shift the scene group adds. It has to move with the type —
+             * it was 122.5 while the title was 68px.
+             */}
             <div
               data-hero="copy"
-              className="absolute top-[min(108.5px,calc(160.25px-13.091vw))] right-0 left-0 flex flex-col items-center gap-[12px] px-5 tablet:top-[92px] desktop-sm:top-[98px] desktop-sm:gap-[9px]"
+              className="absolute top-[min(168.5px,calc(220.25px-13.091vw))] right-0 left-0 flex flex-col items-center gap-[12px] px-5 tablet:top-[92px] desktop-sm:top-[98px] desktop-sm:gap-[9px] desktop-xl:top-[calc(26.3%-137.5px)]"
             >
-              <h1 className="max-w-[355px] text-center text-[40px] leading-[43px] font-bold text-white max-mobile-sm:text-[35px] max-mobile-sm:leading-[38px] tablet:max-w-[440px] tablet:text-[48px] tablet:leading-[52px] desktop-sm:max-w-[527px] desktop-sm:text-[60px] desktop-sm:leading-[62px]">
+              {/* `max-w` grows with the type past 1920 — 527px holds
+                  "Everyday tasks" on one line at 60px and would break it at
+                  68px, which 600 clears. */}
+              <h1 className="max-w-[355px] text-center text-[40px] leading-[43px] font-bold text-white max-mobile-sm:text-[35px] max-mobile-sm:leading-[38px] tablet:max-w-[440px] tablet:text-[48px] tablet:leading-[52px] desktop-sm:max-w-[527px] desktop-sm:text-[60px] desktop-sm:leading-[62px] desktop-xl:max-w-[720px] desktop-xl:text-[80px] desktop-xl:leading-[84px]">
                 <span className="block overflow-hidden pb-[0.14em] -mb-[0.14em]">
                   <span data-hero-line className="block">
                     Everyday tasks
@@ -193,7 +245,7 @@ export default function Fold01() {
                 </span>
               </h1>
 
-              <p className="overflow-hidden pb-[0.14em] -mb-[0.14em] text-center text-[16px] leading-[20px] text-white tablet:text-[20px] tablet:leading-[24px] desktop-sm:text-[24px] desktop-sm:leading-[26px]">
+              <p className="overflow-hidden pb-[0.14em] -mb-[0.14em] text-center text-[16px] leading-[20px] text-white tablet:text-[20px] tablet:leading-[24px] desktop-sm:text-[24px] desktop-sm:leading-[26px] desktop-xl:text-[28px] desktop-xl:leading-[30px]">
                 <span data-hero-line className="block">
                   Through apps that people love
                 </span>

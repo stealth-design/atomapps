@@ -31,7 +31,19 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
       // `--focal` is the scene's own horizontal focal point, consumed by both
       // the scene and its blurred copy below so the two stay in register.
       style={{ "--focal": panel.mobileFocal } as CSSProperties}
-      className="relative h-full w-full overflow-hidden rounded-[20px] shadow-[0_-8px_40px_rgba(0,0,0,0.18)] tablet:rounded-[28px]"
+      // Past 1920 the card stops filling the panel and takes the reference
+      // frame's own 1764:1087, so it reads as a landscape card rather than the
+      // near-square block a 1360-wide panel made of a 100dvh height. At the
+      // nav's 1360 that comes to 1360x838.
+      //
+      // Only the card shrinks. The panel around it stays `h-svh`, because its
+      // height is the scroll distance the sticky stack runs on — shortening
+      // that would speed every transition up. The panel centres this instead.
+      //
+      // Everything inside is a percentage of this box, so the internals hold
+      // their proportions: the glass card lands at 438x652, a 0.67 against the
+      // 0.66 it has at 1440.
+      className="relative h-full w-full overflow-hidden rounded-[20px] shadow-[0_-8px_40px_rgba(0,0,0,0.18)] tablet:rounded-[28px] desktop-xl:h-auto desktop-xl:aspect-[1764/1087]"
     >
       {/*
        * Two boxes, because the scene both drifts and needs somewhere to drift
@@ -64,10 +76,17 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
       />
 
       {/* The card drifts against the scene, which is where the depth in this
-          panel comes from — see StackMotion for the three coupled amounts. */}
+          panel comes from — see StackMotion for the three coupled amounts.
+          *
+          * Past 1920 `top` becomes (100 - 77.765) / 2, so the card rests
+          * centred in the plate. The artboard's 11.738% leaves only 10.497%
+          * under it — a 10px lean that read as a lean once the plate stopped
+          * being a full viewport tall. StackMotion's own +-2.5% swings either
+          * side of wherever it rests, so centring the rest position is what
+          * makes the top and bottom gaps equal through the whole drift. */}
       <div
         data-f05-glass
-        className="absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.738%] tablet:bottom-auto tablet:left-[2.569%] tablet:h-[77.765%] tablet:max-h-none tablet:w-[32.222%]"
+        className="absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.738%] tablet:bottom-auto tablet:left-[2.569%] tablet:h-[77.765%] tablet:max-h-none tablet:w-[32.222%] desktop-xl:top-[11.1175%]"
       >
         <div className="relative isolate h-auto w-full overflow-hidden rounded-[14px] tablet:h-full tablet:rounded-[19px]">
           {/* frosted backing: the same scene, pre-blurred and aligned to it */}
@@ -80,21 +99,36 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 over the same part of the scene it is a copy of. The zoom and
                 the blur stay on the inner box, out of GSAP's way. */}
             <div data-f05-frost className="absolute inset-0">
-            <div className="absolute top-[-118.8%] left-[-5.664%] h-[227.4%] w-[111.328%] scale-[1.08] blur-[22px] tablet:top-[-15.09%] tablet:left-[-79.73%] tablet:h-[128.59%] tablet:w-[310.35%]">
-              <Image
-                src={panel.background}
-                alt=""
-                fill
-                sizes="100vw"
-                className="object-cover object-[var(--focal)_center] tablet:object-center"
-              />
-            </div>
+              <div className="absolute top-[-118.8%] left-[-5.664%] h-[227.4%] w-[111.328%] scale-[1.08] blur-[22px] tablet:top-[-15.09%] tablet:left-[-79.73%] tablet:h-[128.59%] tablet:w-[310.35%]">
+                <Image
+                  src={panel.background}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  className="object-cover object-[var(--focal)_center] tablet:object-center"
+                />
+              </div>
             </div>
             <div className="absolute inset-0 bg-white/[0.72]" />
           </div>
 
+          {/* Top-aligned past 1920, not centred. Centring split the leftover
+              room above and below, which put each card's header at a different
+              height — 64px down on Find My Phone against 6px on Steppy, since
+              the four carry different amounts of copy. Aligning to the top
+              gives every header the same offset from the card's edge and
+              collects the slack at the foot instead.
+
+              The gap that centring originally closed stays closed: the stats
+              block below drops `mt-auto` past 1920, so it follows the content
+              rather than being pushed to the card's bottom. */}
           <div className="relative z-10 flex h-full w-full flex-col px-[6.799%] py-[24px] tablet:px-[9.267%] tablet:py-[44px]">
             {/* ---- header ---- */}
+            {/* The app name deliberately has no `desktop-xl` size. It shares its
+                row with the icon, so it only gets 268px in the narrowed card,
+                and "Volume Control" — the longest of the four — needs 35.6px or
+                less to hold one line there. 35px is already that ceiling, so
+                growing it only buys a wrap the reference frame does not have. */}
             <div className="flex items-center gap-[12px] tablet:gap-[20px]">
               <Image
                 src={panel.icon}
@@ -102,7 +136,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 width={279}
                 height={280}
                 aria-hidden="true"
-                className="size-[40px] shrink-0 rounded-[20.8%] tablet:size-[65px]"
+                className="size-[40px] shrink-0 rounded-[20.8%] tablet:size-[65px] desktop-xl:size-[54px]"
               />
               <h3 className="text-[20px] leading-[26px] font-extrabold text-black tablet:text-[35px] tablet:leading-[46px]">
                 {panel.title}
@@ -110,21 +144,26 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
             </div>
 
             {panel.question && (
-              <p className="mt-[20px] text-[16px] leading-[21px] font-medium text-black tablet:mt-[35px] tablet:text-[20px] tablet:leading-[26px]">
+              <p className="mt-[20px] text-[16px] leading-[21px] font-medium text-black tablet:mt-[35px] desktop-xl:mt-[26px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
                 {panel.question}
               </p>
             )}
 
-            <p className="mt-[14px] text-[12px] leading-[16px] font-light text-black tablet:mt-[30px] tablet:text-[14px] tablet:leading-[18px]">
+            <p className="mt-[14px] text-[12px] leading-[16px] font-light text-black tablet:mt-[30px] desktop-xl:mt-[22px] tablet:text-[14px] tablet:leading-[18px] desktop-xl:text-[15px] desktop-xl:leading-[20px]">
               {panel.description}
             </p>
 
             {panel.cta && (
               <a
                 href={panel.cta.href}
-                className="mt-[18px] flex h-[40px] w-fit max-w-full items-center gap-[10px] rounded-full bg-white pr-[10px] pl-[16px] tablet:mt-[30px]"
+                // One width for all four past 1920. `w-fit` sizes each pill to its own
+                // label, so the four ran 204-230px and read as four different
+                // buttons; 240 clears the longest ("Explore Volume Control", 230)
+                // and `justify-between` pins the arrow to the right edge so the
+                // shorter labels do not leave it floating mid-pill.
+                className="mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-white pr-[10px] pl-[16px] tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
               >
-                <span className="text-[14px] leading-[18px] text-black">
+                <span className="text-[14px] leading-[18px] text-black desktop-xl:text-[15px] desktop-xl:leading-[20px]">
                   {panel.cta.label}
                 </span>
                 <span className="flex size-[20px] shrink-0 items-center justify-center rounded-full bg-black">
@@ -148,15 +187,19 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
             )}
 
             {panel.badge && (
-              <span className="mt-[18px] flex h-[38px] w-fit items-center rounded-full bg-[#909090] px-[17px] text-[14px] leading-[18px] text-white tablet:mt-[30px]">
+              <span // Matches the CTA pill past 1920 — the same 240x44 box with a centred
+                // label — so the "coming soon" card sits in the row rather than
+                // beside it.
+                className="mt-[18px] flex h-[38px] w-fit shrink-0 items-center rounded-full bg-[#909090] px-[17px] text-[14px] leading-[18px] text-white tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-center desktop-xl:text-[15px] desktop-xl:leading-[20px]"
+              >
                 {panel.badge}
               </span>
             )}
 
             {/* ---- closing block, anchored to the bottom of the card ---- */}
-            <div className="mt-auto pt-[20px]">
+            <div className="mt-auto pt-[20px] desktop-xl:mt-[26px]">
               {panel.quote && (
-                <p className="mb-[20px] text-[15px] leading-[21px] font-medium text-black tablet:mb-[40px] tablet:text-[20px] tablet:leading-[26px]">
+                <p className="mb-[20px] text-[15px] leading-[21px] font-medium text-black tablet:mb-[40px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
                   {panel.quote}
                 </p>
               )}
@@ -172,7 +215,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                         height={20}
                         className="mt-[1px] size-[16px] shrink-0 tablet:size-[20px]"
                       />
-                      <p className="text-[12px] leading-[16px] text-black tablet:text-[14px] tablet:leading-[18px]">
+                      <p className="text-[12px] leading-[16px] text-black tablet:text-[14px] tablet:leading-[18px] desktop-xl:text-[15px] desktop-xl:leading-[20px]">
                         {feature.text}
                       </p>
                     </li>
@@ -183,21 +226,21 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
               {panel.stats && (
                 <div className="flex gap-[42px] tablet:gap-[111px]">
                   <div>
-                    <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px]">
+                    <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
                       {panel.stats.downloads}
                     </p>
-                    <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px]">
+                    <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">
                       Downloads
                     </p>
                   </div>
                   <div>
                     <div className="flex items-center gap-[7px]">
-                      <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px]">
+                      <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
                         {panel.stats.rating}
                       </p>
                       <StarRating className="block h-[11px] tablet:h-[18px]" />
                     </div>
-                    <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px]">
+                    <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">
                       App Store Rating
                     </p>
                   </div>

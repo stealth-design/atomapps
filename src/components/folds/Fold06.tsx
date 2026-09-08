@@ -24,15 +24,21 @@ export default function Fold06() {
       {/* ---------- decorative arcs (Figma: one masked circle group at 20%) ---------- */}
       {/* The trigger spans the fold rather than sitting on the arcs
           themselves, so the drift is timed to the section the reader is
-          looking at instead of to the arc field's own 1510px box. Its
-          `inset-0` matches the box the arcs were already positioned against,
-          so their offsets below are unchanged. */}
+          looking at instead of to the arc field's own box. */}
       <div
         data-parallax="trigger"
         data-parallax-start="6"
         data-parallax-end="-6"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
+        // Past 1920 this box becomes the header's content row exactly: the
+        // artboard width less its 40px gutters, centred. `mx-auto` against
+        // `inset-0` is what centres it, the same way the fixed header centres.
+        //
+        // The arcs are sized as a share of this box, so it is what holds them
+        // to the nav's left and right edges. Left uncapped they run 104.86% of
+        // the full window and hang past both sides — at 2560 that would put
+        // the arc field at 579..2261 against a nav sitting at 600..1960.
+        className="pointer-events-none absolute inset-0 mx-auto desktop-xl:max-w-[calc(var(--content-max-width)-80px)]"
       >
         <Image
           data-parallax="target"
@@ -40,12 +46,23 @@ export default function Fold06() {
           alt=""
           width={1510}
           height={1510}
-          className="absolute top-[-14%] left-[-141.7%] w-[383.5%] max-w-none tablet:top-[10.95%] tablet:left-[-2.88%] tablet:w-[104.86%]"
+          // The artboard's own 104.86% at -2.88% up to 1920, where the overhang
+          // is the point of those two numbers and lands off the screen's edge.
+          // Past 1920 it flattens to `left-0 w-full` so the field ends where
+          // its box does, and therefore where the nav does.
+          className="absolute top-[-14%] left-[-141.7%] w-[383.5%] max-w-none tablet:top-[10.95%] tablet:left-[-2.88%] tablet:w-[104.86%] desktop-xl:left-0 desktop-xl:w-full"
         />
       </div>
 
       <div className="relative py-[var(--fold-gap-y)]">
-        <Reveal variant="stagger" className="px-5 text-center tablet:px-10">
+        {/* Held to the nav's own edges past 1920 only — the artboard width less
+            its 40px gutters, with the gutter here dropped so it is not inset
+            twice. Up to 1920 it stays the full window, which is already the
+            nav's box at 1440 and is what keeps this fold end to end at 1920. */}
+        <Reveal
+          variant="stagger"
+          className="mx-auto px-5 text-center tablet:px-10 desktop-xl:max-w-[calc(var(--content-max-width)-80px)] desktop-xl:px-0"
+        >
           <p className="text-[12px] leading-[16px] font-bold tracking-[0.02em] text-black uppercase tablet:text-[16px] tablet:leading-[21px]">
             Our Approach
           </p>

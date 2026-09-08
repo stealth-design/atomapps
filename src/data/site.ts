@@ -34,8 +34,10 @@ export const siteConfig: SiteConfig = {
     { label: "Our Approach", href: "#fold-06" },
     { label: "About Us", href: "#fold-03" },
   ],
-  cta: { label: "Contact Us", href: "#contact" },
-  footerCta: { label: "Get in touch", href: "#contact" },
+  // Both point at the /contact page rather than the footer anchor. The
+  // footer keeps its own `id="contact"`, so existing anchors still resolve.
+  cta: { label: "Contact Us", href: "/contact" },
+  footerCta: { label: "Get in touch", href: "/contact" },
   legal: [
     { label: "Terms & Conditions", href: "#" },
     { label: "Privacy Policy", href: "#" },

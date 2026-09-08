@@ -59,48 +59,91 @@ export function StackMotion({ children }: { children: ReactNode }) {
       const mm = gsap.matchMedia();
 
       // Under reduced motion the stack still works — it just doesn't recede.
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const timeline = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: root,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 0.4,
-            invalidateOnRefresh: true,
-          },
-        });
+      //
+      // `wide` is read below to drop the card's own drift past 1920. The
+      // conditions object rather than a plain query string so the context
+      // re-runs if the window crosses that width.
+      mm.add(
+        {
+          motion: "(prefers-reduced-motion: no-preference)",
+          wide: "(min-width: 1921px)",
+        },
+        (context) => {
+          if (!context.conditions?.motion) return;
+          const wide = Boolean(context.conditions?.wide);
+          const timeline = gsap.timeline({
+            defaults: { ease: "none" },
+            scrollTrigger: {
+              trigger: root,
+              start: "top top",
+              end: "bottom bottom",
+              scrub: 0.4,
+              invalidateOnRefresh: true,
+            },
+          });
 
-        cards.forEach((card, index) => {
-          const shade = card.querySelector<HTMLElement>("[data-f05-shade]");
+          cards.forEach((card, index) => {
+            const shade = card.querySelector<HTMLElement>("[data-f05-shade]");
 
-          if (index < cards.length - 1) {
-            timeline.to(card, { scale: COVERED_SCALE, duration: 1 }, index);
-            if (shade) timeline.to(shade, { opacity: COVERED_SHADE, duration: 1 }, index);
-          }
+            if (index < cards.length - 1) {
+              timeline.to(card, { scale: COVERED_SCALE, duration: 1 }, index);
+              if (shade)
+                timeline.to(
+                  shade,
+                  { opacity: COVERED_SHADE, duration: 1 },
+                  index,
+                );
+            }
 
-          // Each panel drifts across exactly one hand-off, so every panel moves
-          // at the same rate. Which hand-off is the one it can be seen during:
-          // the arrival that brings it up, except for the first panel, which
-          // was never brought up and so uses the hand-off that covers it.
-          const at = index === 0 ? 0 : index - 1;
+            // Each panel drifts across exactly one hand-off, so every panel moves
+            // at the same rate. Which hand-off is the one it can be seen during:
+            // the arrival that brings it up, except for the first panel, which
+            // was never brought up and so uses the hand-off that covers it.
+            const at = index === 0 ? 0 : index - 1;
 
-          // Amounts are resolved as functions of the panel's measured height
-          // rather than yPercent, because the three elements are different
-          // heights and only share a frame of reference through the panel.
-          // `invalidateOnRefresh` re-runs them, so `svh` settling or a rotate
-          // re-derives them instead of scrubbing towards a stale pixel value.
-          const drift = (el: HTMLElement | null, share: number) => {
-            if (!el) return;
-            const to = () => card.offsetHeight * share;
-            timeline.fromTo(el, { y: () => -to() }, { y: to, duration: 1 }, at);
-          };
+            // Amounts are resolved as functions of the panel's measured height
+            // rather than yPercent, because the three elements are different
+            // heights and only share a frame of reference through the panel.
+            // `invalidateOnRefresh` re-runs them, so `svh` settling or a rotate
+            // re-derives them instead of scrubbing towards a stale pixel value.
+            const drift = (el: HTMLElement | null, share: number) => {
+              if (!el) return;
+              const to = () => card.offsetHeight * share;
+              timeline.fromTo(
+                el,
+                { y: () => -to() },
+                { y: to, duration: 1 },
+                at,
+              );
+            };
 
-          drift(card.querySelector<HTMLElement>("[data-f05-scene]"), SCENE_DRIFT);
-          drift(card.querySelector<HTMLElement>("[data-f05-glass]"), -CARD_DRIFT);
-          drift(card.querySelector<HTMLElement>("[data-f05-frost]"), FROST_DRIFT);
-        });
-      });
+            // The card holds still past 1920. Its drift is +-2.5% of the panel
+            // height either side of centre, which is depth while the card fills
+            // a viewport-height panel — but that card is the reference's 1.623
+            // there and rests centred in its plate, so the same swing reads as
+            // the card sitting crooked: 21px low as the fold arrives, 21px high
+            // as it leaves. The scene and frost keep travelling, so the depth
+            // between the photo and the frosted pane is unchanged; only the pane
+            // stops moving against the plate it sits in.
+            //
+            // Frost still needs the sum, and with the card at rest that sum is
+            // just the scene's share.
+            const cardDrift = wide ? 0 : -CARD_DRIFT;
+            drift(
+              card.querySelector<HTMLElement>("[data-f05-scene]"),
+              SCENE_DRIFT,
+            );
+            drift(
+              card.querySelector<HTMLElement>("[data-f05-glass]"),
+              cardDrift,
+            );
+            drift(
+              card.querySelector<HTMLElement>("[data-f05-frost]"),
+              wide ? SCENE_DRIFT : FROST_DRIFT,
+            );
+          });
+        },
+      );
 
       return () => mm.revert();
     },

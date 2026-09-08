@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { siteConfig } from "@/data/site";
 
@@ -31,8 +32,8 @@ export function Header() {
         <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
           {/* Full header height so the home link is a 50px target rather than
               the wordmark's own 24px — the logo still sits where it did. */}
-          <a
-            href="#fold-01"
+          <Link
+            href="/"
             aria-label={`${siteConfig.name} — home`}
             className="flex h-full items-center"
           >
@@ -52,7 +53,7 @@ export function Header() {
               sizes="140px"
               className="h-auto w-[132px] tablet:w-[126px]"
             />
-          </a>
+          </Link>
 
           <nav className="hidden items-center gap-14 tablet:flex">
             {siteConfig.nav.map((item) => (
@@ -69,12 +70,14 @@ export function Header() {
             ))}
           </nav>
 
-          <a
+          {/* `Link`, not `<a>`: this now points at a route (/contact) rather
+              than an in-page anchor, so it should navigate client-side. */}
+          <Link
             href={siteConfig.cta.href}
             className="hidden h-[33px] items-center justify-center rounded-full bg-[#111116] px-[14px] text-[15px] leading-[20px] text-white tablet:inline-flex"
           >
             {siteConfig.cta.label}
-          </a>
+          </Link>
 
           <button
             type="button"
@@ -86,7 +89,13 @@ export function Header() {
             // pads the hit area out to 45px for thumbs.
             className="relative flex size-[33px] items-center justify-center before:absolute before:-inset-[6px] before:content-[''] tablet:hidden"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              fill="none"
+            >
               <path
                 d="M3 6.5h18M3 12h18M3 17.5h18"
                 stroke="#111116"

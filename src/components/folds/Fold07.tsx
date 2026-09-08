@@ -50,7 +50,7 @@ export default function Fold07() {
           --fold-gap-y: two folds each contributing the token would double it,
           which is what made the run of boundaries here uneven (60/60/120/120/60
           on desktop). The space above this fold comes from Fold 06's bottom. */}
-      <div className="px-5 pb-[var(--fold-gap-y)] tablet:px-16">
+      <div className="px-5 pt-[60px] pb-[var(--fold-gap-y)] tablet:px-16 desktop-sm:pt-[160px]">
         <div className="mx-auto flex max-w-[var(--content-max-width)] flex-col desktop-md:flex-row desktop-md:gap-[64px]">
           {/* ---------- heading ---------- */}
           {/* The quote tracks beside this are already drifting, so the heading
@@ -106,16 +106,17 @@ export default function Fold07() {
                 * is no empty column to fill, so the mascot would only push the
                 * cards down.
                 *
-                * 225px against the column's 460 is the reference frame's own
-                * proportion, left-aligned on the same edge as the type. */}
+                * 310px against the column's 460, set well in from the type's
+                * left edge. The column has the room either way, and the inset
+                * keeps the mascot from crowding the quotes beside it. */}
               <Image
                 src="/fold-one/squirrel.png"
                 alt=""
                 width={726}
                 height={1065}
                 aria-hidden="true"
-                sizes="225px"
-                className="mt-[32px] hidden h-auto w-[225px] desktop-md:block"
+                sizes="310px"
+                className="mt-[32px] ml-[64px] hidden h-auto w-[310px] desktop-md:block"
               />
             </Reveal>
           </div>

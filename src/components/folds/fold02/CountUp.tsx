@@ -69,9 +69,15 @@ export function CountUp({
           },
         });
 
+        // `top bottom`, not the usual `top 85%`: this fold sits directly under
+        // the hero, so on a phone it is already partly on screen at scroll 0 —
+        // and 85% is a line it has not reached, which left the figure reading
+        // "0K+" until the reader scrolled. Firing on entry runs the count as
+        // the page settles. On desktop the hero is a full viewport, so this
+        // fold is still below the fold at load and nothing changes.
         const trigger = ScrollTrigger.create({
           trigger: el,
-          start: "top 85%",
+          start: "top bottom",
           once: true,
           onEnter: () => tween.play(),
         });

@@ -51,7 +51,7 @@ export default function Fold03() {
           // clearance added in END_GRID, so raising that clearance pushes the
           // grid down without eating the trailing space that sets the gap into
           // Fold 04.
-          className="relative aspect-[393/563] w-full overflow-clip bg-white tablet:aspect-[1440/584]"
+          className="relative mx-auto aspect-[393/563] w-full max-w-[var(--content-max-width-wide)] overflow-clip bg-white tablet:aspect-[1440/584]"
         >
           {/* ---------- phone plate + white fade (mobile) ---------- */}
           {/* Anchored by its bottom, not its top. The plate's upper half is
@@ -101,26 +101,8 @@ export default function Fold03() {
           </div>
 
           {/* ---------- reflection on the phone screen (fades with the phone) ---------- */}
-          <Image
-            data-f03="phone"
-            src="/images/fold03/screen-reflection.png"
-            alt=""
-            width={256}
-            height={256}
-            aria-hidden="true"
-            className="absolute tablet:hidden"
-            // Bottom-anchored to stay on the phone's screen, which is now
-            // bottom-anchored too (the reflection is square, so its height
-            // follows its width).
-            style={{
-              left: `${(136 / MOBILE_STAGE.width) * 100}%`,
-              bottom: `${((MOBILE_STAGE.height - (333 + 122)) / MOBILE_STAGE.height) * 100}%`,
-              width: `${(122 / MOBILE_STAGE.width) * 100}%`,
-              height: "auto",
-              opacity: 0.22,
-              filter: "blur(7.5px)",
-            }}
-          />
+          {/* Desktop only — the mobile artboard had one too, but at phone size it
+              read as a smudge on the screen rather than a reflection. */}
           <Image
             data-f03="phone"
             src="/images/fold03/screen-reflection.png"
