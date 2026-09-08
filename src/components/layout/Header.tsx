@@ -28,7 +28,17 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] bg-white">
+      {/* `transform-gpu` promotes the bar to its own compositing layer. It is
+          not cosmetic: iOS Safari intermittently fails to paint a
+          `position: fixed` element on first load over a tall page and only
+          brings it in once a scroll forces a repaint, which is what made the
+          nav look absent on a first visit. Giving it a layer up front means it
+          is composited from the first frame.
+
+          Safe here because `MobileMenu` is a sibling of this element, not a
+          descendant — a transform would otherwise become the containing block
+          for its `fixed inset-0` panel. */}
+      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] transform-gpu bg-white">
         <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
           {/* Full header height so the home link is a 50px target rather than
               the wordmark's own 24px — the logo still sits where it did. */}
