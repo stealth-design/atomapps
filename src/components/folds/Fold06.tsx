@@ -18,11 +18,12 @@ import { APPROACH_STEPS } from "@/components/folds/fold06/steps";
  * Card illustrations are dense vector compositions (avatar clusters, a phone
  * UI, an orbit diagram), so each is exported as a PNG rather than rebuilt.
  *
- * This is the only fold that carries a colour of its own — the light teal in
- * `--fold-06-bg`, sitting between Fold 05's white and Fold 07's. Type over the
- * band stays dark: see the token for the measurements, but the short version
- * is that black reads at 17:1 on this teal and white at 1.2:1, so nothing
- * here inverts.
+ * This is the only fold that carries a ground of its own — `--fold-06-bg`,
+ * sitting between Fold 05's white and Fold 07's. Because the cards are white
+ * and the ground behind them now is not, they are separated by a hairline
+ * rather than by the drop shadow they used to carry (Figma 1539:625 has the
+ * shadow present but switched off). The arcs behind everything run the
+ * artboard's orange-to-teal gradient at 20%.
  */
 export default function Fold06() {
   return (
@@ -94,24 +95,27 @@ export default function Fold06() {
           {APPROACH_STEPS.map((step) => (
             <article
               key={step.id}
-              className="relative h-[535px] w-[331px] shrink-0 snap-start overflow-hidden rounded-[13px] bg-white px-[28px] pt-[33px] shadow-[0_0_4px_rgba(0,0,0,0.03),0_0_19px_rgba(0,0,0,0.07)]"
+              className="relative h-[535px] w-[331px] shrink-0 snap-start overflow-hidden rounded-[13px] border border-[#e5e7eb] bg-white px-[28px] pt-[33px]"
             >
-              <span className="flex size-[39px] items-center justify-center rounded-[11px] border border-[#e5e7eb] bg-white">
-                <Image
-                  src={`/images/fold06/${step.icon}.svg`}
-                  alt=""
-                  width={17}
-                  height={17}
-                  className="size-[17px]"
-                />
-              </span>
+              {/* The glyph alone, at the artboard's 39px. It used to sit in a
+                  white chip with its own hairline; 1539:625 drops that and
+                  lets the icon stand on the card. Each file is exported at
+                  39x39 with the vector already placed inside it, so the box
+                  here is the icon's own frame rather than a wrapper. */}
+              <Image
+                src={`/images/fold06/${step.icon}.svg`}
+                alt=""
+                width={39}
+                height={39}
+                className="size-[39px]"
+              />
 
-              <h3 className="mt-[16px] text-[25px] leading-[33px] font-bold text-[#111827]">
+              <h3 className="mt-[16px] text-[25px] leading-[33px] font-bold text-[#1e1e1e]">
                 {step.title}
               </h3>
 
               <p
-                className="mt-[16px] text-[14px] leading-[18px] text-[#6b7280]"
+                className="mt-[16px] text-[14px] leading-[18px] text-[#444444]"
                 style={{ width: step.bodyWidth }}
               >
                 {step.body}

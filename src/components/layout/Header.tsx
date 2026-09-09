@@ -3,9 +3,11 @@
 import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "@/lib/gsap";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { scrollToTop } from "@/lib/lenis";
 import { siteConfig } from "@/data/site";
 
 /**
@@ -77,6 +79,7 @@ interface HeaderProps {
 }
 
 export function Header({ transparentOverHero = false }: HeaderProps) {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRetracted, setIsRetracted] = useState(false);
   const [isOverHero, setIsOverHero] = useState(transparentOverHero);
@@ -177,9 +180,23 @@ export function Header({ transparentOverHero = false }: HeaderProps) {
         <div className="relative mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
           {/* Full header height so the home link is a 50px target rather than
               the wordmark's own 24px — the logo still sits where it did. */}
+          {/* On the home page the mark sends the page back to the top rather
+              than navigating: `href="/"` from `/` is a no-op route change, so
+              Next leaves the scroll position where it is and the click appears
+              to do nothing. From any other page it is a plain link home. The
+              href stays either way, so it still opens in a new tab and still
+              reads as a link to assistive tech. */}
           <Link
             href="/"
             aria-label={`${siteConfig.name} — home`}
+            onClick={(event) => {
+              if (pathname !== "/" || event.metaKey || event.ctrlKey || event.shiftKey) return;
+              event.preventDefault();
+              scrollToTop();
+              // The bar hides itself on the way down; coming back to the top
+              // should always leave it showing.
+              setRetracted(false);
+            }}
             className="flex h-full items-center"
           >
             {/* The two ink cuts of the final lockup — dark for the white bar,
