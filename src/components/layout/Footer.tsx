@@ -9,10 +9,14 @@ import { siteConfig } from "@/data/site";
  *   desktop  1144:2746  1440 x 800
  *   mobile   1136:2513   393 x 657
  *
- * A dark panel stacked down the centre line: the AtomApps wordmark across the
- * top, the "Get in touch" call to action under it, the three section links
- * below that, and the legal row on the foot — the only block that is not
- * centred, with the links left and the copyright right.
+ * A dark panel stacked down its left edge (Figma 1539:2185): the AtomApps
+ * wordmark across the top, the "Get in touch" call to action under it, the
+ * three section links below that, and the legal row alone on the foot with the
+ * copyright pushed out to the right.
+ *
+ * The gutter here is 60px, not the 40px the rest of the page uses. That is the
+ * artboard's own number and it is what the whole stack aligns to, copyright
+ * included, so it is deliberate rather than a stray value.
  *
  * The composition is the artboard's; the way it is held together is not.
  * Every block used to sit at its measured offset from the top of a panel fixed
@@ -36,7 +40,7 @@ export function Footer() {
       // above that it gives way rather than clipping the wordmark.
       className="relative min-h-[657px] w-full overflow-hidden bg-[#171717] tablet:min-h-[800px]"
     >
-      <div className="mx-auto flex min-h-[657px] w-full max-w-[var(--content-max-width)] flex-col px-5 pt-[36px] pb-[38px] tablet:min-h-[800px] tablet:px-10 tablet:pt-[45px] tablet:pb-[45px]">
+      <div className="mx-auto flex min-h-[657px] w-full max-w-[var(--content-max-width)] flex-col px-5 pt-[36px] pb-[38px] tablet:min-h-[800px] tablet:px-[60px] tablet:pt-[53px] tablet:pb-[38px]">
         {/* ---------- wordmark ---------- */}
         {/* The final lockup ships as a single asset with the colour orbit drawn
             into it, so this composes nothing — see the note above for the
@@ -48,12 +52,14 @@ export function Footer() {
           width={14786}
           height={3422}
           sizes="(max-width: 767px) 100vw, 64vw"
-          // 64% of the content row from tablet up — the artboard's 872 of the
-          // 1360 between the gutters — and the full row below it, where a
-          // 353px-wide phone has none to spare. A share rather than a fixed
-          // width so the lockup keeps its proportions against the call to
-          // action, which is sized off the same row.
-          className="mx-auto h-auto w-full tablet:w-[64%]"
+          // The artboard's 874 of the 1320 between the gutters, as a share so
+          // the lockup keeps its proportions against the call to action, which
+          // is sized off the same row. Full width below tablet, where a
+          // 353px-wide phone has none to spare.
+          //
+          // `mx-auto` only on mobile: from tablet up the mark sits on the
+          // gutter with everything else.
+          className="mx-auto h-auto w-full tablet:mx-0 tablet:w-[66.2%]"
         />
 
         {/* ---------- call to action ---------- */}
@@ -65,7 +71,7 @@ export function Footer() {
         {/* `Link` for the same reason as the header's: /contact is a route. */}
         <Link
           href={siteConfig.footerCta.href}
-          className="group mx-auto mt-[170px] flex w-fit items-center gap-[0.254em] text-[32px] leading-[1.4] font-medium text-[#f5f5f7] tablet:mt-[210px] tablet:text-[clamp(67px,calc(var(--locked-vw)*0.04653),104px)]"
+          className="group mx-auto mt-[170px] flex w-fit items-center gap-[0.254em] text-[32px] leading-[1.4] font-medium text-[#f5f5f7] tablet:mx-0 tablet:mt-[22px] tablet:text-[clamp(67px,calc(var(--locked-vw)*0.04653),104px)]"
         >
           <span>{siteConfig.footerCta.label}</span>
 
@@ -88,13 +94,13 @@ export function Footer() {
         {/* ---------- section links ---------- */}
         {/* The same three the header carries, so they come from the same place
             in the config rather than being written out again here. */}
-        <nav className="mt-[90px] flex flex-wrap items-center justify-center gap-x-[28px] gap-y-[14px] tablet:mt-[38px] tablet:gap-x-[97px]">
+        <nav className="mt-[90px] flex flex-wrap items-center justify-center gap-x-[28px] gap-y-[14px] tablet:mt-[87px] tablet:justify-start tablet:gap-x-[96px]">
           {siteConfig.nav.map((item) => (
             <a
               key={item.label}
               href={item.href}
               data-underline-link
-              className="text-[18px] leading-[24px] text-[#f5f5f7] tablet:text-[36px] tablet:leading-[47px]"
+              className="text-[18px] leading-[24px] text-[#f5f5f7] tablet:text-[35px] tablet:leading-[46px]"
             >
               {item.label}
             </a>
@@ -105,7 +111,7 @@ export function Footer() {
         {/* `mt-auto` is what holds the artboard's shape: the stack above keeps
             its own spacing off the top of the panel, and this row sits on the
             foot however tall the panel ends up. */}
-        <div className="mt-auto flex flex-col gap-[24px] pt-[64px] text-[14px] leading-[17px] text-white tablet:flex-row tablet:items-center tablet:gap-0">
+        <div className="mt-auto flex flex-col gap-[24px] pt-[64px] text-[14px] leading-[17px] text-white tablet:flex-row tablet:items-center tablet:gap-0 tablet:text-[12px] tablet:leading-[15px]">
           {/* `tablet:contents` dissolves this row above the breakpoint, so the
               desktop layout still lays both links out as direct children of the
               flex row with its own spacing. */}
@@ -120,7 +126,7 @@ export function Footer() {
                 // still leaves 2px between the two, so neither steals the other's
                 // taps.
                 className={`relative before:absolute before:inset-x-0 before:-inset-y-[11px] before:content-[''] ${
-                  index > 0 ? "tablet:ml-[103px]" : ""
+                  index > 0 ? "tablet:ml-[33px]" : ""
                 }`}
               >
                 {item.label}
