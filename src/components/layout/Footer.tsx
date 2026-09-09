@@ -3,35 +3,37 @@ import Link from "next/link";
 import { siteConfig } from "@/data/site";
 
 /**
- * Site footer.
+ * Site footer (Figma 1576:4269, 1440x800).
  *
- * Figma (canvas `----> v7`):
- *   desktop  1144:2746  1440 x 800
- *   mobile   1136:2513   393 x 657
+ * The call to action sits on the top right, the AtomApps wordmark runs the full
+ * width of the foot, and the legal row tucks under it — links left, copyright
+ * right. The middle of the panel is deliberately empty: the two blocks are
+ * anchored to opposite ends and the ~273px between them is what the artboard
+ * asks for, not slack left over.
  *
- * A dark panel stacked down its left edge (Figma 1539:2185): the AtomApps
- * wordmark across the top, the "Get in touch" call to action under it, the
- * three section links below that, and the legal row alone on the foot with the
- * copyright pushed out to the right.
- *
- * The gutter here is 60px, not the 40px the rest of the page uses. That is the
- * artboard's own number and it is what the whole stack aligns to, copyright
- * included, so it is deliberate rather than a stray value.
- *
- * The composition is the artboard's; the way it is held together is not.
- * Every block used to sit at its measured offset from the top of a panel fixed
- * at 800px, which only holds at the width those offsets were taken from. The
+ * The composition is the artboard's; the way it is held together is not. Every
+ * block used to sit at its measured offset from the top of a panel fixed at
+ * 800px, which only holds at the width those offsets were taken from. The
  * blocks are in flow instead, the panel's height is a floor rather than a cap,
- * and the legal row is pushed to the foot by `mt-auto`, so the lockup keeps
- * its shape as the panel grows.
+ * and `mt-auto` is what pins the foot — with the paddings below that resolves
+ * to the artboard's own numbers (wordmark box top at 428 of 800) at 1440, and
+ * gives way rather than clipping above it.
  *
- * The wordmark reserves 19.024% of its own box as transparent space above the
- * ink — the asset's box is 4.32 wide to tall, the ink inside it 5.34. That is
- * why the padding above it looks short against the gap it actually renders:
- * at the artboard's width the box starts 45px down and the wordmark itself
- * appears 83px down. Any change to the top padding has to account for it.
+ * Two numbers to be careful with:
+ *
+ *   - The wordmark asset reserves 19.024% of its own box as transparent space
+ *     above the ink (box 4.32 wide to tall, ink 5.34). Nothing here depends on
+ *     that, because the block is anchored by its foot, but any change to the
+ *     padding above it does.
+ *   - The gap under the wordmark is 3px. That is the artboard's, and it is
+ *     tight on purpose — the legal row reads as part of the lockup rather than
+ *     as a separate band. It is measured to the wordmark's box, which ends on
+ *     the descenders of "pp", so there is no hidden slack in it.
+ *
+ * An earlier revision carried the three section links between the call to
+ * action and the wordmark. This artboard has no such row, so they are gone;
+ * the header still carries them.
  */
-
 export function Footer() {
   return (
     <footer
@@ -40,28 +42,7 @@ export function Footer() {
       // above that it gives way rather than clipping the wordmark.
       className="relative min-h-[657px] w-full overflow-hidden bg-[#171717] tablet:min-h-[800px]"
     >
-      <div className="mx-auto flex min-h-[657px] w-full max-w-[var(--content-max-width)] flex-col px-5 pt-[36px] pb-[38px] tablet:min-h-[800px] tablet:px-[60px] tablet:pt-[53px] tablet:pb-[38px]">
-        {/* ---------- wordmark ---------- */}
-        {/* The final lockup ships as a single asset with the colour orbit drawn
-            into it, so this composes nothing — see the note above for the
-            transparent band the asset carries over the ink. Light cut, for
-            this #171717 panel. */}
-        <Image
-          src="/logos/final-atom-logo-white.png"
-          alt={siteConfig.name}
-          width={14786}
-          height={3422}
-          sizes="(max-width: 767px) 100vw, 64vw"
-          // The artboard's 874 of the 1320 between the gutters, as a share so
-          // the lockup keeps its proportions against the call to action, which
-          // is sized off the same row. Full width below tablet, where a
-          // 353px-wide phone has none to spare.
-          //
-          // `mx-auto` only on mobile: from tablet up the mark sits on the
-          // gutter with everything else.
-          className="mx-auto h-auto w-full tablet:mx-0 tablet:w-[66.2%]"
-        />
-
+      <div className="mx-auto flex min-h-[657px] w-full max-w-[var(--content-max-width)] flex-col px-5 pt-[45px] pb-[38px] tablet:min-h-[800px] tablet:px-10 tablet:pt-[62px] tablet:pb-[37px]">
         {/* ---------- call to action ---------- */}
         {/*
          * The ring and its gap are fractions of the call to action's own type
@@ -71,7 +52,7 @@ export function Footer() {
         {/* `Link` for the same reason as the header's: /contact is a route. */}
         <Link
           href={siteConfig.footerCta.href}
-          className="group mx-auto mt-[170px] flex w-fit items-center gap-[0.254em] text-[32px] leading-[1.4] font-medium text-[#f5f5f7] tablet:mx-0 tablet:mt-[22px] tablet:text-[clamp(67px,calc(var(--locked-vw)*0.04653),104px)]"
+          className="group flex w-fit items-center gap-[0.254em] self-end text-[32px] leading-[1.4] font-medium text-[#f5f5f7] tablet:text-[clamp(67px,calc(var(--locked-vw)*0.04653),104px)]"
         >
           <span>{siteConfig.footerCta.label}</span>
 
@@ -91,49 +72,48 @@ export function Footer() {
           </span>
         </Link>
 
-        {/* ---------- section links ---------- */}
-        {/* The same three the header carries, so they come from the same place
-            in the config rather than being written out again here. */}
-        <nav className="mt-[90px] flex flex-wrap items-center justify-center gap-x-[28px] gap-y-[14px] tablet:mt-[87px] tablet:justify-start tablet:gap-x-[96px]">
-          {siteConfig.nav.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              data-underline-link
-              className="text-[18px] leading-[24px] text-[#f5f5f7] tablet:text-[35px] tablet:leading-[46px]"
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
+        {/* ---------- wordmark and legal, on the foot ---------- */}
+        {/* `mt-auto` is what holds the artboard's shape: the call to action
+            stays at the top and these two sit together on the foot however
+            tall the panel ends up. */}
+        <div className="mt-auto">
+          {/* The final lockup ships as a single asset with the colour orbit
+              drawn into it, so this composes nothing. Light cut, for this
+              #171717 panel. */}
+          <Image
+            src="/logos/final-atom-logo-white.png"
+            alt={siteConfig.name}
+            width={14786}
+            height={3422}
+            sizes="100vw"
+            className="h-auto w-full"
+          />
 
-        {/* ---------- legal ---------- */}
-        {/* `mt-auto` is what holds the artboard's shape: the stack above keeps
-            its own spacing off the top of the panel, and this row sits on the
-            foot however tall the panel ends up. */}
-        <div className="mt-auto flex flex-col gap-[24px] pt-[64px] text-[14px] leading-[17px] text-white tablet:flex-row tablet:items-center tablet:gap-0 tablet:text-[12px] tablet:leading-[15px]">
-          {/* `tablet:contents` dissolves this row above the breakpoint, so the
-              desktop layout still lays both links out as direct children of the
-              flex row with its own spacing. */}
-          <div className="flex gap-[28px] tablet:contents">
-            {siteConfig.legal.map((item, index) => (
-              <a
-                key={item.label}
-                href={item.href}
-                // A 14px line box is a 17px-tall touch target, under the 24px WCAG
-                // 2.5.8 floor. The pseudo-element grows the hit area into the 24px
-                // stack gap without moving anything: 11px a side lands at 39px and
-                // still leaves 2px between the two, so neither steals the other's
-                // taps.
-                className={`relative before:absolute before:inset-x-0 before:-inset-y-[11px] before:content-[''] ${
-                  index > 0 ? "tablet:ml-[33px]" : ""
-                }`}
-              >
-                {item.label}
-              </a>
-            ))}
+          {/* ---------- legal ---------- */}
+          <div className="mt-[26px] flex flex-col gap-[24px] text-[14px] leading-[17px] text-white tablet:mt-[3px] tablet:flex-row tablet:items-center tablet:gap-0">
+            {/* `tablet:contents` dissolves this row above the breakpoint, so the
+                desktop layout still lays both links out as direct children of the
+                flex row with its own spacing. */}
+            <div className="flex gap-[28px] tablet:contents">
+              {siteConfig.legal.map((item, index) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  // A 14px line box is a 17px-tall touch target, under the 24px WCAG
+                  // 2.5.8 floor. The pseudo-element grows the hit area into the 24px
+                  // stack gap without moving anything: 11px a side lands at 39px and
+                  // still leaves 2px between the two, so neither steals the other's
+                  // taps.
+                  className={`relative before:absolute before:inset-x-0 before:-inset-y-[11px] before:content-[''] ${
+                    index > 0 ? "tablet:ml-[103px]" : ""
+                  }`}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+            <p className="tablet:ml-auto">{siteConfig.copyright}</p>
           </div>
-          <p className="tablet:ml-auto">{siteConfig.copyright}</p>
         </div>
       </div>
     </footer>
