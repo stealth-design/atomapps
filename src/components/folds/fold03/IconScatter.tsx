@@ -1,6 +1,7 @@
 import Image from "next/image";
 import {
   BLUR_SCALE,
+  ICON_LINKS,
   DESKTOP_ICONS,
   DESKTOP_ICONS_WIDE,
   DESKTOP_STAGE,
@@ -52,15 +53,27 @@ const START_CSS = [
   // intends. Only past 1920 does the stage centre inside gutters and turn
   // those bleeds into visible cuts — see DESKTOP_ICONS_WIDE.
   `@media(min-width:1921px){${startRules(DESKTOP_ICONS_WIDE, DESKTOP_STAGE)}}`,
+  // Icon links go live only once the sequence has settled — see the anchor
+  // below. Written here rather than as a Tailwind variant because the selector
+  // needs an ancestor condition on the stage, which arbitrary variants express
+  // badly, and this stylesheet is already server-rendered alongside it.
+  `#fold-03 [data-f03-icon] a{pointer-events:none}`,
+  `#fold-03 [data-f03-complete] [data-f03-icon] a{pointer-events:auto}`,
 ].join("");
 
 export function IconScatter() {
   return (
-    <div aria-hidden="true">
+    // No `aria-hidden` on the group any more: a linked icon is a real
+    // destination and has to reach the accessibility tree. Each unlinked icon
+    // carries the attribute itself instead, so the decorative ones stay out of
+    // it exactly as before.
+    <div>
       <style>{START_CSS}</style>
 
-      {END_ORDER.map((icon) => (
-        <div key={icon} data-f03-icon={icon} className="absolute aspect-square">
+      {END_ORDER.map((icon) => {
+        const link = ICON_LINKS[icon];
+
+        const art = (
           <div
             data-f03-float
             className="relative h-full w-full overflow-hidden"
@@ -74,8 +87,35 @@ export function IconScatter() {
               className="object-cover"
             />
           </div>
-        </div>
-      ))}
+        );
+
+        return (
+          <div
+            key={icon}
+            data-f03-icon={icon}
+            aria-hidden={link ? undefined : true}
+            className="absolute aspect-square"
+          >
+            {link ? (
+              // Only live once the grid has settled — mid-flight the icons are
+              // moving targets, and a click that lands on whichever one happens
+              // to be under the cursor is a click nobody meant. The stage sets
+              // `data-f03-complete` when the sequence finishes; until then the
+              // anchor is inert but still focusable by keyboard, which does not
+              // depend on where anything is on screen.
+              <a
+                href={link.href}
+                aria-label={link.label}
+                className="block h-full w-full"
+              >
+                {art}
+              </a>
+            ) : (
+              art
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

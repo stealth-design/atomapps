@@ -96,7 +96,10 @@ export function ContactForm() {
           <div className="mt-[28px] flex justify-center">
             <button
               type="submit"
-              className="inline-flex h-[48px] items-center justify-center rounded-[10px] bg-[#2774c1] px-[32px] text-[15px] leading-[20px] font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2774c1]"
+              // `can-hover:` rather than a bare `hover:` — see globals.css. A
+              // tap on a phone matches `hover:` too, and the state then sticks
+              // on the button until something else is touched.
+              className="inline-flex h-[48px] items-center justify-center rounded-[10px] bg-[#2774c1] px-[32px] text-[15px] leading-[20px] font-medium text-white transition-[background-color,transform] duration-300 ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:-translate-y-[2px] can-hover:hover:bg-[#1f63a8] active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2774c1] motion-reduce:transition-none motion-reduce:can-hover:hover:translate-y-0"
             >
               Submit
             </button>

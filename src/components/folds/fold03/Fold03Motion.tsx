@@ -14,8 +14,13 @@ import { END_GRID, END_ORDER, type GridConfig } from "./appIcons";
  * out and replaced by a second set.
  *
  *   0.00–0.10  start frame, ambient float easing off
- *   0.05–0.35  the phone dissolves out
- *   0.05–0.92  icons travel to the grid, shrinking and clearing their blur
+ *   0.05–0.30  the phone dissolves out
+ *   0.05–1.00  icons travel to the grid, shrinking and clearing their blur
+ *
+ * `arrive` is 1, not a little short of it. It used to be 0.92, which left the
+ * last 8% of the pin — about a scroll gesture — with nothing happening in it:
+ * the grid had settled and the stage was still held, which is what read as
+ * dead scroll before the fold would let go.
  *
  * The path is deliberately direct. It used to collect every icon onto the
  * phone screen first, which meant each one shrank hard into the middle and
@@ -28,7 +33,7 @@ import { END_GRID, END_ORDER, type GridConfig } from "./appIcons";
  * swap stay correct.
  */
 
-const PHASE = { settle: 0.1, phoneOut: 0.35, arrive: 0.92 } as const;
+const PHASE = { settle: 0.1, phoneOut: 0.3, arrive: 1 } as const;
 
 /**
  * How much of the travel window is spent staggering rather than moving.
@@ -40,15 +45,25 @@ const PHASE = { settle: 0.1, phoneOut: 0.35, arrive: 0.92 } as const;
  * in END_ORDER — reading order, row by row — so at any point the rows that
  * have arrived are square and the rest are still out in the scatter. Each icon
  * still makes one direct, monotonic move; only the start times fan out.
+ *
+ * 0.24 rather than the 0.42 this started at. The fan-out is what fixes the
+ * ordering, but the icon at the end of END_ORDER waits the whole spread before
+ * it even sets off — at 0.42 the last one (the bible, END_ORDER's 15th) sat
+ * alone in the scatter for two fifths of the sequence, long enough to read as
+ * stuck rather than as the last to arrive. A quarter still lands the rows in
+ * reading order while keeping every icon in motion for most of the window.
  */
-const TRAVEL_SPREAD = 0.42;
+const TRAVEL_SPREAD = 0.24;
 
 /**
- * Length of the pinned scroll, in viewport heights. ~1.35 works out to roughly
- * three scroll gestures to play the whole sequence — raise it for a longer,
- * slower transformation, lower it for a snappier one.
+ * Length of the pinned scroll, in viewport heights.
+ *
+ * This is the fold's whole cost in scroll, so it is the number to reach for
+ * when the sequence feels long: 0.7 is about half what it was, and since the
+ * pin's spacer is exactly this tall it takes the same amount straight out of
+ * the document. Raise it for a longer, slower transformation.
  */
-const SCROLL_VIEWPORTS = 1.35;
+const SCROLL_VIEWPORTS = 0.7;
 
 /** Hover grow once the grid has settled. */
 const HOVER_SCALE = 1.08;

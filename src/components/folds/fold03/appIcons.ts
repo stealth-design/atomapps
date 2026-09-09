@@ -182,6 +182,24 @@ export const END_GRID: { desktop: GridConfig; mobile: GridConfig } = {
    screen mid-sequence. The icons now travel straight from the scatter to the
    grid, so nothing needs the face geometry. */
 
+/**
+ * Where each icon goes when clicked — a Play Store listing, its own page, or
+ * the app's site. Keyed by the same icon id as everything else here.
+ *
+ * Empty on purpose: an icon with no entry renders exactly as it always has,
+ * decorative and unclickable, so adding a link is a one-line change here and
+ * nothing else. `label` is the accessible name, since the artwork itself
+ * carries no text.
+ *
+ * Order below follows END_ORDER's row 2 naming, for whoever fills them in:
+ *   icon-05 · icon-15 · icon-02 · icon-03 · icon-10 · icon-11 · icon-01
+ *   icon-08 · icon-12 · icon-13 · icon-06 · icon-07 · icon-09 · icon-04
+ *   icon-14 (the bible)
+ */
+export const ICON_LINKS: Partial<Record<string, { label: string; href: string }>> = {
+  // "icon-14": { label: "Holy Bible", href: "https://play.google.com/store/apps/details?id=..." },
+};
+
 /** The white fade Figma lays over the phone plate (gradient stops preserved). */
 export const PHONE_FADE =
   "linear-gradient(to bottom, #fff 41%, rgba(255,255,255,0.88) 51%, rgba(255,255,255,0) 87.9%)";

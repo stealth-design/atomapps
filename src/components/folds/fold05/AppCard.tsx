@@ -88,30 +88,18 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
         data-f05-glass
         className="absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.738%] tablet:bottom-auto tablet:left-[2.569%] tablet:h-[77.765%] tablet:max-h-none tablet:w-[32.222%] desktop-xl:top-[11.1175%]"
       >
-        <div className="relative isolate h-auto w-full overflow-hidden rounded-[14px] tablet:h-full tablet:rounded-[19px]">
-          {/* frosted backing: the same scene, pre-blurred and aligned to it */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 z-0 overflow-hidden"
-          >
-            {/* A plain box for StackMotion to move: the card it sits in is
-                drifting, so this has to travel back by the difference to stay
-                over the same part of the scene it is a copy of. The zoom and
-                the blur stay on the inner box, out of GSAP's way. */}
-            <div data-f05-frost className="absolute inset-0">
-              <div className="absolute top-[-118.8%] left-[-5.664%] h-[227.4%] w-[111.328%] scale-[1.08] blur-[22px] tablet:top-[-15.09%] tablet:left-[-79.73%] tablet:h-[128.59%] tablet:w-[310.35%]">
-                <Image
-                  src={panel.background}
-                  alt=""
-                  fill
-                  sizes="100vw"
-                  className="object-cover object-[var(--focal)_center] tablet:object-center"
-                />
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-white/[0.72]" />
-          </div>
-
+        {/*
+         * Solid white, not frosted.
+         *
+         * This used to hold its own pre-blurred copy of the scene under a 72%
+         * white wash — a way of faking `backdrop-filter`, which four stacked
+         * full-bleed photos could not afford to do for real. Solid white drops
+         * all of it: the copy, the second decode of every scene, the wash, and
+         * the coupled drift that kept the copy registered against the photo as
+         * the card moved over it. `data-f05-frost` is gone with it, so
+         * StackMotion now moves two things here instead of three.
+         */}
+        <div className="relative isolate h-auto w-full overflow-hidden rounded-[14px] bg-white tablet:h-full tablet:rounded-[19px]">
           {/* Top-aligned past 1920, not centred. Centring split the leftover
               room above and below, which put each card's header at a different
               height — 64px down on Find My Phone against 6px on Steppy, since
@@ -122,7 +110,15 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
               The gap that centring originally closed stays closed: the stats
               block below drops `mt-auto` past 1920, so it follows the content
               rather than being pushed to the card's bottom. */}
-          <div className="relative z-10 flex h-full w-full flex-col px-[6.799%] py-[24px] tablet:px-[9.267%] tablet:py-[44px]">
+          {/*
+           * One padding value, all four sides. Percentage padding resolves
+           * against the inline size for top and bottom as well as left and
+           * right, so a single number is genuinely equal all round — which the
+           * old `px-[9.267%] py-[44px]` pair only happened to be at 1440 and
+           * drifted from at every other width. 10.4% is ~48px in the card
+           * against the 43 it was, which is the nudge inward.
+           */}
+          <div className="relative z-10 flex h-full w-full flex-col p-[6.799%] tablet:p-[10.4%]">
             {/* ---- header ---- */}
             {/* The app name deliberately has no `desktop-xl` size. It shares its
                 row with the icon, so it only gets 268px in the narrowed card,
@@ -161,12 +157,43 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 // buttons; 240 clears the longest ("Explore Volume Control", 230)
                 // and `justify-between` pins the arrow to the right edge so the
                 // shorter labels do not leave it floating mid-pill.
-                className="mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-white pr-[10px] pl-[16px] tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
+                className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] overflow-hidden rounded-full bg-white pr-[10px] pl-[16px] tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
               >
-                <span className="text-[14px] leading-[18px] text-black desktop-xl:text-[15px] desktop-xl:leading-[20px]">
+                {/*
+                 * The border is the animation. It sits on a ring of its own
+                 * rather than on the pill, because a `border` would change the
+                 * pill's box and shift the label by a pixel as it came in;
+                 * an inset ring paints inside the same box and moves nothing.
+                 *
+                 * At rest it is a hairline the card's own grey. On hover it
+                 * thickens to black and sweeps round from the leading edge —
+                 * the sweep is a second ring drawn with `conic-gradient` in a
+                 * mask, so it costs one composited layer and no layout.
+                 */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-black/15 transition-[box-shadow,color] duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:ring-black/70 motion-reduce:transition-none"
+                />
+                <span
+                  aria-hidden="true"
+                  // The sweep: a full-turn conic wedge, rotated once on hover.
+                  // `--sweep` is the wedge's own angle, animated from 0 so the
+                  // line grows out of the leading edge rather than appearing.
+                  className="pointer-events-none absolute -inset-px rounded-full opacity-0 transition-opacity duration-[300ms] can-hover:group-hover/cta:opacity-100 motion-reduce:hidden"
+                  style={{
+                    background:
+                      "conic-gradient(from 180deg, rgba(0,0,0,0.85) 0deg, rgba(0,0,0,0) 120deg, rgba(0,0,0,0) 360deg)",
+                    mask: "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
+                    WebkitMask:
+                      "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
+                    animation: "cta-sweep 1.6s linear infinite",
+                  }}
+                />
+
+                <span className="relative text-[14px] leading-[18px] text-black desktop-xl:text-[15px] desktop-xl:leading-[20px]">
                   {panel.cta.label}
                 </span>
-                <span className="flex size-[20px] shrink-0 items-center justify-center rounded-full bg-black">
+                <span className="relative flex size-[20px] shrink-0 items-center justify-center rounded-full bg-black transition-transform duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:translate-x-[2px] can-hover:group-hover/cta:-translate-y-[2px] motion-reduce:transition-none">
                   <svg
                     width="11"
                     height="11"
@@ -197,7 +224,13 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
             )}
 
             {/* ---- closing block, anchored to the bottom of the card ---- */}
-            <div className="mt-auto pt-[20px] desktop-xl:mt-[26px]">
+            {/* `pb-0` and a `-mb` on the stats below: the closing block is
+                pinned to the foot by `mt-auto`, so the only thing under the
+                numbers is the card's own padding — and a caption's line box
+                carries leading under its baseline, which made that padding
+                read deeper than the equal one above it. The negative margin
+                takes back just that leading. */}
+            <div className="mt-auto pt-[20px] -mb-[6px] desktop-xl:mt-[26px]">
               {panel.quote && (
                 <p className="mb-[20px] text-[15px] leading-[21px] font-medium text-black tablet:mb-[40px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
                   {panel.quote}

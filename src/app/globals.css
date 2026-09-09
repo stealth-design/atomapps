@@ -11,6 +11,17 @@
   --font-sans: var(--font-dm-sans);
 }
 
+/*
+ * `can-hover:` — a hover that only applies on a device that really hovers.
+ *
+ * Tailwind's bare `hover:` also matches a tap on a touchscreen, and the state
+ * then sticks until something else is touched, so a tapped button sits there
+ * looking hovered. Every hover affordance on the site goes through this
+ * instead: `can-hover:hover:...`, or `can-hover:group-hover:...` inside a
+ * `group`.
+ */
+@custom-variant can-hover (@media (hover: hover) and (pointer: fine));
+
 /* Everything below lives in `base` on purpose: unlayered CSS outranks every
    Tailwind utility, so an unlayered `h1 { font-size }` here would silently
    beat `text-[60px]` in a fold. Keeping it layered lets utilities win. */
@@ -123,6 +134,57 @@
   /* ========================================================================
      Misc
      ======================================================================== */
+
+  /* ========================================================================
+     Underline links
+
+     The rule wipes in from the left and out to the right rather than
+     reversing: the origin flips with the hover state, so the line always
+     travels the same way and never retraces its own path.
+     ======================================================================== */
+
+  [data-underline-link] {
+    position: relative;
+    text-decoration: none;
+  }
+
+  [data-underline-link]::before {
+    content: "";
+    position: absolute;
+    bottom: -0.14em;
+    left: 0;
+    width: 100%;
+    height: 0.07em;
+    background-color: currentColor;
+    transform-origin: right;
+    /* The hair of rotation keeps the line on the GPU, which stops a rule this
+       thin flickering as it scales. */
+    transform: scaleX(0) rotate(0.001deg);
+    transition: transform 0.6s cubic-bezier(0.625, 0.05, 0, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    [data-hover]:hover [data-underline-link]::before,
+    [data-underline-link]:hover::before {
+      transform-origin: left;
+      transform: scaleX(1) rotate(0.001deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-underline-link]::before {
+      transition: none;
+    }
+  }
+
+  /* Rotates the conic wedge that draws the Fold 05 CTA's border on hover.
+     Only ever runs while a pointer is on the button — the element carrying it
+     is `opacity-0` and `motion-reduce:hidden` otherwise. */
+  @keyframes cta-sweep {
+    to {
+      transform: rotate(1turn);
+    }
+  }
 
   ::selection {
     background: var(--foreground);

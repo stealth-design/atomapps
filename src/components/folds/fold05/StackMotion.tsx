@@ -30,11 +30,11 @@ const COVERED_SHADE = 0.45;
 /**
  * Parallax inside a panel, as shares of the panel's own height.
  *
- * The three are coupled, not independent. The card travels against the scene,
- * which is the whole effect; the blurred copy inside the card has to end up
- * where the scene is, so it travels by the sum of the two — the card carries
- * it one way and it has to come back the other. Get that wrong and the frosted
- * pane stops matching the photo it is pretending to show through.
+ * The card travels against the scene, which is the whole effect. There used to
+ * be a third amount here for the blurred copy the card carried — it had to
+ * travel by the sum of the other two to stay registered against the photo it
+ * stood in for. The card is solid white now, so the copy and its coupling are
+ * both gone.
  *
  * SCENE has to stay inside the 3% the scene's zoom holds off each edge, or the
  * drift pulls a blank strip into frame. CARD is bounded by the tighter of the
@@ -43,7 +43,6 @@ const COVERED_SHADE = 0.45;
  */
 const SCENE_DRIFT = 0.02;
 const CARD_DRIFT = 0.025;
-const FROST_DRIFT = SCENE_DRIFT + CARD_DRIFT;
 
 export function StackMotion({ children }: { children: ReactNode }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -122,24 +121,12 @@ export function StackMotion({ children }: { children: ReactNode }) {
             // a viewport-height panel — but that card is the reference's 1.623
             // there and rests centred in its plate, so the same swing reads as
             // the card sitting crooked: 21px low as the fold arrives, 21px high
-            // as it leaves. The scene and frost keep travelling, so the depth
-            // between the photo and the frosted pane is unchanged; only the pane
-            // stops moving against the plate it sits in.
-            //
-            // Frost still needs the sum, and with the card at rest that sum is
-            // just the scene's share.
-            const cardDrift = wide ? 0 : -CARD_DRIFT;
-            drift(
-              card.querySelector<HTMLElement>("[data-f05-scene]"),
-              SCENE_DRIFT,
-            );
+            // as it leaves. The scene keeps travelling either way, so the depth
+            // between photo and card is only ever reduced, never lost.
+            drift(card.querySelector<HTMLElement>("[data-f05-scene]"), SCENE_DRIFT);
             drift(
               card.querySelector<HTMLElement>("[data-f05-glass]"),
-              cardDrift,
-            );
-            drift(
-              card.querySelector<HTMLElement>("[data-f05-frost]"),
-              wide ? SCENE_DRIFT : FROST_DRIFT,
+              wide ? 0 : -CARD_DRIFT,
             );
           });
         },

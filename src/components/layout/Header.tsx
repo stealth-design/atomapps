@@ -70,6 +70,7 @@ export function Header() {
               <a
                 key={item.label}
                 href={item.href}
+                data-underline-link
                 // Pure black, kept from when the bar was translucent and
                 // needed every point of contrast; on solid white it simply
                 // matches the wordmark.
@@ -81,12 +82,33 @@ export function Header() {
           </nav>
 
           {/* `Link`, not `<a>`: this now points at a route (/contact) rather
-              than an in-page anchor, so it should navigate client-side. */}
+              than an in-page anchor, so it should navigate client-side.
+
+              The arrow shifts a little on hover and the pill lightens. Both are
+              behind `@media (hover: hover)` — Tailwind's `hover:` alone also
+              fires on a tap, which leaves a phone showing the hover state until
+              something else is touched. */}
           <Link
             href={siteConfig.cta.href}
-            className="hidden h-[33px] items-center justify-center rounded-full bg-[#111116] px-[14px] text-[15px] leading-[20px] text-white tablet:inline-flex"
+            className="group hidden h-[33px] items-center justify-center gap-[7px] rounded-full bg-[#111116] pr-[12px] pl-[14px] text-[15px] leading-[20px] text-white transition-colors duration-300 ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:bg-[#2c2c33] tablet:inline-flex"
           >
             {siteConfig.cta.label}
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              aria-hidden="true"
+              fill="none"
+              className="shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover:translate-x-[3px] motion-reduce:transition-none"
+            >
+              <path
+                d="M2.5 7h9M8 3.5 11.5 7 8 10.5"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </Link>
 
           <button
