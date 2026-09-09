@@ -112,7 +112,7 @@ export default function Fold07() {
               </h2>
 
               <p className="mt-[29px] hidden max-w-[275px] text-[15px] leading-[23px] text-[#61616a] tablet:block tablet:text-[16px] tablet:leading-[24px]">
-                Real feedback from teams and users who ship faster with Atom.
+                Real reviews from users who use our apps everyday.
               </p>
 
               {/* Squirrel, filling the column under the subtext.
