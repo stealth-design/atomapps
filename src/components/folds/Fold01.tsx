@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 import { HeroMotion } from "@/components/folds/fold01/HeroMotion";
+import { HeroVideo } from "@/components/folds/fold01/HeroVideo";
 
 /**
  * Fold 01 — Hero
@@ -37,6 +38,40 @@ import { HeroMotion } from "@/components/folds/fold01/HeroMotion";
  * already did.
  */
 const HERO_LAG = 35;
+
+/**
+ * ---------------------------------------------------------------------------
+ * TRIAL: the hero plate as a video.
+ *
+ * OFF for now. To switch it on:
+ *
+ *   1. Put the file in `public/videos/`. Anything under `public/` is served
+ *      from the site root, so `public/videos/hero.mp4` is `/videos/hero.mp4`
+ *      — the same place Fold 07's squirrel lives.
+ *   2. Set this to `{ src: "/videos/hero.mp4" }`.
+ *
+ * TO REVERT: set it back to `null`. That is the whole revert — the two
+ * `<Image>` plates below are never touched by any of this, so the fold goes
+ * straight back to the stills.
+ *
+ * It is `null` rather than a path to a file that is not there yet on purpose:
+ * the fold survives a missing video (the stills stand), but every visitor
+ * would still spend a request finding that out.
+ *
+ * `mobileSrc` is optional and only worth cutting if the landscape file looks
+ * wrong on a phone. Under 640px the stage is portrait (1206/2280), so a
+ * landscape video loses roughly 42% of its width to `object-cover` there —
+ * the same crop the landscape still would take, which is why the stills carry
+ * a separate portrait cut of their own.
+ *
+ *   const HERO_VIDEO = { src: "/videos/hero.mp4", mobileSrc: "/videos/hero-mobile.mp4" };
+ *
+ * It plays once and holds its last frame — no loop. See HeroVideo for how it
+ * degrades (reduced motion, blocked autoplay, missing file all fall back to
+ * the stills).
+ * ---------------------------------------------------------------------------
+ */
+const HERO_VIDEO: { src: string; mobileSrc?: string } | null = null;
 
 export default function Fold01() {
   return (
@@ -204,6 +239,20 @@ export default function Fold01() {
                     sizes="100vw"
                     className="hidden object-cover object-center min-[640px]:block"
                   />
+
+                  {/* Over the two stills, which stay as its poster and its
+                      fallback — see HERO_VIDEO at the top of this file for the
+                      switch and for where the file goes. The framing mirrors
+                      the stills exactly so the cross-fade does not shift the
+                      composition: bottom-anchored on the portrait stage,
+                      centred once the landscape one takes over. */}
+                  {HERO_VIDEO && (
+                    <HeroVideo
+                      src={HERO_VIDEO.src}
+                      mobileSrc={HERO_VIDEO.mobileSrc}
+                      className="absolute inset-0 h-full w-full object-cover object-bottom min-[640px]:object-center"
+                    />
+                  )}
                 </div>
 
                 {/* ---------- small moon (mobile only; the desktop moon is in the plate) ---------- */}
@@ -266,7 +315,7 @@ export default function Fold01() {
 
               <p className="overflow-hidden pb-[0.14em] -mb-[0.14em] text-center text-[16px] leading-[20px] text-white tablet:text-[20px] tablet:leading-[24px] desktop-sm:text-[24px] desktop-sm:leading-[26px] desktop-xl:text-[28px] desktop-xl:leading-[30px]">
                 <span data-hero-line className="block">
-                  Through apps that people love
+                  Through apps people love
                 </span>
               </p>
             </div>
