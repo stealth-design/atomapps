@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "@/lib/gsap";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { siteConfig } from "@/data/site";
 
@@ -22,9 +24,58 @@ import { siteConfig } from "@/data/site";
  *
  * The mark is `final-atom-logo-dark.png` — see the note at the element for why a
  * derived file rather than a CSS filter.
+ *
+ * The bar retracts on the way down the page and comes back the moment the
+ * scroll reverses. Direction comes from a ScrollTrigger rather than a `scroll`
+ * listener: Lenis owns the scroll position here and already drives
+ * ScrollTrigger from the same ticker (see SmoothScroll), so reading direction
+ * from it means one source of truth and no second listener firing on a
+ * position Lenis has not finished settling.
  */
+
+/**
+ * Movement to ignore before the bar reacts, in pixels.
+ *
+ * Without it a trackpad's own jitter around a standstill flips direction on
+ * its own and the bar flickers in and out while nobody is really scrolling.
+ */
+const DIRECTION_THRESHOLD = 8;
+
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isRetracted, setIsRetracted] = useState(false);
+
+  // Mirrors of the two values the ScrollTrigger needs to read on every frame.
+  // Kept in refs so `onUpdate` can compare against them without the effect
+  // depending on state and rebuilding the trigger on every toggle.
+  const lastScroll = useRef(0);
+  const retracted = useRef(false);
+
+  const setRetracted = useCallback((next: boolean) => {
+    if (retracted.current === next) return;
+    retracted.current = next;
+    setIsRetracted(next);
+  }, []);
+
+  useGSAP(() => {
+    const trigger = ScrollTrigger.create({
+      start: 0,
+      end: "max",
+      onUpdate: (self) => {
+        const y = self.scroll();
+        const delta = y - lastScroll.current;
+        if (Math.abs(delta) < DIRECTION_THRESHOLD) return;
+        lastScroll.current = y;
+
+        // Never retracted over the top of the page: the first 50px is the bar's
+        // own height, and hiding it there would take it away as the hero
+        // arrives rather than once the reader is into the page.
+        setRetracted(y > 50 && delta > 0);
+      },
+    });
+
+    return () => trigger.kill();
+  }, [setRetracted]);
 
   return (
     <>
@@ -38,7 +89,18 @@ export function Header() {
           Safe here because `MobileMenu` is a sibling of this element, not a
           descendant — a transform would otherwise become the containing block
           for its `fixed inset-0` panel. */}
-      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] transform-gpu bg-white">
+      <header
+        // Focus brings it back before anything can be tabbed to behind it:
+        // a retracted bar is off screen but its links are still in the tab
+        // order, and focus landing on something invisible is a dead end.
+        onFocusCapture={() => setRetracted(false)}
+        // Tailwind v4 puts `-translate-y-full` on the `translate` property,
+        // which is separate from the `transform` that `transform-gpu` sets, so
+        // the two compose rather than one dropping the other.
+        className={`fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] transform-gpu bg-white transition-transform duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none ${
+          isRetracted && !isMenuOpen ? "-translate-y-full" : "translate-y-0"
+        }`}
+      >
         <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
           {/* Full header height so the home link is a 50px target rather than
               the wordmark's own 24px — the logo still sits where it did. */}
