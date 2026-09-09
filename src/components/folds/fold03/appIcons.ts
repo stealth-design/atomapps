@@ -32,6 +32,16 @@ export interface IconPlacement {
 export const DESKTOP_STAGE = { width: 1440, height: 886 };
 export const MOBILE_STAGE = { width: 393, height: 626 };
 
+/**
+ * Source extension per icon. Everything came out of Figma as `.jpg`; anything
+ * added since carries its own here rather than being re-encoded to match.
+ * Next/Image re-encodes to webp/avif on the way out either way, so the source
+ * format only decides what sits in `public/`.
+ */
+export const ICON_EXT: Record<string, string> = {
+  "icon-16": "webp",
+};
+
 /** Corner radius as a share of icon width (Figma: 20.8% at every size). */
 export const ICON_RADIUS = "20.8%";
 
@@ -66,6 +76,11 @@ export const DESKTOP_ICONS: IconPlacement[] = [
   { icon: "icon-13", x: 150, y: 520, size: 143, blur: 16, opacity: 0.64 },
   { icon: "icon-14", x: 1009, y: 262, size: 158, opacity: 0.83 },
   { icon: "icon-15", x: 114, y: -22, size: 94, blur: 4 },
+  // The 16th, added after the artboard. It sits in the one clear pocket on
+  // the right: below icon-14 (ends y 420), left of icon-06 (starts x 1204),
+  // above icon-11 (starts y 680) and clear of the device, which spans
+  // x 468-964, y 178-413.
+  { icon: "icon-16", x: 900, y: 500, size: 90, blur: 5 },
 ];
 
 /**
@@ -125,6 +140,9 @@ export const MOBILE_ICONS: IconPlacement[] = [
   { icon: "icon-13", x: 223, y: 29, size: 79, blur: 9, opacity: 0.64 },
   { icon: "icon-10", x: 354, y: 267, size: 73, blur: 8 },
   { icon: "icon-03", x: 296, y: -18, size: 88, blur: 6 },
+  // Bottom-left, in the gap under icon-12 (ends y 533) and right of icon-05
+  // (ends x 52), well left of icon-09 (starts x 167).
+  { icon: "icon-16", x: 95, y: 560, size: 44, blur: 5 },
 ];
 
 /**
@@ -134,6 +152,9 @@ export const MOBILE_ICONS: IconPlacement[] = [
  *
  *   row 1  clap · moon · volume · steps · weather · calculator · clock
  *   row 2  zodiac · torch · scanner · AI · calendar · notes · news · bible
+ *
+ * icon-16 is appended rather than slotted in: it postdates the reference
+ * frame, so there is no position in that reading order it belongs to.
  */
 export const END_ORDER = [
   "icon-05",
@@ -151,6 +172,7 @@ export const END_ORDER = [
   "icon-09",
   "icon-04",
   "icon-14",
+  "icon-16",
 ];
 
 export interface GridConfig {
@@ -172,10 +194,19 @@ export interface GridConfig {
   reference: number;
 }
 
-/** Desktop matches the end-frame reference: two rows of 7 and 8. */
+/**
+ * Desktop was the end-frame reference's 7 and 8; the 16th icon makes it an even
+ * two rows of 8, which is the same 226px block as before.
+ *
+ * Mobile cannot take a sixth icon at 58px — six of those plus their gaps come
+ * to 408 against a 393 stage — so the row that gains it is paid for by 58->54
+ * and 12->10, which lands a row of six at 374 and leaves 9px either side. The
+ * block ends up 194px tall against the 206 it was, so the grid does not grow
+ * into the stage it has to fit inside.
+ */
 export const END_GRID: { desktop: GridConfig; mobile: GridConfig } = {
-  desktop: { rows: [7, 8], size: 96, gap: 20, rowGap: 34, headingGap: 58, reference: 1440 },
-  mobile: { rows: [5, 5, 5], size: 58, gap: 12, rowGap: 16, headingGap: 52, reference: 393 },
+  desktop: { rows: [8, 8], size: 96, gap: 20, rowGap: 34, headingGap: 58, reference: 1440 },
+  mobile: { rows: [6, 5, 5], size: 54, gap: 10, rowGap: 16, headingGap: 52, reference: 393 },
 };
 
 /* PHONE_FACE / CLUSTER_FILL used to live here, aiming the icons at the phone

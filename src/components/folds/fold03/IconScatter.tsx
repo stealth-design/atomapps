@@ -1,16 +1,5 @@
 import Image from "next/image";
-import {
-  BLUR_SCALE,
-  ICON_LINKS,
-  DESKTOP_ICONS,
-  DESKTOP_ICONS_WIDE,
-  DESKTOP_STAGE,
-  END_ORDER,
-  ICON_RADIUS,
-  MOBILE_ICONS,
-  MOBILE_STAGE,
-  type IconPlacement,
-} from "./appIcons";
+import { ICON_EXT, BLUR_SCALE, ICON_LINKS, DESKTOP_ICONS, DESKTOP_ICONS_WIDE, DESKTOP_STAGE, END_ORDER, ICON_RADIUS, MOBILE_ICONS, MOBILE_STAGE, type IconPlacement } from "./appIcons";
 
 /**
  * The app-icon layer: exactly ONE element per icon, which the scroll timeline
@@ -80,7 +69,7 @@ export function IconScatter() {
             style={{ borderRadius: ICON_RADIUS }}
           >
             <Image
-              src={`/images/fold03/${icon}.jpg`}
+              src={`/images/fold03/${icon}.${ICON_EXT[icon] ?? "jpg"}`}
               alt=""
               fill
               sizes="(max-width: 767px) 25vw, 20vw"
