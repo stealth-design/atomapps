@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { GlobalParallax } from "@/components/layout/GlobalParallax";
+import { CommentMode } from "@/components/review/CommentMode";
 import { siteConfig } from "@/data/site";
 import "./globals.css";
 
@@ -26,6 +27,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <GlobalParallax />
           {children}
         </SmoothScroll>
+
+        {/* Pre-launch review comments — TEMPORARY, see lib/review/store.
+            On by default so the client needs nothing set up, and invisible
+            until asked for by `Alt`+`C` or `?comments`. Set
+            NEXT_PUBLIC_REVIEW_COMMENTS=0 to switch it off without a deploy of
+            its own; at launch, delete this and the three `review` folders. */}
+        {process.env.NEXT_PUBLIC_REVIEW_COMMENTS !== "0" && <CommentMode />}
       </body>
     </html>
   );
