@@ -39,7 +39,7 @@ export const MOBILE_STAGE = { width: 393, height: 626 };
  * format only decides what sits in `public/`.
  */
 export const ICON_EXT: Record<string, string> = {
-  "icon-16": "webp",
+  "icon-08": "webp",
 };
 
 /** Corner radius as a share of icon width (Figma: 20.8% at every size). */
