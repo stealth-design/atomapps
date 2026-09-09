@@ -52,6 +52,12 @@ export const PARTNERS: PartnerLogo[] = [
 ];
 
 export interface TeamMember {
+  /**
+   * Full name, and the same one at both breakpoints — no short variant. The
+   * mobile column is only 109px, so the longer two wrap to a second line
+   * there; see the name element in Fold08 for how the row is kept level
+   * through that.
+   */
   name: string;
   /** Desktop role; mobile shortens Tarika's. */
   role: string;
@@ -61,9 +67,9 @@ export interface TeamMember {
 
 export const TEAM: TeamMember[] = [
   { name: "Dan Rabin", role: "CEO", photo: "team-dan.jpg" },
-  { name: "Ektarina", role: "CMO", photo: "team-ektarina.jpg" },
+  { name: "Ekaterina Samohovets", role: "CMO", photo: "team-ektarina.jpg" },
   {
-    name: "Tarika",
+    name: "Tarika Maini Soni",
     role: "Director of Strategic Initiatives",
     roleMobile: "Strategic Initiatives",
     photo: "team-tarika.jpg",

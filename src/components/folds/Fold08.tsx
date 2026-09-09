@@ -95,7 +95,13 @@ export default function Fold08() {
                       />
                     </div>
                   </div>
-                  <p className="mt-[18px] text-center text-[17.4px] leading-[24px] font-bold text-[#111116] tablet:mt-[25px] tablet:text-left tablet:text-[24px] tablet:leading-[31px]">
+                  {/* Two lines' worth of room on mobile whether the name needs
+                      it or not. The column is 108px, so the longer two names
+                      wrap and the shortest does not — without a floor the roles
+                      under them sat 24px apart and the row read as misaligned.
+                      `tablet:min-h-0` drops it above the breakpoint, where all
+                      three set on one line. */}
+                  <p className="mt-[18px] min-h-[48px] text-center text-[17.4px] leading-[24px] font-bold text-[#111116] tablet:mt-[25px] tablet:min-h-0 tablet:text-left tablet:text-[24px] tablet:leading-[31px]">
                     {member.name}
                   </p>
                   <p className="mt-[3px] text-center text-[12px] leading-[16px] text-[#111116] tablet:mt-[4px] tablet:text-left tablet:text-[18px] tablet:leading-[24px] tablet:font-light">
