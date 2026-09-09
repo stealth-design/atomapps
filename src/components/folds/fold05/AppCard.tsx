@@ -157,58 +157,37 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 // buttons; 240 clears the longest ("Explore Volume Control", 230)
                 // and `justify-between` pins the arrow to the right edge so the
                 // shorter labels do not leave it floating mid-pill.
-                className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] overflow-hidden rounded-full bg-white pr-[10px] pl-[16px] tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
+                className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-white pr-[10px] pl-[16px] tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
               >
                 {/*
-                 * The border is the animation. It sits on a ring of its own
-                 * rather than on the pill, because a `border` would change the
-                 * pill's box and shift the label by a pixel as it came in;
-                 * an inset ring paints inside the same box and moves nothing.
+                 * A hairline at rest that goes to black on hover.
                  *
-                 * At rest it is a hairline the card's own grey. On hover it
-                 * thickens to black and sweeps round from the leading edge —
-                 * the sweep is a second ring drawn with `conic-gradient` in a
-                 * mask, so it costs one composited layer and no layout.
+                 * It is a ring on its own element rather than a `border` on the
+                 * pill: a border is part of the box, so bringing one in would
+                 * shift the label by its own width. An inset ring paints inside
+                 * the same box and moves nothing.
                  */}
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-black/15 transition-[box-shadow,color] duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:ring-black/70 motion-reduce:transition-none"
-                />
-                <span
-                  aria-hidden="true"
-                  // The sweep: a full-turn conic wedge, rotated once on hover.
-                  // `--sweep` is the wedge's own angle, animated from 0 so the
-                  // line grows out of the leading edge rather than appearing.
-                  className="pointer-events-none absolute -inset-px rounded-full opacity-0 transition-opacity duration-[300ms] can-hover:group-hover/cta:opacity-100 motion-reduce:hidden"
-                  style={{
-                    background:
-                      "conic-gradient(from 180deg, rgba(0,0,0,0.85) 0deg, rgba(0,0,0,0) 120deg, rgba(0,0,0,0) 360deg)",
-                    mask: "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
-                    WebkitMask:
-                      "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
-                    animation: "cta-sweep 1.6s linear infinite",
-                  }}
+                  className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-black/15 transition-[box-shadow] duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:ring-black motion-reduce:transition-none"
                 />
 
                 <span className="relative text-[14px] leading-[18px] text-black desktop-xl:text-[15px] desktop-xl:leading-[20px]">
                   {panel.cta.label}
                 </span>
-                <span className="relative flex size-[20px] shrink-0 items-center justify-center rounded-full bg-black transition-transform duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:translate-x-[2px] can-hover:group-hover/cta:-translate-y-[2px] motion-reduce:transition-none">
-                  <svg
-                    width="11"
-                    height="11"
-                    viewBox="0 0 11 11"
-                    aria-hidden="true"
-                    fill="none"
-                  >
-                    <path
-                      d="M2 9 9 2M4 2h5v5"
-                      stroke="#fff"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+
+                {/*
+                 * The same arrow move as the footer's ring: one copy leaves
+                 * through the top-right and its replacement arrives from the
+                 * bottom-left, both clipped to the circle by `overflow-hidden`,
+                 * so it reads as one arrow travelling through rather than a
+                 * glyph that jumps back. Two copies rather than one going out
+                 * and returning — a single arrow has to come back along the
+                 * diagonal it just left by, which reads as a recoil.
+                 */}
+                <span className="relative grid size-[20px] shrink-0 place-items-center overflow-hidden rounded-full bg-black">
+                  <CtaArrow className="translate-x-0 translate-y-0 can-hover:group-hover/cta:translate-x-[150%] can-hover:group-hover/cta:-translate-y-[150%]" />
+                  <CtaArrow className="-translate-x-[150%] translate-y-[150%] can-hover:group-hover/cta:translate-x-0 can-hover:group-hover/cta:translate-y-0" />
                 </span>
               </a>
             )}
@@ -284,5 +263,30 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * One copy of the CTA's arrow. Two of these ride in the circle at a time — see
+ * the note at the ring for why — on the same curve the footer's arrow uses.
+ */
+function CtaArrow({ className }: { className: string }) {
+  return (
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 11 11"
+      aria-hidden="true"
+      fill="none"
+      className={`col-start-1 row-start-1 transition-transform duration-[600ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none ${className}`}
+    >
+      <path
+        d="M2 9 9 2M4 2h5v5"
+        stroke="#fff"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

@@ -177,15 +177,6 @@
     }
   }
 
-  /* Rotates the conic wedge that draws the Fold 05 CTA's border on hover.
-     Only ever runs while a pointer is on the button — the element carrying it
-     is `opacity-0` and `motion-reduce:hidden` otherwise. */
-  @keyframes cta-sweep {
-    to {
-      transform: rotate(1turn);
-    }
-  }
-
   ::selection {
     background: var(--foreground);
     color: var(--background);
