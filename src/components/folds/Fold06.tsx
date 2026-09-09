@@ -17,10 +17,16 @@ import { APPROACH_STEPS } from "@/components/folds/fold06/steps";
  *
  * Card illustrations are dense vector compositions (avatar clusters, a phone
  * UI, an orbit diagram), so each is exported as a PNG rather than rebuilt.
+ *
+ * This is the only fold that carries a colour of its own — the light teal in
+ * `--fold-06-bg`, sitting between Fold 05's white and Fold 07's. Type over the
+ * band stays dark: see the token for the measurements, but the short version
+ * is that black reads at 17:1 on this teal and white at 1.2:1, so nothing
+ * here inverts.
  */
 export default function Fold06() {
   return (
-    <Section fold="06" className="relative overflow-hidden bg-white">
+    <Section fold="06" className="relative overflow-hidden bg-[var(--fold-06-bg)]">
       {/* ---------- decorative arcs (Figma: one masked circle group at 20%) ---------- */}
       {/* The trigger spans the fold rather than sitting on the arcs
           themselves, so the drift is timed to the section the reader is

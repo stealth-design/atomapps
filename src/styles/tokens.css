@@ -37,6 +37,19 @@
   --muted: #6b6b6b;
   --border: #e5e5e5;
 
+  /* Fold 06's band — the one fold that carries a colour instead of the page's
+     white. An 18% tint of #0596a4, the teal the fold's own "keep making it
+     better" icon is already drawn in, so the band is the design's teal rather
+     than a new one.
+
+     It stays light because the type over it stays dark. Against #d2ecef the
+     black eyebrow and heading measure 17.0:1 and the #515151 subhead 6.4:1 —
+     AA at any size, and AAA for the headings. White type would be 1.2:1, so
+     inverting the fold is not an option at this lightness: the band would have
+     to darken past roughly #04838f — a saturated teal, not a light one —
+     before white cleared 4.5:1, and that is a different design. */
+  --fold-06-bg: #d2ecef;
+
   /* Layout — the design's desktop artboard is 1440 wide */
   --content-max-width: 1440px;
   /* The artboard width, or the viewport when it is narrower. Viewport-relative

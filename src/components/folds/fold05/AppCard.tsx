@@ -75,204 +75,226 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
         className="pointer-events-none absolute inset-0 bg-black opacity-0"
       />
 
-      {/* The card drifts against the scene, which is where the depth in this
-          panel comes from — see StackMotion for the three coupled amounts.
-          *
-          * Past 1920 `top` becomes (100 - 77.765) / 2, so the card rests
-          * centred in the plate. The artboard's 11.738% leaves only 10.497%
-          * under it — a 10px lean that read as a lean once the plate stopped
-          * being a full viewport tall. StackMotion's own +-2.5% swings either
-          * side of wherever it rests, so centring the rest position is what
-          * makes the top and bottom gaps equal through the whole drift. */}
-      <div
-        data-f05-glass
-        className="absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.738%] tablet:bottom-auto tablet:left-[2.569%] tablet:h-[77.765%] tablet:max-h-none tablet:w-[32.222%] desktop-xl:top-[11.1175%]"
-      >
-        {/*
-         * Solid white, not frosted.
-         *
-         * This used to hold its own pre-blurred copy of the scene under a 72%
-         * white wash — a way of faking `backdrop-filter`, which four stacked
-         * full-bleed photos could not afford to do for real. Solid white drops
-         * all of it: the copy, the second decode of every scene, the wash, and
-         * the coupled drift that kept the copy registered against the photo as
-         * the card moved over it. `data-f05-frost` is gone with it, so
-         * StackMotion now moves two things here instead of three.
-         */}
-        <div className="relative isolate h-auto w-full overflow-hidden rounded-[14px] bg-white tablet:h-full tablet:rounded-[19px]">
-          {/* Top-aligned past 1920, not centred. Centring split the leftover
-              room above and below, which put each card's header at a different
-              height — 64px down on Find My Phone against 6px on Steppy, since
-              the four carry different amounts of copy. Aligning to the top
-              gives every header the same offset from the card's edge and
-              collects the slack at the foot instead.
-
-              The gap that centring originally closed stays closed: the stats
-              block below drops `mt-auto` past 1920, so it follows the content
-              rather than being pushed to the card's bottom. */}
+      {/*
+       * A size container, purely so the card below can measure its own insets
+       * against the panel's HEIGHT on all four sides.
+       *
+       * `top`/`bottom` percentages resolve against the container's height and
+       * `left` against its width, so the artboard's 11.738% / 2.569% pair was
+       * only ever equal at one aspect ratio — and was not equal at any of
+       * them: at the reference frame's 1764x1087 it came out 93px above and
+       * below against 35px on the left. `cqh` is 1% of this box's height
+       * whatever its shape, so one number drives all three and the three stay
+       * equal from a 4:3 tablet to the 1.623 plate past 1920.
+       *
+       * It is a box of its own rather than `container-type` on the card root,
+       * which would put size containment on the element whose height the
+       * aspect ratio and the sticky panel are already deriving.
+       *
+       * `pointer-events-none` because it spans the whole panel; the card puts
+       * them back for itself, so the scene beside it is not covered by an
+       * invisible sheet.
+       */}
+      <div className="pointer-events-none absolute inset-0 [container-type:size]">
+        {/* The card drifts against the scene, which is where the depth in this
+            panel comes from — see StackMotion for the three coupled amounts.
+            *
+            * The rest position is centred vertically — (100 - 77.765) / 2 —
+            * rather than the artboard's 11.738% top, which left only 10.497%
+            * under it. StackMotion's own +-2.5% swings either side of wherever
+            * the card rests, so centring the rest position is what makes the
+            * top and bottom gaps equal through the whole drift, and the left
+            * inset above is what brings the third side into line with them. */}
+        <div
+          data-f05-glass
+          className="pointer-events-auto absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.1175cqh] tablet:bottom-auto tablet:left-[11.1175cqh] tablet:h-[77.765cqh] tablet:max-h-none tablet:w-[32.222%]"
+        >
           {/*
-           * One padding value, all four sides. Percentage padding resolves
-           * against the inline size for top and bottom as well as left and
-           * right, so a single number is genuinely equal all round — which the
-           * old `px-[9.267%] py-[44px]` pair only happened to be at 1440 and
-           * drifted from at every other width. 10.4% is ~48px in the card
-           * against the 43 it was, which is the nudge inward.
+           * Solid white, not frosted.
+           *
+           * This used to hold its own pre-blurred copy of the scene under a 72%
+           * white wash — a way of faking `backdrop-filter`, which four stacked
+           * full-bleed photos could not afford to do for real. Solid white drops
+           * all of it: the copy, the second decode of every scene, the wash, and
+           * the coupled drift that kept the copy registered against the photo as
+           * the card moved over it. `data-f05-frost` is gone with it, so
+           * StackMotion now moves two things here instead of three.
            */}
-          <div className="relative z-10 flex h-full w-full flex-col p-[6.799%] tablet:p-[10.4%]">
-            {/* ---- header ---- */}
-            {/* The app name deliberately has no `desktop-xl` size. It shares its
-                row with the icon, so it only gets 268px in the narrowed card,
-                and "Volume Control" — the longest of the four — needs 35.6px or
-                less to hold one line there. 35px is already that ceiling, so
-                growing it only buys a wrap the reference frame does not have. */}
-            <div className="flex items-center gap-[12px] tablet:gap-[20px]">
-              <Image
-                src={panel.icon}
-                alt=""
-                width={279}
-                height={280}
-                aria-hidden="true"
-                className="size-[40px] shrink-0 rounded-[20.8%] tablet:size-[65px] desktop-xl:size-[54px]"
-              />
-              <h3 className="text-[20px] leading-[26px] font-extrabold text-black tablet:text-[35px] tablet:leading-[46px]">
-                {panel.title}
-              </h3>
-            </div>
+          <div className="relative isolate h-auto w-full overflow-hidden rounded-[14px] bg-white tablet:h-full tablet:rounded-[19px]">
+            {/* Top-aligned past 1920, not centred. Centring split the leftover
+                room above and below, which put each card's header at a different
+                height — 64px down on Find My Phone against 6px on Steppy, since
+                the four carry different amounts of copy. Aligning to the top
+                gives every header the same offset from the card's edge and
+                collects the slack at the foot instead.
 
-            {panel.question && (
-              <p className="mt-[20px] text-[16px] leading-[21px] font-medium text-black tablet:mt-[35px] desktop-xl:mt-[26px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
-                {panel.question}
-              </p>
-            )}
-
-            <p className="mt-[14px] text-[12px] leading-[16px] font-light text-black tablet:mt-[30px] desktop-xl:mt-[22px] tablet:text-[14px] tablet:leading-[18px] desktop-xl:text-[15px] desktop-xl:leading-[20px]">
-              {panel.description}
-            </p>
-
-            {panel.cta && (
-              <a
-                href={panel.cta.href}
-                // One width for all four past 1920. `w-fit` sizes each pill to its own
-                // label, so the four ran 204-230px and read as four different
-                // buttons; 240 clears the longest ("Explore Volume Control", 230)
-                // and `justify-between` pins the arrow to the right edge so the
-                // shorter labels do not leave it floating mid-pill.
-                className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-white pr-[10px] pl-[16px] transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:bg-black motion-reduce:transition-none tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
-              >
-                {/*
-                 * The whole pill inverts on hover: white ground and black type
-                 * become black ground and white type, and the arrow's disc
-                 * flips with them.
-                 *
-                 * At rest a hairline holds the pill's edge against the card,
-                 * which is white too. It goes black with the fill, so on hover
-                 * it stops being a visible line and simply keeps the edge crisp.
-                 *
-                 * The fill is `hover:` on the pill while everything inside it
-                 * is `group-hover:` — a group's own element is not a descendant
-                 * of itself, so `group-hover` never matches it. That mismatch
-                 * is what left the ground white while the label went white too.
-                 *
-                 * The stroke is a ring on its own element rather than a `border`
-                 * on the pill: a border is part of the box, so bringing one in
-                 * would shift the label by its own width. An inset ring paints
-                 * inside the same box and moves nothing — the CTA measures the
-                 * same at rest and on hover.
-                 */}
-                <span
+                The gap that centring originally closed stays closed: the stats
+                block below drops `mt-auto` past 1920, so it follows the content
+                rather than being pushed to the card's bottom. */}
+            {/*
+             * One padding value, all four sides. Percentage padding resolves
+             * against the inline size for top and bottom as well as left and
+             * right, so a single number is genuinely equal all round — which the
+             * old `px-[9.267%] py-[44px]` pair only happened to be at 1440 and
+             * drifted from at every other width. 10.4% is ~48px in the card
+             * against the 43 it was, which is the nudge inward.
+             */}
+            <div className="relative z-10 flex h-full w-full flex-col p-[6.799%] tablet:p-[10.4%]">
+              {/* ---- header ---- */}
+              {/* The app name deliberately has no `desktop-xl` size. It shares its
+                  row with the icon, so it only gets 268px in the narrowed card,
+                  and "Volume Control" — the longest of the four — needs 35.6px or
+                  less to hold one line there. 35px is already that ceiling, so
+                  growing it only buys a wrap the reference frame does not have. */}
+              <div className="flex items-center gap-[12px] tablet:gap-[20px]">
+                <Image
+                  src={panel.icon}
+                  alt=""
+                  width={279}
+                  height={280}
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-black/15 transition-[box-shadow] duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:ring-black motion-reduce:transition-none"
+                  className="size-[40px] shrink-0 rounded-[20.8%] tablet:size-[65px] desktop-xl:size-[54px]"
                 />
+                <h3 className="text-[20px] leading-[26px] font-extrabold text-black tablet:text-[35px] tablet:leading-[46px]">
+                  {panel.title}
+                </h3>
+              </div>
 
-                <span className="relative text-[14px] leading-[18px] text-black transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:text-white motion-reduce:transition-none desktop-xl:text-[15px] desktop-xl:leading-[20px]">
-                  {panel.cta.label}
-                </span>
-
-                {/*
-                 * The same arrow move as the footer's ring: one copy leaves
-                 * through the top-right and its replacement arrives from the
-                 * bottom-left, both clipped to the circle by `overflow-hidden`,
-                 * so it reads as one arrow travelling through rather than a
-                 * glyph that jumps back. Two copies rather than one going out
-                 * and returning — a single arrow has to come back along the
-                 * diagonal it just left by, which reads as a recoil.
-                 */}
-                {/* `text-*` on the disc rather than a colour on the arrows:
-                    both copies draw with `currentColor`, so one declaration
-                    here inverts the pair and they cannot fall out of step. */}
-                <span className="relative grid size-[20px] shrink-0 place-items-center overflow-hidden rounded-full bg-black text-white transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:bg-white can-hover:group-hover/cta:text-black motion-reduce:transition-none">
-                  <CtaArrow className="translate-x-0 translate-y-0 can-hover:group-hover/cta:translate-x-[150%] can-hover:group-hover/cta:-translate-y-[150%]" />
-                  <CtaArrow className="-translate-x-[150%] translate-y-[150%] can-hover:group-hover/cta:translate-x-0 can-hover:group-hover/cta:translate-y-0" />
-                </span>
-              </a>
-            )}
-
-            {panel.badge && (
-              <span // Matches the CTA pill past 1920 — the same 240x44 box with a centred
-                // label — so the "coming soon" card sits in the row rather than
-                // beside it.
-                className="mt-[18px] flex h-[38px] w-fit shrink-0 items-center rounded-full bg-[#909090] px-[17px] text-[14px] leading-[18px] text-white tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-center desktop-xl:text-[15px] desktop-xl:leading-[20px]"
-              >
-                {panel.badge}
-              </span>
-            )}
-
-            {/* ---- closing block, anchored to the bottom of the card ---- */}
-            {/* `pb-0` and a `-mb` on the stats below: the closing block is
-                pinned to the foot by `mt-auto`, so the only thing under the
-                numbers is the card's own padding — and a caption's line box
-                carries leading under its baseline, which made that padding
-                read deeper than the equal one above it. The negative margin
-                takes back just that leading. */}
-            <div className="mt-auto pt-[20px] -mb-[6px] desktop-xl:mt-[26px]">
-              {panel.quote && (
-                <p className="mb-[20px] text-[15px] leading-[21px] font-medium text-black tablet:mb-[40px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
-                  {panel.quote}
+              {panel.question && (
+                <p className="mt-[20px] text-[16px] leading-[21px] font-medium text-black tablet:mt-[35px] desktop-xl:mt-[26px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
+                  {panel.question}
                 </p>
               )}
 
-              {panel.features && (
-                <ul className="flex flex-col gap-[14px] tablet:gap-[20px]">
-                  {panel.features.map((feature) => (
-                    <li key={feature.icon} className="flex gap-[12px]">
-                      <Image
-                        src={`/images/fold05/icons/${feature.icon}.svg`}
-                        alt=""
-                        width={20}
-                        height={20}
-                        className="mt-[1px] size-[16px] shrink-0 tablet:size-[20px]"
-                      />
-                      <p className="text-[12px] leading-[16px] text-black tablet:text-[14px] tablet:leading-[18px] desktop-xl:text-[15px] desktop-xl:leading-[20px]">
-                        {feature.text}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
+              <p className="mt-[14px] text-[12px] leading-[16px] font-light text-black tablet:mt-[30px] desktop-xl:mt-[22px] tablet:text-[14px] tablet:leading-[18px] desktop-xl:text-[15px] desktop-xl:leading-[20px]">
+                {panel.description}
+              </p>
+
+              {panel.cta && (
+                <a
+                  href={panel.cta.href}
+                  // One width for all four past 1920. `w-fit` sizes each pill to its own
+                  // label, so the four ran 204-230px and read as four different
+                  // buttons; 240 clears the longest ("Explore Volume Control", 230)
+                  // and `justify-between` pins the arrow to the right edge so the
+                  // shorter labels do not leave it floating mid-pill.
+                  className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-white pr-[10px] pl-[16px] transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:bg-black motion-reduce:transition-none tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
+                >
+                  {/*
+                   * The whole pill inverts on hover: white ground and black type
+                   * become black ground and white type, and the arrow's disc
+                   * flips with them.
+                   *
+                   * At rest a hairline holds the pill's edge against the card,
+                   * which is white too. It goes black with the fill, so on hover
+                   * it stops being a visible line and simply keeps the edge crisp.
+                   *
+                   * The fill is `hover:` on the pill while everything inside it
+                   * is `group-hover:` — a group's own element is not a descendant
+                   * of itself, so `group-hover` never matches it. That mismatch
+                   * is what left the ground white while the label went white too.
+                   *
+                   * The stroke is a ring on its own element rather than a `border`
+                   * on the pill: a border is part of the box, so bringing one in
+                   * would shift the label by its own width. An inset ring paints
+                   * inside the same box and moves nothing — the CTA measures the
+                   * same at rest and on hover.
+                   */}
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-black/15 transition-[box-shadow] duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:ring-black motion-reduce:transition-none"
+                  />
+
+                  <span className="relative text-[14px] leading-[18px] text-black transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:text-white motion-reduce:transition-none desktop-xl:text-[15px] desktop-xl:leading-[20px]">
+                    {panel.cta.label}
+                  </span>
+
+                  {/*
+                   * The same arrow move as the footer's ring: one copy leaves
+                   * through the top-right and its replacement arrives from the
+                   * bottom-left, both clipped to the circle by `overflow-hidden`,
+                   * so it reads as one arrow travelling through rather than a
+                   * glyph that jumps back. Two copies rather than one going out
+                   * and returning — a single arrow has to come back along the
+                   * diagonal it just left by, which reads as a recoil.
+                   */}
+                  {/* `text-*` on the disc rather than a colour on the arrows:
+                      both copies draw with `currentColor`, so one declaration
+                      here inverts the pair and they cannot fall out of step. */}
+                  <span className="relative grid size-[20px] shrink-0 place-items-center overflow-hidden rounded-full bg-black text-white transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:bg-white can-hover:group-hover/cta:text-black motion-reduce:transition-none">
+                    <CtaArrow className="translate-x-0 translate-y-0 can-hover:group-hover/cta:translate-x-[150%] can-hover:group-hover/cta:-translate-y-[150%]" />
+                    <CtaArrow className="-translate-x-[150%] translate-y-[150%] can-hover:group-hover/cta:translate-x-0 can-hover:group-hover/cta:translate-y-0" />
+                  </span>
+                </a>
               )}
 
-              {panel.stats && (
-                <div className="flex gap-[42px] tablet:gap-[111px]">
-                  <div>
-                    <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
-                      {panel.stats.downloads}
-                    </p>
-                    <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">
-                      Downloads
-                    </p>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-[7px]">
-                      <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
-                        {panel.stats.rating}
-                      </p>
-                      <StarRating className="block h-[11px] tablet:h-[18px]" />
-                    </div>
-                    <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">
-                      App Store Rating
-                    </p>
-                  </div>
-                </div>
+              {panel.badge && (
+                <span // Matches the CTA pill past 1920 — the same 240x44 box with a centred
+                  // label — so the "coming soon" card sits in the row rather than
+                  // beside it.
+                  className="mt-[18px] flex h-[38px] w-fit shrink-0 items-center rounded-full bg-[#909090] px-[17px] text-[14px] leading-[18px] text-white tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-center desktop-xl:text-[15px] desktop-xl:leading-[20px]"
+                >
+                  {panel.badge}
+                </span>
               )}
+
+              {/* ---- closing block, anchored to the bottom of the card ---- */}
+              {/* `pb-0` and a `-mb` on the stats below: the closing block is
+                  pinned to the foot by `mt-auto`, so the only thing under the
+                  numbers is the card's own padding — and a caption's line box
+                  carries leading under its baseline, which made that padding
+                  read deeper than the equal one above it. The negative margin
+                  takes back just that leading. */}
+              <div className="mt-auto pt-[20px] -mb-[6px] desktop-xl:mt-[26px]">
+                {panel.quote && (
+                  <p className="mb-[20px] text-[15px] leading-[21px] font-medium text-black tablet:mb-[40px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
+                    {panel.quote}
+                  </p>
+                )}
+
+                {panel.features && (
+                  <ul className="flex flex-col gap-[14px] tablet:gap-[20px]">
+                    {panel.features.map((feature) => (
+                      <li key={feature.icon} className="flex gap-[12px]">
+                        <Image
+                          src={`/images/fold05/icons/${feature.icon}.svg`}
+                          alt=""
+                          width={20}
+                          height={20}
+                          className="mt-[1px] size-[16px] shrink-0 tablet:size-[20px]"
+                        />
+                        <p className="text-[12px] leading-[16px] text-black tablet:text-[14px] tablet:leading-[18px] desktop-xl:text-[15px] desktop-xl:leading-[20px]">
+                          {feature.text}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {panel.stats && (
+                  <div className="flex gap-[42px] tablet:gap-[111px]">
+                    <div>
+                      <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
+                        {panel.stats.downloads}
+                      </p>
+                      <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">
+                        Downloads
+                      </p>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-[7px]">
+                        <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
+                          {panel.stats.rating}
+                        </p>
+                        <StarRating className="block h-[11px] tablet:h-[18px]" />
+                      </div>
+                      <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">
+                        App Store Rating
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

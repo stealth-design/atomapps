@@ -27,7 +27,7 @@ export interface SiteConfig {
  */
 export const siteConfig: SiteConfig = {
   name: "Atom",
-  description: "Everyday tasks made easy through apps that people love.",
+  description: "Everyday tasks made easy through apps people love.",
   // Order matches the design's header: Our Apps · Our Approach · About Us.
   nav: [
     { label: "Our Apps", href: "#fold-04" },
