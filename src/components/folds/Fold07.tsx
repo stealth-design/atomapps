@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { TestimonialCard } from "@/components/folds/fold07/TestimonialCard";
 import { MarqueeMotion } from "@/components/folds/fold07/MarqueeMotion";
+import { MascotVideo } from "@/components/folds/fold07/MascotVideo";
 import { DESKTOP_COLUMNS, MOBILE_ROWS } from "@/components/folds/fold07/testimonials";
 
 /**
@@ -39,6 +39,20 @@ const EDGE_FADE =
   "linear-gradient(to bottom, transparent 0%, #000 7%, #000 92%, transparent 98%)";
 
 /** Softens the left and right ends of the horizontal rows. */
+/**
+ * The mascot's video and its still.
+ *
+ * Drop the video in `public/videos/` and point `MASCOT_VIDEO` at it — that one
+ * line is the whole change. Until the file is there the poster shows on its
+ * own, so the fold looks exactly as it does today rather than breaking.
+ *
+ * MP4 (H.264) is the safe single format. To add a second, give MascotVideo
+ * more than one `<source>`; browsers take the first they can play, so put
+ * `.webm` before `.mp4`.
+ */
+const MASCOT_VIDEO = "/videos/squirrel.mp4";
+const MASCOT_STILL = "/fold-one/squirrel.png";
+
 const ROW_FADE =
   "linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%)";
 
@@ -109,14 +123,13 @@ export default function Fold07() {
                 * 310px against the column's 460, set well in from the type's
                 * left edge. The column has the room either way, and the inset
                 * keeps the mascot from crowding the quotes beside it. */}
-              <Image
-                src="/fold-one/squirrel.png"
-                alt=""
-                width={726}
-                height={1065}
-                aria-hidden="true"
-                sizes="310px"
-                className="mt-[32px] ml-[64px] hidden h-auto w-[310px] desktop-md:block"
+              <MascotVideo
+                src={MASCOT_VIDEO}
+                poster={MASCOT_STILL}
+                // Same box the still had: 310px wide, auto height, and the
+                // 726x1065 aspect held explicitly so the column does not
+                // reflow between the poster loading and the video starting.
+                className="mt-[32px] ml-[64px] hidden aspect-[726/1065] h-auto w-[310px] object-contain desktop-md:block"
               />
             </Reveal>
           </div>
