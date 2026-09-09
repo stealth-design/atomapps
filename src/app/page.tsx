@@ -13,7 +13,8 @@ import Fold08 from "@/components/folds/Fold08";
 export default function Home() {
   return (
     <>
-      <Header />
+      {/* The hero is the one backdrop the bar's scrim reads against — see Header. */}
+      <Header transparentOverHero />
 
       <main>
         <Fold01 /> {/* Hero */}

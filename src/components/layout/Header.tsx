@@ -22,8 +22,18 @@ import { siteConfig } from "@/data/site";
  * decides legibility, so the nav, CTA and menu button carry explicit dark
  * colours instead.
  *
- * The mark is `final-atom-logo-dark.png` — see the note at the element for why a
- * derived file rather than a CSS filter.
+ * Over the hero the bar drops its white ground for the artboard's scrim
+ * (Figma 1551:4258) and inverts: white wordmark, white links, and the contact
+ * pill white on black type. It is the hero's own frame that makes that legible
+ * — the scrim is 50% black on the top edge and clear by the bar's foot, which
+ * reads against a photograph and does nothing at all against the white folds
+ * below it. So the inversion is scoped to the hero rather than applied for the
+ * whole page: past it the bar returns to the solid white below, and pages with
+ * no hero (there is one, /contact) never leave it. Both cuts of the mark are
+ * in the bar and cross-fade, because an `src` swap cannot be transitioned.
+ *
+ * The mark is `final-atom-logo-dark.png` / `-white.png` — see the note at the
+ * element for why derived files rather than a CSS filter.
  *
  * The bar retracts on the way down the page and comes back the moment the
  * scroll reverses. Direction comes from a ScrollTrigger rather than a `scroll`
@@ -41,9 +51,35 @@ import { siteConfig } from "@/data/site";
  */
 const DIRECTION_THRESHOLD = 8;
 
-export function Header() {
+/** The bar's own height, in pixels — mirrors `--header-height`. */
+const HEADER_HEIGHT = 50;
+
+/**
+ * The bar's ground over the hero, straight off the artboard (Figma 1551:4258):
+ * black at half opacity along the top edge, clear by the bar's foot. It is a
+ * scrim, not a panel — it darkens whatever the bar is over just enough to hold
+ * white type, which is why it only works over the hero's photograph.
+ */
+const HERO_SCRIM = "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%)";
+
+/** The state swap. Matches the retract, so the two read as one movement. */
+const SWAP = "transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none";
+const SWAP_FADE = "transition-opacity duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none";
+
+interface HeaderProps {
+  /**
+   * Set on pages whose first fold is the dark hero, which is the only backdrop
+   * the scrim above is legible over. It is a prop rather than something read
+   * from the route so the server renders the right bar and there is no white
+   * flash over the hero before hydration.
+   */
+  transparentOverHero?: boolean;
+}
+
+export function Header({ transparentOverHero = false }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRetracted, setIsRetracted] = useState(false);
+  const [isOverHero, setIsOverHero] = useState(transparentOverHero);
 
   // Mirrors of the two values the ScrollTrigger needs to read on every frame.
   // Kept in refs so `onUpdate` can compare against them without the effect
@@ -74,8 +110,28 @@ export function Header() {
       },
     });
 
-    return () => trigger.kill();
-  }, [setRetracted]);
+    // The bar is inverted only while it is genuinely over the hero: the swap
+    // lands when the hero's bottom edge reaches the bar's foot, so it never
+    // holds white type over the white fold underneath.
+    const hero = transparentOverHero ? document.getElementById("fold-01") : null;
+    const heroTrigger = hero
+      ? ScrollTrigger.create({
+          trigger: hero,
+          start: `bottom top+=${HEADER_HEIGHT}`,
+          end: "max",
+          onToggle: (self) => setIsOverHero(!self.isActive),
+        })
+      : null;
+    // `onToggle` only fires on a crossing, so the initial state has to be read
+    // off the trigger — otherwise a load already scrolled past the hero (a
+    // hash link, or a restored position) would come up inverted.
+    if (heroTrigger) setIsOverHero(!heroTrigger.isActive);
+
+    return () => {
+      trigger.kill();
+      heroTrigger?.kill();
+    };
+  }, [setRetracted, transparentOverHero]);
 
   return (
     <>
@@ -97,11 +153,28 @@ export function Header() {
         // Tailwind v4 puts `-translate-y-full` on the `translate` property,
         // which is separate from the `transform` that `transform-gpu` sets, so
         // the two compose rather than one dropping the other.
-        className={`fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] transform-gpu bg-white transition-transform duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none ${
+        className={`fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] transform-gpu transition-transform duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none ${
           isRetracted && !isMenuOpen ? "-translate-y-full" : "translate-y-0"
         }`}
       >
-        <div className="mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
+        {/* Two grounds rather than one that changes colour: a gradient and a
+            solid cannot be transitioned into each other, so they are stacked
+            and their opacity is cross-faded instead. The scrim is second, so
+            over the hero it is all that shows; past it the white beneath it
+            takes over. */}
+        <div
+          aria-hidden="true"
+          className={`absolute inset-0 bg-white ${SWAP_FADE} ${isOverHero ? "opacity-0" : "opacity-100"}`}
+        />
+        {transparentOverHero && (
+          <div
+            aria-hidden="true"
+            style={{ backgroundImage: HERO_SCRIM }}
+            className={`absolute inset-0 ${SWAP_FADE} ${isOverHero ? "opacity-100" : "opacity-0"}`}
+          />
+        )}
+
+        <div className="relative mx-auto flex h-full max-w-[var(--content-max-width)] items-center justify-between px-5 tablet:px-10">
           {/* Full header height so the home link is a 50px target rather than
               the wordmark's own 24px — the logo still sits where it did. */}
           <Link
@@ -109,22 +182,42 @@ export function Header() {
             aria-label={`${siteConfig.name} — home`}
             className="flex h-full items-center"
           >
-            {/* `final-atom-logo-dark.png` — the dark-ink cut of the final
-                lockup, for this white bar. The light cut is
-                `final-atom-logo-white.png`; both share the 4.32 aspect the
-                previous lockup had, so the widths below are unchanged.
+            {/* The two ink cuts of the final lockup — dark for the white bar,
+                light for the scrim — held one over the other and cross-faded,
+                because an `src` swap cannot be transitioned and the orbit in
+                the mark is orange, blue and teal, so `filter: invert()` would
+                take those with it. Both share the 4.32 aspect the previous
+                lockup had, so the widths below are unchanged, and next/image
+                serves each at 140px, not at the source's megabytes.
 
                 132 wide on mobile against the artboard's 104: at phone size
-                the wordmark read as an afterthought. */}
-            <Image
-              src="/logos/final-atom-logo-dark.png"
-              alt={siteConfig.name}
-              width={8226}
-              height={1904}
-              priority
-              sizes="140px"
-              className="h-auto w-[132px] tablet:w-[126px]"
-            />
+                the wordmark read as an afterthought.
+
+                Only the dark cut is `priority` when there is no hero, because
+                it is the one that shows; with a hero the light cut leads. */}
+            <span className="relative block w-[132px] tablet:w-[126px]">
+              <Image
+                src="/logos/final-atom-logo-dark.png"
+                alt={siteConfig.name}
+                width={8226}
+                height={1904}
+                priority={!transparentOverHero}
+                sizes="140px"
+                className={`h-auto w-full ${SWAP_FADE} ${isOverHero ? "opacity-0" : "opacity-100"}`}
+              />
+              {transparentOverHero && (
+                <Image
+                  src="/logos/final-atom-logo-white.png"
+                  alt=""
+                  aria-hidden="true"
+                  width={14786}
+                  height={3422}
+                  priority
+                  sizes="140px"
+                  className={`absolute inset-0 h-auto w-full ${SWAP_FADE} ${isOverHero ? "opacity-100" : "opacity-0"}`}
+                />
+              )}
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-14 tablet:flex">
@@ -133,10 +226,9 @@ export function Header() {
                 key={item.label}
                 href={item.href}
                 data-underline-link
-                // Pure black, kept from when the bar was translucent and
-                // needed every point of contrast; on solid white it simply
-                // matches the wordmark.
-                className="text-[15px] leading-[20px] text-black"
+                // Black on the white bar, matching the wordmark; white over
+                // the hero, where the scrim is what carries it.
+                className={`text-[15px] leading-[20px] ${SWAP} ${isOverHero ? "text-white" : "text-black"}`}
               >
                 {item.label}
               </a>
@@ -152,7 +244,14 @@ export function Header() {
               something else is touched. */}
           <Link
             href={siteConfig.cta.href}
-            className="group hidden h-[33px] items-center justify-center gap-[7px] rounded-full bg-[#111116] pr-[12px] pl-[14px] text-[15px] leading-[20px] text-white transition-colors duration-300 ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:bg-[#2c2c33] tablet:inline-flex"
+            // The pill inverts with the bar — the artboard has it white with
+            // black type over the hero — and its hover moves the ground one
+            // step further from the type either way round.
+            className={`group hidden h-[33px] items-center justify-center gap-[7px] rounded-full pr-[12px] pl-[14px] text-[15px] leading-[20px] transition-colors duration-300 ease-[cubic-bezier(0.625,0.05,0,1)] tablet:inline-flex ${
+              isOverHero
+                ? "bg-white text-[#111116] can-hover:hover:bg-[#dedee2]"
+                : "bg-[#111116] text-white can-hover:hover:bg-[#2c2c33]"
+            }`}
           >
             {siteConfig.cta.label}
             <svg
@@ -181,7 +280,9 @@ export function Header() {
             // without the circle: the menu's close button mirrors it so the
             // control does not shift when the panel opens. The pseudo-element
             // pads the hit area out to 45px for thumbs.
-            className="relative flex size-[33px] items-center justify-center before:absolute before:-inset-[6px] before:content-[''] tablet:hidden"
+            className={`relative flex size-[33px] items-center justify-center before:absolute before:-inset-[6px] before:content-[''] tablet:hidden ${SWAP} ${
+              isOverHero ? "text-white" : "text-[#111116]"
+            }`}
           >
             <svg
               width="24"
@@ -192,7 +293,7 @@ export function Header() {
             >
               <path
                 d="M3 6.5h18M3 12h18M3 17.5h18"
-                stroke="#111116"
+                stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
               />
