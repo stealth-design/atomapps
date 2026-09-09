@@ -91,12 +91,40 @@ export function GlobalParallax() {
         const from = parseOffset(trigger.getAttribute("data-parallax-start"), DEFAULT_START);
         const to = parseOffset(trigger.getAttribute("data-parallax-end"), DEFAULT_END);
 
+        // Declared up front, not left to `force3D` to imply — see the note on
+        // the tween. Four elements on the page carry this, which is well
+        // inside what the compositor is happy to hold.
+        gsap.set(target, { willChange: "transform" });
+
         gsap.fromTo(
           target,
           { [prop]: from },
           {
             [prop]: to,
             ease: "none",
+            // Holds the target on its own compositor layer for the whole
+            // scrub, rather than letting GSAP promote and demote it around
+            // each tween — the same reason FooterParallax sets it.
+            //
+            // It is not a micro-optimisation here, it is the difference
+            // between smooth and visibly juddery. `yPercent` of an element's
+            // own height almost never lands on a whole pixel (measured on
+            // Fold 04: -9.39, -13.3856, -17.3812 ...), and two of these
+            // targets are pure text — Fold 04's heading and Fold 07's. An
+            // unpromoted text layer is re-rasterized by the main thread at
+            // every one of those sub-pixel offsets, which reads as the glyphs
+            // shimmering as you scroll. Promoted, the text is rasterized once
+            // and the compositor moves the texture, sub-pixel and all.
+            //
+            // It drops no frames, so this does not show up in frame timing at
+            // all — do not go looking for it there.
+            //
+            // Paired with the `will-change` below rather than relied on alone:
+            // `force3D` writes `translate3d(0,0,0)`, which composes to a plain
+            // 2D matrix once it meets the percentage translate, so whether it
+            // earns a layer is left to the browser's heuristics.
+            // `will-change` is the declared opt-in and is not a heuristic.
+            force3D: true,
             scrollTrigger: {
               trigger,
               start: `clamp(${trigger.dataset.parallaxScrollStart ?? "top bottom"})`,
