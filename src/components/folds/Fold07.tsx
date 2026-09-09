@@ -52,6 +52,9 @@ const EDGE_FADE =
  */
 const MASCOT_VIDEO = "/videos/squirrel.mp4";
 const MASCOT_STILL = "/fold-one/squirrel.png";
+// NB: the still is portrait and the video landscape, so the poster only ever
+// shows for the moment before the video decodes. If the video is ever pulled,
+// the slot's aspect wants putting back to the still's 726/1065.
 
 const ROW_FADE =
   "linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%)";
@@ -123,13 +126,25 @@ export default function Fold07() {
                 * 310px against the column's 460, set well in from the type's
                 * left edge. The column has the room either way, and the inset
                 * keeps the mascot from crowding the quotes beside it. */}
+              {/*
+               * The slot is the video's shape, not the still's.
+               *
+               * The still was 726x1065 portrait and sat in a 310px-wide box
+               * inset from the type. The video is 960x540 landscape and fills
+               * its frame corner to corner — sampled at 2.5s, content covers
+               * 99.7% of the width and 99.4% of the height, so there is no
+               * margin in it to crop into. In the old portrait box `contain`
+               * left it a 174px strip inside a 455px hole and `cover` would
+               * have thrown away two thirds of the width.
+               *
+               * So it runs the column's full width at its own 16:9 instead.
+               * Nothing is cropped and nothing is letterboxed; it is simply a
+               * wider, shorter element than the still was.
+               */}
               <MascotVideo
                 src={MASCOT_VIDEO}
                 poster={MASCOT_STILL}
-                // Same box the still had: 310px wide, auto height, and the
-                // 726x1065 aspect held explicitly so the column does not
-                // reflow between the poster loading and the video starting.
-                className="mt-[32px] ml-[64px] hidden aspect-[726/1065] h-auto w-[310px] object-contain desktop-md:block"
+                className="mt-[32px] hidden aspect-video w-full rounded-[12px] object-cover desktop-md:block"
               />
             </Reveal>
           </div>
