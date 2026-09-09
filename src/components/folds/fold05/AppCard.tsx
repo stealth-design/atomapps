@@ -157,22 +157,34 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 // buttons; 240 clears the longest ("Explore Volume Control", 230)
                 // and `justify-between` pins the arrow to the right edge so the
                 // shorter labels do not leave it floating mid-pill.
-                className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-white pr-[10px] pl-[16px] tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
+                className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-white pr-[10px] pl-[16px] transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:bg-black motion-reduce:transition-none tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
               >
                 {/*
-                 * A hairline at rest that goes to black on hover.
+                 * The whole pill inverts on hover: white ground and black type
+                 * become black ground and white type, and the arrow's disc
+                 * flips with them.
                  *
-                 * It is a ring on its own element rather than a `border` on the
-                 * pill: a border is part of the box, so bringing one in would
-                 * shift the label by its own width. An inset ring paints inside
-                 * the same box and moves nothing.
+                 * At rest a hairline holds the pill's edge against the card,
+                 * which is white too. It goes black with the fill, so on hover
+                 * it stops being a visible line and simply keeps the edge crisp.
+                 *
+                 * The fill is `hover:` on the pill while everything inside it
+                 * is `group-hover:` — a group's own element is not a descendant
+                 * of itself, so `group-hover` never matches it. That mismatch
+                 * is what left the ground white while the label went white too.
+                 *
+                 * The stroke is a ring on its own element rather than a `border`
+                 * on the pill: a border is part of the box, so bringing one in
+                 * would shift the label by its own width. An inset ring paints
+                 * inside the same box and moves nothing — the CTA measures the
+                 * same at rest and on hover.
                  */}
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-black/15 transition-[box-shadow] duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:ring-black motion-reduce:transition-none"
                 />
 
-                <span className="relative text-[14px] leading-[18px] text-black desktop-xl:text-[15px] desktop-xl:leading-[20px]">
+                <span className="relative text-[14px] leading-[18px] text-black transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:text-white motion-reduce:transition-none desktop-xl:text-[15px] desktop-xl:leading-[20px]">
                   {panel.cta.label}
                 </span>
 
@@ -185,7 +197,10 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                  * and returning — a single arrow has to come back along the
                  * diagonal it just left by, which reads as a recoil.
                  */}
-                <span className="relative grid size-[20px] shrink-0 place-items-center overflow-hidden rounded-full bg-black">
+                {/* `text-*` on the disc rather than a colour on the arrows:
+                    both copies draw with `currentColor`, so one declaration
+                    here inverts the pair and they cannot fall out of step. */}
+                <span className="relative grid size-[20px] shrink-0 place-items-center overflow-hidden rounded-full bg-black text-white transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:bg-white can-hover:group-hover/cta:text-black motion-reduce:transition-none">
                   <CtaArrow className="translate-x-0 translate-y-0 can-hover:group-hover/cta:translate-x-[150%] can-hover:group-hover/cta:-translate-y-[150%]" />
                   <CtaArrow className="-translate-x-[150%] translate-y-[150%] can-hover:group-hover/cta:translate-x-0 can-hover:group-hover/cta:translate-y-0" />
                 </span>
@@ -282,7 +297,7 @@ function CtaArrow({ className }: { className: string }) {
     >
       <path
         d="M2 9 9 2M4 2h5v5"
-        stroke="#fff"
+        stroke="currentColor"
         strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
