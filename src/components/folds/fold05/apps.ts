@@ -64,7 +64,7 @@ export const APP_PANELS: AppPanel[] = [
     title: "Find My Phone",
     question: "Can't find your phone when you need it most?",
     description:
-      "Find My Phone by Clap Launcher helps you quickly locate your phone by clapping or whistling. Your phone will sound, vibrate, and flash to make it easy to find.",
+      "Find My Phone by Clap Launcher helps you quickly find your phone by clapping or whistling.",
     cta: { label: "Explore Find My Phone", href: "#fold-05" },
     stats: { downloads: "1M+", rating: "4.8" },
   },
@@ -76,13 +76,12 @@ export const APP_PANELS: AppPanel[] = [
     title: "Steppy",
     question: "Need a push to start walking more? Walk with Steppy.",
     description:
-      "Step Tracker Launcher helps you stay active with real-time step, distance, and calorie tracking on your home screen. Monitor daily steps, view stats, and set goals to build healthier habits.",
+      "Turn your steps into real rewards, the more you walk, the more you can earn.",
     badge: "Coming soon",
     features: [
-      { icon: "ic-footprints", text: "Track your daily steps in real time." },
-      { icon: "ic-chart", text: "View distance covered, calories burned, and daily progress." },
-      { icon: "ic-target", text: "Set achievable targets and build healthier habits." },
-      { icon: "ic-gift", text: "Earn rewards through walking and redeem them for gift cards." },
+      { icon: "ic-footprints", text: "Track your daily steps" },
+      { icon: "ic-coins", text: "Earn coins for hitting achievable milestones" },
+      { icon: "ic-gift", text: "Redeem your coins for gift cards from your favorite brands" },
     ],
   },
   {
@@ -92,7 +91,7 @@ export const APP_PANELS: AppPanel[] = [
     icon: "/images/fold03/icon-02.jpg",
     title: "Volume Control",
     description:
-      "Access all your key volume settings with a single swipe. Easily boost volume, improve call clarity, and balance media sound, all in one place.",
+      "Tired of not knowing how to set the volume level for your ringtone, alarm clock or text messages? Easily control all your volume settings in one place with Volume Control Launcher.",
     cta: { label: "Explore Volume Control", href: "#fold-05" },
     quote:
       "“This app really boosts your phone's volume, good productive application to utilize”",
@@ -104,16 +103,14 @@ export const APP_PANELS: AppPanel[] = [
     mobileFocal: "80%",
     icon: "/images/fold03/icon-15.jpg",
     title: "White Noise",
-    // Figma reads "Cat’t sleep?" — a typo for "Can't", corrected here.
-    question: "Can't sleep? Easily distracted? Drowning in noise?",
+    question: "Your Sound. Your Calm.",
     description:
-      "Drift off to sleep with soothing white noise and ambient sounds. Easily customize your soundscape, set sleep timers, and block distractions.",
+      "Find your calm with soothing sounds designed to help you sleep, focus, and unwind.",
     cta: { label: "Explore White Noise", href: "#fold-05" },
     features: [
       { icon: "ic-headphones", text: "Relax with soothing white noise and calming audio." },
-      { icon: "ic-sliders", text: "Combine different sounds to create your ideal soundscape." },
+      { icon: "ic-sliders", text: "Choose from white noise, nature sounds, ambient audio, and more." },
       { icon: "ic-clock", text: "Set sounds to automatically stop after you fall asleep." },
-      { icon: "ic-shield", text: "Mask unwanted noise for better sleep and focus." },
     ],
   },
 ];
