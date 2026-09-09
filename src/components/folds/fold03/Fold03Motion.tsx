@@ -2,7 +2,7 @@
 
 import { useRef, type ReactNode } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { END_GRID, END_ORDER, type GridConfig } from "./appIcons";
 
 /**
@@ -310,8 +310,6 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
               scrub: 0.4,
               invalidateOnRefresh: true,
               onRefreshInit: remeasure,
-              onToggle: (self) =>
-                gsap.set(icons, { willChange: self.isActive ? "transform" : "auto" }),
               onUpdate: (self) => {
                 // Only touch the DOM when the state actually flips.
                 const done = self.progress > 0.985;
@@ -323,6 +321,30 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
                 }
               },
             },
+          });
+
+          // `will-change` is managed on its own trigger, a full viewport clear of
+          // the stage at both ends, and deliberately NOT on the pin's own
+          // `onToggle`.
+          //
+          // It used to ride the pin: promoted on activate, back to `auto` on
+          // deactivate. That put the demotion at the moment the pin releases,
+          // which is when the stage is still fully on screen and Fold 04 is
+          // arriving — so 16 compositor layers were torn down in a single
+          // frame and 16 blurred icons re-rasterized at once, right in front of
+          // the reader. That is the flicker people were seeing over "Different
+          // apps for different needs": measured, the flip landed at scroll
+          // 1918 with that heading at viewport y=800 of 945.
+          //
+          // Promoting a viewport early and demoting a viewport late keeps the
+          // layer churn off screen, where it costs nothing to look at, without
+          // holding 16 layers for the life of the page.
+          ScrollTrigger.create({
+            trigger: stage,
+            start: "top bottom+=100%",
+            end: "bottom top-=100%",
+            onToggle: (self) =>
+              gsap.set(icons, { willChange: self.isActive ? "transform" : "auto" }),
           });
 
           // PHASE 1 — ambient float settles.
