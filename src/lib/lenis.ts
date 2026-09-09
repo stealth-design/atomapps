@@ -18,6 +18,24 @@ export function setLenis(next: Lenis | null) {
   instance = next;
 }
 
+/**
+ * Send the page back to the top.
+ *
+ * Goes through Lenis for the same reason `setScrollLocked` does: Lenis owns a
+ * virtual scroll position, so a bare `window.scrollTo` would move the document
+ * out from under it and the two would fight on the next frame. Reduced-motion
+ * users have no Lenis, so they get the native call — and `auto` rather than
+ * `smooth`, because a scripted smooth scroll is exactly the motion that
+ * preference is asking us not to make.
+ */
+export function scrollToTop() {
+  if (instance) {
+    instance.scrollTo(0);
+    return;
+  }
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
 /** Stop or resume page scrolling. No-ops under reduced motion, where there is no Lenis. */
 export function setScrollLocked(locked: boolean) {
   if (instance) {
