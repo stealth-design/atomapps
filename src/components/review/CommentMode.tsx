@@ -91,6 +91,7 @@ export function CommentMode() {
   const [body, setBody] = useState("");
   const [author, setAuthor] = useState("");
   const [busy, setBusy] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [showResolved, setShowResolved] = useState(false);
   const [tick, setTick] = useState(0); // forces pins to re-measure
   const composerRef = useRef<HTMLTextAreaElement>(null);
@@ -238,15 +239,23 @@ export function CommentMode() {
     };
 
     if (shared) {
+      // A failed save must never close the composer: the note is only in this
+      // textarea, and silently dropping someone's feedback is worse than any
+      // error message.
       try {
         const res = await fetch("/api/review-comments", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(payload),
         });
-        if (res.ok) await load();
+        if (!res.ok) {
+          setSaveError(`Could not save (${res.status}). Your note is still here — try again.`);
+          setBusy(false);
+          return;
+        }
+        await load();
       } catch {
-        /* keep the draft open so the note is not lost */
+        setSaveError("Could not reach the server. Your note is still here — try again.");
         setBusy(false);
         return;
       }
@@ -258,6 +267,7 @@ export function CommentMode() {
     }
 
     setBusy(false);
+    setSaveError(null);
     putDraft(null);
     setBody("");
   };
@@ -426,6 +436,20 @@ export function CommentMode() {
             rows={4}
             style={{ ...field, resize: "vertical", marginBottom: 8 }}
           />
+          {saveError && (
+            <div
+              style={{
+                marginBottom: 8,
+                padding: "6px 8px",
+                borderRadius: 6,
+                background: "#7f1d1d",
+                color: "#fecaca",
+                fontSize: 11,
+              }}
+            >
+              {saveError}
+            </div>
+          )}
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button type="button" onClick={submit} disabled={!body.trim() || busy} style={btn}>
               {busy ? "Saving…" : "Comment"}

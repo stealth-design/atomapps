@@ -44,9 +44,20 @@ export interface ReviewComment {
 
 const PREFIX = "review-comments/";
 
-/** True when a shared store is configured. */
+/**
+ * True when a shared store is configured.
+ *
+ * `BLOB_STORE_ID` first, and that ordering is the whole point: a *private*
+ * store connected to a project does not get a `BLOB_READ_WRITE_TOKEN` at all.
+ * Vercel injects a short-lived OIDC token plus `BLOB_STORE_ID` instead, and
+ * the SDK authenticates with those by default when it runs on Vercel. Checking
+ * only for the read-write token reported "no shared store" on a store that was
+ * connected and working, and quietly sent every comment to localStorage.
+ *
+ * The token is still honoured for anything running off Vercel.
+ */
 export function isShared(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  return Boolean(process.env.BLOB_STORE_ID ?? process.env.BLOB_READ_WRITE_TOKEN);
 }
 
 export async function readAll(): Promise<ReviewComment[]> {
@@ -60,7 +71,9 @@ export async function readAll(): Promise<ReviewComment[]> {
         // `useCache: false` because a comment posted a second ago must show up
         // in the very next read.
         const result = await get(blob.pathname, { access: "private", useCache: false });
-        if (!result) return null;
+        // `get` answers with a status rather than throwing on a miss, and the
+        // stream is null on anything that is not a 200.
+        if (!result || result.statusCode !== 200 || !result.stream) return null;
         return (await new Response(result.stream).json()) as ReviewComment;
       } catch {
         // One unreadable comment should not take the whole list down with it.
