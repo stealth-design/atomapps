@@ -56,6 +56,13 @@ export async function POST(request: Request) {
     return Response.json({ error: "bad-request" }, { status: 400 });
   }
 
+  // Recovered comments carry their original timestamp: a note left three days
+  // ago should not read as if it arrived the moment it was rescued from a
+  // browser. Anything unparseable falls back to now.
+  const claimed = clean(data.createdAt, 40);
+  const createdAt =
+    claimed && !Number.isNaN(Date.parse(claimed)) ? new Date(claimed).toISOString() : null;
+
   const comment: ReviewComment = {
     id: crypto.randomUUID(),
     anchor,
@@ -65,7 +72,7 @@ export async function POST(request: Request) {
     author: clean(data.author, MAX_AUTHOR) || "Anonymous",
     body,
     resolved: false,
-    createdAt: new Date().toISOString(),
+    createdAt: createdAt ?? new Date().toISOString(),
     viewport: typeof data.viewport === "number" ? Math.round(data.viewport) : 0,
   };
 

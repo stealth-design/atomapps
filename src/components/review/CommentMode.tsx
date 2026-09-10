@@ -92,6 +92,17 @@ export function CommentMode() {
   const [author, setAuthor] = useState("");
   const [busy, setBusy] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  /**
+   * Comments this browser saved locally while no shared store was reachable.
+   *
+   * There was a window where the store was connected but the server did not
+   * recognise it, so every comment fell back to localStorage and never
+   * reached anyone. They are still sitting in the browser that wrote them, so
+   * the tool offers to send them rather than making someone go and find them
+   * in devtools.
+   */
+  const [orphans, setOrphans] = useState<ReviewComment[]>([]);
+  const [recovering, setRecovering] = useState(false);
   const [showResolved, setShowResolved] = useState(false);
   const [tick, setTick] = useState(0); // forces pins to re-measure
   const composerRef = useRef<HTMLTextAreaElement>(null);
@@ -123,6 +134,15 @@ export function CommentMode() {
       if (data.shared) {
         setShared(true);
         setComments(data.comments as ReviewComment[]);
+        // Anything left in local storage predates the store working.
+        try {
+          const stranded = JSON.parse(
+            localStorage.getItem(LOCAL_KEY) ?? "[]",
+          ) as ReviewComment[];
+          setOrphans(Array.isArray(stranded) ? stranded : []);
+        } catch {
+          setOrphans([]);
+        }
         return;
       }
     } catch {
@@ -270,6 +290,46 @@ export function CommentMode() {
     setSaveError(null);
     putDraft(null);
     setBody("");
+  };
+
+  /** Send the stranded local comments to the shared store, then clear them. */
+  const recover = async () => {
+    setRecovering(true);
+    let sent = 0;
+    for (const c of orphans) {
+      try {
+        const res = await fetch("/api/review-comments", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            anchor: c.anchor,
+            x: c.x,
+            y: c.y,
+            path: c.path,
+            author: c.author,
+            body: c.body,
+            viewport: c.viewport,
+            createdAt: c.createdAt,
+          }),
+        });
+        if (res.ok) sent += 1;
+      } catch {
+        /* keep going; whatever fails stays in local storage */
+      }
+    }
+    // Only clear what actually made it, so a partial failure loses nothing.
+    if (sent === orphans.length) {
+      try {
+        localStorage.removeItem(LOCAL_KEY);
+      } catch {
+        /* nothing to do */
+      }
+      setOrphans([]);
+    } else {
+      setOrphans(orphans.slice(sent));
+    }
+    setRecovering(false);
+    await load();
   };
 
   const setResolved = async (comment: ReviewComment, resolved: boolean) => {
@@ -496,6 +556,27 @@ export function CommentMode() {
         <div style={{ opacity: 0.55, marginTop: 6, fontSize: 11 }}>
           Click anywhere to leave a note · Esc to exit · Alt+C toggles
         </div>
+
+        {orphans.length > 0 && (
+          <div
+            style={{
+              marginTop: 8,
+              padding: "8px",
+              borderRadius: 6,
+              background: "#1e3a8a",
+              color: "#dbeafe",
+              fontSize: 11,
+            }}
+          >
+            <div style={{ marginBottom: 6 }}>
+              <strong>{orphans.length}</strong> comment{orphans.length === 1 ? "" : "s"} saved in
+              this browser never reached the team.
+            </div>
+            <button type="button" onClick={recover} disabled={recovering} style={btn}>
+              {recovering ? "Sending…" : `Send ${orphans.length} now`}
+            </button>
+          </div>
+        )}
 
         {shared === false && (
           <div
