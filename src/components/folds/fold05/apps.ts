@@ -7,9 +7,9 @@
  * frosted card.
  *
  * The four cards are deliberately not the same shape — Steppy swaps the CTA for
- * a "Coming soon" badge and adds a feature list, Volume Control drops the
- * question and adds a pull-quote, White Noise has both a CTA and features. Each
- * block below is optional, and the card renders whatever is present.
+ * a "Coming soon" badge and adds a feature list, Volume Control carries a
+ * pull-quote, White Noise has both a CTA and features. Each block below is
+ * optional, and the card renders whatever is present.
  *
  * Figma sources: 1136:3208 (Find My Phone), 1136:3261 (Steppy),
  * 1136:3064 (Volume Control), 1136:2679 (White Noise).
@@ -90,8 +90,10 @@ export const APP_PANELS: AppPanel[] = [
     mobileFocal: "66%",
     icon: "/images/fold03/icon-02.jpg",
     title: "Volume Control",
+    question:
+      "Tired of not knowing how to set the volume level for your ringtone, alarm clock or text messages?",
     description:
-      "Tired of not knowing how to set the volume level for your ringtone, alarm clock or text messages? Easily control all your volume settings in one place with Volume Control Launcher.",
+      "Easily control all your volume settings in one place with Volume Control Launcher.",
     cta: { label: "Explore Volume Control", href: "#fold-05" },
     quote:
       "“This app really boosts your phone's volume, good productive application to utilize”",
