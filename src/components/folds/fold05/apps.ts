@@ -66,7 +66,7 @@ export const APP_PANELS: AppPanel[] = [
     description:
       "Find My Phone by Clap Launcher helps you quickly find your phone by clapping or whistling.",
     cta: { label: "Explore Find My Phone", href: "#fold-05" },
-    stats: { downloads: "1M+", rating: "4.8" },
+    stats: { downloads: "1M+", rating: "4.5" },
   },
   {
     id: "steppy",
@@ -95,7 +95,7 @@ export const APP_PANELS: AppPanel[] = [
     cta: { label: "Explore Volume Control", href: "#fold-05" },
     quote:
       "“This app really boosts your phone's volume, good productive application to utilize”",
-    stats: { downloads: "1M+", rating: "4.8" },
+    stats: { downloads: "1M+", rating: "4.5" },
   },
   {
     id: "white-noise",

@@ -28,12 +28,12 @@ const STATS = [
   {
     prefix: "Top ",
     to: 10,
-    label: "Publisher in downloads on US GooglePlay Store",
+    label: "Publisher in downloads on US Google Play Store",
     labelMobile: "Downloads on US Google Play Store",
   },
   {
     to: 35,
-    suffix: "M",
+    suffix: "M+",
     label: "US Downloads",
     labelMobile: "Million Downloads",
   },

@@ -288,7 +288,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                         <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
                           {panel.stats.rating}
                         </p>
-                        <StarRating className="block h-[11px] tablet:h-[18px]" />
+                        <StarRating rating={panel.stats.rating} className="block h-[11px] tablet:h-[18px]" />
                       </div>
                       <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">
                         App Store Rating

@@ -1,10 +1,16 @@
 /**
  * The 4½-star row beside the App Store rating (Figma: four `star` glyphs plus
  * one `star_half`, 18px each on desktop).
+ *
+ * The glyph itself is fixed at four and a half — every app the design carries
+ * rounds to it — but the accessible name is not. It takes the card's own
+ * figure, because it was hard-coded to 4.8 and stayed there when the ratings
+ * changed, which left screen readers being told a number no sighted reader
+ * could see.
  */
-export function StarRating({ className }: { className?: string }) {
+export function StarRating({ rating, className }: { rating: string; className?: string }) {
   return (
-    <span className={className} role="img" aria-label="Rated 4.8 out of 5">
+    <span className={className} role="img" aria-label={`Rated ${rating} out of 5`}>
       <svg viewBox="0 0 106 20" fill="#1c1b1f" aria-hidden="true" className="h-full w-auto">
         <defs>
           <path
