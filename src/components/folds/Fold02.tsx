@@ -35,7 +35,10 @@ const STATS = [
     to: 35,
     suffix: "M+",
     label: "US Downloads",
-    labelMobile: "Million Downloads",
+    // Was "Million Downloads", which read as "35M+ million downloads" once the
+    // figure carried its own M. Both breakpoints say the same thing now, the
+    // way the first stat already does.
+    labelMobile: "US Downloads",
   },
 ];
 
