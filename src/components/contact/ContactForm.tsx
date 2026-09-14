@@ -93,7 +93,7 @@ export function ContactForm() {
             />
           </div>
 
-          <div className="mt-[28px] flex justify-center">
+          <div className="mt-[28px] flex">
             <button
               type="submit"
               // `can-hover:` rather than a bare `hover:` — see globals.css. A
@@ -105,7 +105,7 @@ export function ContactForm() {
             </button>
           </div>
 
-          <p className="mt-[20px] text-center text-[13px] leading-[20px] text-[#61616a]">
+          <p className="mt-[20px] text-[13px] leading-[20px] text-[#61616a]">
             By submitting the form, you agree to our{" "}
             <a
               href={siteConfig.legal[0].href}
