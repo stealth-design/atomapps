@@ -1,8 +1,9 @@
+import Image from "next/image";
+
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { TestimonialCard } from "@/components/folds/fold07/TestimonialCard";
 import { MarqueeMotion } from "@/components/folds/fold07/MarqueeMotion";
-import { MascotVideo } from "@/components/folds/fold07/MascotVideo";
 import { DESKTOP_COLUMNS, MOBILE_ROWS } from "@/components/folds/fold07/testimonials";
 
 /**
@@ -39,23 +40,6 @@ const EDGE_FADE =
   "linear-gradient(to bottom, transparent 0%, #000 7%, #000 92%, transparent 98%)";
 
 /** Softens the left and right ends of the horizontal rows. */
-/**
- * The mascot's video and its still.
- *
- * Drop the video in `public/videos/` and point `MASCOT_VIDEO` at it — that one
- * line is the whole change. Until the file is there the poster shows on its
- * own, so the fold looks exactly as it does today rather than breaking.
- *
- * MP4 (H.264) is the safe single format. To add a second, give MascotVideo
- * more than one `<source>`; browsers take the first they can play, so put
- * `.webm` before `.mp4`.
- */
-const MASCOT_VIDEO = "/videos/squirrel.mp4";
-const MASCOT_STILL = "/fold-one/squirrel.png";
-// NB: the still is portrait and the video landscape, so the poster only ever
-// shows for the moment before the video decodes. If the video is ever pulled,
-// the slot's aspect wants putting back to the still's 726/1065.
-
 const ROW_FADE =
   "linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%)";
 
@@ -115,7 +99,7 @@ export default function Fold07() {
                 Real reviews from users who use our apps everyday.
               </p>
 
-              {/* Squirrel, filling the column under the subtext.
+              {/* The rabbit, filling the column under the subtext.
                 *
                 * `desktop-md` only, which is the one breakpoint where this
                 * column stands beside the quotes and therefore has height to
@@ -126,25 +110,14 @@ export default function Fold07() {
                 * 310px against the column's 460, set well in from the type's
                 * left edge. The column has the room either way, and the inset
                 * keeps the mascot from crowding the quotes beside it. */}
-              {/*
-               * The slot is the video's shape, not the still's.
-               *
-               * The still was 726x1065 portrait and sat in a 310px-wide box
-               * inset from the type. The video is 960x540 landscape and fills
-               * its frame corner to corner — sampled at 2.5s, content covers
-               * 99.7% of the width and 99.4% of the height, so there is no
-               * margin in it to crop into. In the old portrait box `contain`
-               * left it a 174px strip inside a 455px hole and `cover` would
-               * have thrown away two thirds of the width.
-               *
-               * So it runs the column's full width at its own 16:9 instead.
-               * Nothing is cropped and nothing is letterboxed; it is simply a
-               * wider, shorter element than the still was.
-               */}
-              <MascotVideo
-                src={MASCOT_VIDEO}
-                poster={MASCOT_STILL}
-                className="mt-[32px] hidden aspect-video w-full rounded-[12px] object-cover desktop-md:block"
+              <Image
+                src="/images/rabbit.webp"
+                alt=""
+                width={2934}
+                height={4305}
+                aria-hidden="true"
+                sizes="310px"
+                className="mt-[32px] ml-[64px] hidden h-auto w-[310px] desktop-md:block"
               />
             </Reveal>
           </div>

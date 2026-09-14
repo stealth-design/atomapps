@@ -47,7 +47,7 @@ const HERO_LAG = 35;
  *
  *   1. Put the file in `public/videos/`. Anything under `public/` is served
  *      from the site root, so `public/videos/hero.mp4` is `/videos/hero.mp4`
- *      — the same place Fold 07's squirrel lives.
+ *      — the same place Fold 06's step illustrations live.
  *   2. Set this to `{ src: "/videos/hero.mp4" }`.
  *
  * TO REVERT: set it back to `null`. That is the whole revert — the two
