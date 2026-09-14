@@ -30,7 +30,9 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
       data-f05-card
       // `--focal` is the scene's own horizontal focal point, consumed by both
       // the scene and its blurred copy below so the two stay in register.
-      style={{ "--focal": panel.mobileFocal } as CSSProperties}
+      style={
+        { "--focal": panel.mobileFocal, backgroundColor: panel.ground } as CSSProperties
+      }
       // Past 1920 the card stops filling the panel and takes the reference
       // frame's own 1764:1087, so it reads as a landscape card rather than the
       // near-square block a 1360-wide panel made of a 100dvh height. At the
@@ -63,6 +65,13 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
             alt=""
             fill
             priority={index === 0}
+            // Every scene loads with the page rather than on approach. The
+            // three later panels were lazy, so each one began fetching only as
+            // it came up — and on production that arrival gap is what showed
+            // as a white panel. The four together are ~1.1MB now they are
+            // webp, which is what makes eager affordable; at 28MB of jpeg it
+            // would not have been.
+            loading={index === 0 ? undefined : "eager"}
             sizes="100vw"
             className="object-cover object-[var(--focal)_center] tablet:object-center"
           />

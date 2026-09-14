@@ -26,6 +26,16 @@ export interface AppPanel {
   /** Pre-composed scene behind the card. */
   background: string;
   /**
+   * The scene's own average colour, painted on the card underneath it.
+   *
+   * The card used to have no ground of its own, so until a scene decoded the
+   * section's white showed through — full-panel white rectangles tearing over
+   * the stack as it scrolled. These are sampled from each scene (a 1x1
+   * resample), so the gap now reads as the photo dimming rather than as a
+   * hole in the page.
+   */
+  ground: string;
+  /**
    * Horizontal focal point of the scene, as a percentage of its width.
    *
    * The scenes are landscape (1.625) and the mobile panel is portrait (~0.46),
@@ -59,6 +69,7 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "find-my-phone",
     background: "/images/image-1.webp",
+    ground: "#897b6a",
     mobileFocal: "68%",
     icon: "/images/fold03/icon-05.jpg",
     title: "Find My Phone",
@@ -71,6 +82,7 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "steppy",
     background: "/images/image-2.webp",
+    ground: "#5d593a",
     mobileFocal: "64%",
     icon: "/images/apps/steppy.png",
     title: "Steppy",
@@ -87,6 +99,7 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "volume-control",
     background: "/images/image-3.webp",
+    ground: "#2f2015",
     mobileFocal: "66%",
     icon: "/images/fold03/icon-02.jpg",
     title: "Volume Control",
@@ -101,6 +114,7 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "white-noise",
     background: "/images/image-4.webp",
+    ground: "#3d2d29",
     mobileFocal: "80%",
     icon: "/images/fold03/icon-15.jpg",
     title: "White Noise",
