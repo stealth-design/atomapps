@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
-import { GlobalParallax } from "@/components/layout/GlobalParallax";
 import { CommentMode } from "@/components/review/CommentMode";
 import { siteConfig } from "@/data/site";
 import "./globals.css";
@@ -24,7 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${dmSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <SmoothScroll>
-          <GlobalParallax />
+          {/* DEBUG BISECT: parallax off, to test the fold 05 tearing. */}
           {children}
         </SmoothScroll>
 
