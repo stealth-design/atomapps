@@ -65,13 +65,11 @@ export default function Fold07() {
               the ~300px the type occupies, so 5% here is the ~32px it reads
               as. Anything near the 20% default slid the heading clean out of
               line with the quotes. */}
-          <div
-            data-parallax="trigger"
-            data-parallax-disable="mobileLandscape"
-            data-parallax-start="5"
-            data-parallax-end="-5"
-            className="desktop-md:w-[460px] desktop-md:shrink-0"
-          >
+          {/* The heading used to drift +-5% here on a `data-parallax`
+              trigger. Parallax is the hero's alone now — see Fold 04 and
+              Fold 06, both dropped for the tearing they caused over Fold
+              05's sticky stack. */}
+          <div className="desktop-md:w-[460px] desktop-md:shrink-0">
             <Reveal variant="stagger">
               {/* Mobile runs it as one sentence that simply wraps, with no
                   forced breaks and no subtext under it. The two colours are the

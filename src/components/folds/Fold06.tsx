@@ -29,13 +29,13 @@ export default function Fold06() {
   return (
     <Section fold="06" className="relative overflow-hidden bg-[var(--fold-06-bg)]">
       {/* ---------- decorative arcs (Figma: one masked circle group at 20%) ---------- */}
-      {/* The trigger spans the fold rather than sitting on the arcs
-          themselves, so the drift is timed to the section the reader is
-          looking at instead of to the arc field's own box. */}
+      {/* The arcs used to drift +-6% on a `data-parallax` trigger spanning
+          the fold. Parallax is now the hero's alone — GlobalParallax holds
+          `will-change: transform` on every target for the life of the page,
+          and those layers tore white tiles across Fold 05's sticky stack on
+          production. This trigger was live while the last panel was still on
+          screen. See Fold 04, which came out for the same reason. */}
       <div
-        data-parallax="trigger"
-        data-parallax-start="6"
-        data-parallax-end="-6"
         aria-hidden="true"
         // Past 1920 this box becomes the header's content row exactly: the
         // artboard width less its 40px gutters, centred. `mx-auto` against
@@ -48,7 +48,6 @@ export default function Fold06() {
         className="pointer-events-none absolute inset-0 mx-auto desktop-xl:max-w-[calc(var(--content-max-width)-80px)]"
       >
         <Image
-          data-parallax="target"
           src="/images/fold06/bg-arcs.svg"
           alt=""
           width={1510}
