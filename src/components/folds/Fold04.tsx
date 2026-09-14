@@ -30,32 +30,42 @@ export default function Fold04() {
       fold="04"
       className="mx-auto bg-white py-[var(--fold-gap-y)] desktop-xl:max-w-[calc(var(--content-max-width)-80px)]"
     >
-      {/* Small numbers on purpose: this band is only ~120px tall, so the
-          offset still only comes to ~24px either way — enough to read as
-          motion, not enough to unseat a centred band. */}
-      <div data-parallax="trigger" data-parallax-start="14" data-parallax-end="-14">
-        <Reveal
-          variant="stagger"
-          // `px-0` past 1920: the section itself is already on the nav's edges
-          // by then, so the gutter here would inset the copy a second time.
-          className="mx-auto max-w-[var(--content-max-width)] px-5 text-center tablet:px-10 desktop-xl:px-0"
-        >
-          <h2 className="text-[28px] leading-[36px] font-bold text-[#111111] tablet:text-[clamp(38px,calc(var(--locked-vw)*0.05),72px)] tablet:leading-[1.3] tablet:text-black tablet:capitalize">
-            {/* Mobile breaks after "apps" so the second line reads "for
-                different needs" instead of orphaning "needs" on its own. The
-                spans go inline again on desktop, where it sets as one line. */}
-            <span className="block tablet:inline">Different apps </span>
-            <span className="block tablet:inline">for different needs</span>
-          </h2>
+      {/* No parallax on this band, deliberately.
+          *
+          * It used to be a `data-parallax` trigger drifting +-14%. That put a
+          * permanently promoted layer — GlobalParallax sets `will-change:
+          * transform` once and never clears it — directly above Fold 05, whose
+          * four sticky panels are full-viewport composited layers of their own.
+          * The result was white tiles tearing across the app stack while
+          * scrolling: visible on production, never on localhost.
+          *
+          * Bisected on a preview build with GlobalParallax unmounted entirely,
+          * which was clean. This band is the one trigger adjacent to the stack,
+          * so it is the one that comes out; every other fold keeps its drift.
+          *
+          * If the tearing ever comes back, Fold 06's trigger is the next
+          * suspect — it activates while the last panel is still on screen. */}
+      <Reveal
+        variant="stagger"
+        // `px-0` past 1920: the section itself is already on the nav's edges
+        // by then, so the gutter here would inset the copy a second time.
+        className="mx-auto max-w-[var(--content-max-width)] px-5 text-center tablet:px-10 desktop-xl:px-0"
+      >
+        <h2 className="text-[28px] leading-[36px] font-bold text-[#111111] tablet:text-[clamp(38px,calc(var(--locked-vw)*0.05),72px)] tablet:leading-[1.3] tablet:text-black tablet:capitalize">
+          {/* Mobile breaks after "apps" so the second line reads "for
+              different needs" instead of orphaning "needs" on its own. The
+              spans go inline again on desktop, where it sets as one line. */}
+          <span className="block tablet:inline">Different apps </span>
+          <span className="block tablet:inline">for different needs</span>
+        </h2>
 
-          <p className="mt-3 text-[15px] leading-[20px] text-[#61616a] tablet:mt-[38px] tablet:text-[clamp(16px,calc(var(--locked-vw)*0.0201),29px)] tablet:leading-[1.31] tablet:font-semibold tablet:text-black">
-            <span className="tablet:hidden">Thoughtful designs built for real needs</span>
-            <span className="hidden tablet:inline">
-              Thoughtful designs create better experiences
-            </span>
-          </p>
-        </Reveal>
-      </div>
+        <p className="mt-3 text-[15px] leading-[20px] text-[#61616a] tablet:mt-[38px] tablet:text-[clamp(16px,calc(var(--locked-vw)*0.0201),29px)] tablet:leading-[1.31] tablet:font-semibold tablet:text-black">
+          <span className="tablet:hidden">Thoughtful designs built for real needs</span>
+          <span className="hidden tablet:inline">
+            Thoughtful designs create better experiences
+          </span>
+        </p>
+      </Reveal>
     </Section>
   );
 }
