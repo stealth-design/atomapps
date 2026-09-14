@@ -58,7 +58,7 @@ export interface AppPanel {
 export const APP_PANELS: AppPanel[] = [
   {
     id: "find-my-phone",
-    background: "/images/image-1.jpg",
+    background: "/images/image-1.webp",
     mobileFocal: "68%",
     icon: "/images/fold03/icon-05.jpg",
     title: "Find My Phone",
@@ -70,7 +70,7 @@ export const APP_PANELS: AppPanel[] = [
   },
   {
     id: "steppy",
-    background: "/images/image-2.jpg",
+    background: "/images/image-2.webp",
     mobileFocal: "64%",
     icon: "/images/apps/steppy.png",
     title: "Steppy",
@@ -86,7 +86,7 @@ export const APP_PANELS: AppPanel[] = [
   },
   {
     id: "volume-control",
-    background: "/images/image-3.jpg",
+    background: "/images/image-3.webp",
     mobileFocal: "66%",
     icon: "/images/fold03/icon-02.jpg",
     title: "Volume Control",
@@ -100,7 +100,7 @@ export const APP_PANELS: AppPanel[] = [
   },
   {
     id: "white-noise",
-    background: "/images/image-4.jpg",
+    background: "/images/image-4.webp",
     mobileFocal: "80%",
     icon: "/images/fold03/icon-15.jpg",
     title: "White Noise",
