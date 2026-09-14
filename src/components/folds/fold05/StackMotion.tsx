@@ -2,7 +2,7 @@
 
 import { useRef, type ReactNode } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 /**
  * Fold 05 — stacked-card scroll.
@@ -69,6 +69,31 @@ export function StackMotion({ children }: { children: ReactNode }) {
         },
         (context) => {
           if (!context.conditions?.motion) return;
+          // Chrome re-rasters a scaled layer as its scale changes; Safari
+          // rasterizes once and scales the texture. That is the whole of why this
+          // tore in one browser and not the other.
+          //
+          // Each card is a full-viewport box holding a 3840px-wide scene, clipped
+          // by a 20px radius, and the timeline scales it to 0.93 under a scrub —
+          // so Chrome was re-rastering four of those continuously while the stack
+          // moved, and the tiles it could not finish in time showed as white
+          // rectangles with tile-shaped edges rather than element-shaped ones.
+          // `will-change: transform` pins the raster: the layer is rastered once
+          // and the compositor scales the texture, which is what Safari was doing
+          // already.
+          //
+          // Promoted a viewport early and released a viewport late, deliberately,
+          // rather than on the timeline's own range — the same reason Fold 03's
+          // icons are handled this way (see f1e5ef2). Flipping four layers of this
+          // size while the stack is on screen would trade one flicker for another.
+          ScrollTrigger.create({
+            trigger: root,
+            start: "top bottom+=100%",
+            end: "bottom top-=100%",
+            onToggle: (self) =>
+              gsap.set(cards, { willChange: self.isActive ? "transform" : "auto" }),
+          });
+
           const wide = Boolean(context.conditions?.wide);
           const timeline = gsap.timeline({
             defaults: { ease: "none" },
