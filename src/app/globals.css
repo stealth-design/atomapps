@@ -177,8 +177,13 @@
     }
   }
 
+  /* The lightest stop of the brand blue ramp (the contact hero's gradient
+     ends on it). Pale enough to take the page's near-black type at 11:1. */
   ::selection {
-    background: var(--foreground);
-    color: var(--background);
+    background: #a8cdec;
+    /* Pinned rather than inherited: the type over the dark folds (the hero,
+       the contact ground, the footer) is white, and white on this would be
+       1.7:1. */
+    color: var(--foreground);
   }
 }
