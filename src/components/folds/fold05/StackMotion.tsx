@@ -69,34 +69,50 @@ export function StackMotion({ children }: { children: ReactNode }) {
         },
         (context) => {
           if (!context.conditions?.motion) return;
-          // Chrome re-rasters a scaled layer as its scale changes; Safari
-          // rasterizes once and scales the texture. That is the whole of why this
-          // tore in one browser and not the other.
+          // Everything the timeline animates gets its own compositor layer
+          // for as long as the stack is near the viewport.
           //
-          // Each card is a full-viewport box holding a 3840px-wide scene, clipped
-          // by a 20px radius, and the timeline scales it to 0.93 under a scrub —
-          // so Chrome was re-rastering four of those continuously while the stack
-          // moved, and the tiles it could not finish in time showed as white
-          // rectangles with tile-shaped edges rather than element-shaped ones.
-          // `will-change: transform` pins the raster: the layer is rastered once
-          // and the compositor scales the texture, which is what Safari was doing
-          // already.
+          // Promoting only the card was not enough, and measurably so: with
+          // paint flashing on, scrolling this fold turned the whole viewport
+          // green while every other fold stayed clean. A child animating
+          // inside a promoted parent is still painted INTO that parent's
+          // layer, so moving the scene and fading the shade forced the card's
+          // full-viewport layer to re-raster every frame — the promotion made
+          // the re-raster bigger rather than removing it.
           //
-          // Promoted a viewport early and released a viewport late, deliberately,
-          // rather than on the timeline's own range — the same reason Fold 03's
-          // icons are handled this way (see f1e5ef2). Flipping four layers of this
-          // size while the stack is on screen would trade one flicker for another.
+          // Promoted individually, each animation is a compositor operation
+          // on its own texture and nothing repaints. This is also why it was
+          // Chrome-only: Chrome re-rasters a scaled layer as its scale
+          // changes, where Safari rasterizes once and scales the texture.
+          //
+          // A viewport early and a viewport late, not the timeline's own
+          // range: flipping layers this size while the stack is on screen
+          // trades one flicker for another (see f1e5ef2, Fold 03's icons).
+          const within = (selector: string) =>
+            cards
+              .map((card) => card.querySelector<HTMLElement>(selector))
+              .filter((el): el is HTMLElement => el !== null);
+
+          const moved = [...cards, ...within("[data-f05-scene]"), ...within("[data-f05-glass]")];
+          const faded = within("[data-f05-shade]");
+
           ScrollTrigger.create({
             trigger: root,
             start: "top bottom+=100%",
             end: "bottom top-=100%",
-            onToggle: (self) =>
-              gsap.set(cards, { willChange: self.isActive ? "transform" : "auto" }),
+            onToggle: (self) => {
+              gsap.set(moved, { willChange: self.isActive ? "transform" : "auto" });
+              gsap.set(faded, { willChange: self.isActive ? "opacity" : "auto" });
+            },
           });
 
           const wide = Boolean(context.conditions?.wide);
           const timeline = gsap.timeline({
-            defaults: { ease: "none" },
+            // `force3D` for the same reason GlobalParallax sets it: it keeps
+            // the tweened elements on a 3D transform rather than letting GSAP
+            // drop back to a 2D matrix at rest, which hands the layer back to
+            // the browser's heuristics at exactly the wrong moment.
+            defaults: { ease: "none", force3D: true },
             scrollTrigger: {
               trigger: root,
               start: "top top",
