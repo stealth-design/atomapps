@@ -75,7 +75,7 @@ export const APP_PANELS: AppPanel[] = [
     title: "Find My Phone",
     question: "Can't find your phone when you need it most?",
     description:
-      "Find My Phone by Clap Launcher helps you quickly find your phone by clapping or whistling.",
+      "Find My Phone helps you quickly find your phone by clapping or whistling.",
     cta: { label: "Learn More", href: "#fold-05" },
     stats: { downloads: "1M+", rating: "4.5" },
   },
