@@ -22,14 +22,14 @@ const STATS = [
   {
     to: 160,
     suffix: "K+",
-    label: "4 + Star Reviews",
-    labelMobile: "4 + Star Reviews",
+    label: "4+ Star Reviews",
+    labelMobile: "4+ Star Reviews",
   },
   {
     prefix: "Top ",
     to: 10,
-    label: "Publisher in downloads on US Google Play Store",
-    labelMobile: "Downloads on US Google Play Store",
+    label: "Publisher by downloads on U.S. Google Play™ Store",
+    labelMobile: "Downloads on U.S. Google Play™ Store",
   },
   {
     to: 35,

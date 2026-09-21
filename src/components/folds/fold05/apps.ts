@@ -76,7 +76,7 @@ export const APP_PANELS: AppPanel[] = [
     question: "Can't find your phone when you need it most?",
     description:
       "Find My Phone by Clap Launcher helps you quickly find your phone by clapping or whistling.",
-    cta: { label: "Explore Find My Phone", href: "#fold-05" },
+    cta: { label: "Learn More", href: "#fold-05" },
     stats: { downloads: "1M+", rating: "4.5" },
   },
   {
@@ -106,7 +106,7 @@ export const APP_PANELS: AppPanel[] = [
     question: "Tired of not knowing how to set ringtone, alarm, or text volumes?",
     description:
       "Easily control all your volume settings in one place with Volume Control Launcher.",
-    cta: { label: "Explore Volume Control", href: "#fold-05" },
+    cta: { label: "Learn More", href: "#fold-05" },
     quote:
       "“This app really boosts your phone's volume, good productive application to utilize”",
     stats: { downloads: "1M+", rating: "4.5" },
@@ -121,7 +121,7 @@ export const APP_PANELS: AppPanel[] = [
     question: "Your Sound. Your Calm.",
     description:
       "Find your calm with soothing sounds designed to help you sleep, focus, and unwind.",
-    cta: { label: "Explore White Noise", href: "#fold-05" },
+    cta: { label: "Learn More", href: "#fold-05" },
     features: [
       { icon: "ic-headphones", text: "Relax with soothing white noise and calming audio." },
       { icon: "ic-sliders", text: "Choose from white noise, nature sounds, ambient audio, and more." },

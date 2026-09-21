@@ -182,12 +182,13 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
               {panel.cta && (
                 <a
                   href={panel.cta.href}
-                  // One width for all four past 1920. `w-fit` sizes each pill to its own
-                  // label, so the four ran 204-230px and read as four different
-                  // buttons; 240 clears the longest ("Explore Volume Control", 230)
-                  // and `justify-between` pins the arrow to the right edge so the
-                  // shorter labels do not leave it floating mid-pill.
-                  className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-black pr-[10px] pl-[16px] transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:bg-white motion-reduce:transition-none tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-between"
+                  // `w-fit` is enough now that all three labels read "Learn More".
+                  // This used to be pinned to 240px past 1920 with the arrow pushed
+                  // out by `justify-between`, because the labels were "Explore <app
+                  // name>" and ran 204-230px — four pills of four different widths.
+                  // Identical labels size identically on their own, so the fixed
+                  // width would only add empty pill to the right of the type.
+                  className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-black pr-[10px] pl-[16px] transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:bg-white motion-reduce:transition-none tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px]"
                 >
                   {/*
                    * The whole pill inverts on hover: black ground and white type
