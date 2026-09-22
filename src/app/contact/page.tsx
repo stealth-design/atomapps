@@ -84,7 +84,7 @@ export default function ContactPage() {
                         {QUOTE.app}
                       </span>
                       <span className="block text-[14px] leading-[19px] text-white/75">
-                        Verified review · {siteConfig.name} Apps
+                        Verified review · {siteConfig.name}
                       </span>
                     </span>
                   </figcaption>

@@ -88,7 +88,7 @@ export const APP_PANELS: AppPanel[] = [
     mobileFocal: "68%",
     icon: "/images/apps/steppy.png",
     title: "Steppy",
-    question: "Need a push to start walking more? Walk with Steppy.",
+    question: "Need a push to start walking more?\nWalk with Steppy.",
     description:
       "Turn your steps into real rewards, the more you walk, the more you can earn.",
     badge: "Coming soon",

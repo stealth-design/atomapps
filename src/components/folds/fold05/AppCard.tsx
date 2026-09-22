@@ -170,7 +170,10 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
               </div>
 
               {panel.question && (
-                <p className="mt-[20px] text-[16px] leading-[21px] font-medium text-black tablet:mt-[35px] desktop-xl:mt-[26px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
+                // `whitespace-pre-line` so a panel can force its own break —
+                // see Steppy, which puts "Walk with Steppy." on a line of its
+                // own. Everything else still wraps to the card's width.
+                <p className="mt-[20px] whitespace-pre-line text-[16px] leading-[21px] font-medium text-black tablet:mt-[35px] desktop-xl:mt-[26px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
                   {panel.question}
                 </p>
               )}
