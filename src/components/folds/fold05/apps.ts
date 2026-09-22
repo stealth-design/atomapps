@@ -110,7 +110,7 @@ export const APP_PANELS: AppPanel[] = [
       "Easily control all your volume settings in one place with Volume Control Launcher.",
     cta: { label: "Learn More", href: "#fold-05" },
     quote:
-      "“This app really boosts your phone's volume, good productive application to utilize”",
+      "“Great app! I can control all my app volumes separately and the boost is incredible!”",
     stats: { downloads: "1M+", rating: "4.5" },
   },
   {
