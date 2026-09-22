@@ -11,6 +11,12 @@ export interface LegalBlock {
   text?: string;
   /** Set for "ul". */
   items?: string[];
+  /**
+   * Phrases in this block that should link somewhere the text does not name.
+   * The published documents hyperlink a few words — "CCPA Form", "the link" —
+   * whose targets are lost the moment the wording is stored as plain text.
+   */
+  links?: Record<string, string>;
 }
 
 export interface LegalDoc {

@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import Link from "next/link";
 import type { LegalBlock, LegalDoc } from "@/data/legal/types";
 
 /**
@@ -10,33 +11,63 @@ import type { LegalBlock, LegalDoc } from "@/data/legal/types";
  * the 1440 content width would otherwise set them at ~160 characters a line.
  */
 
-/** Emails and bare URLs, so the contact points in the text are clickable. */
-// Each label is matched without a trailing dot, so an address or URL that
-// closes a sentence does not swallow the full stop into its href.
-const LINKABLE = /([\w.+-]+@[\w-]+(?:\.[\w-]+)+)|((?:https?:\/\/|www\.)[^\s,)]+[^\s,).])/g;
+/**
+ * What gets linked inside a block of legal copy:
+ *
+ *   - phrases the block names in its own `links` map, for the places the
+ *     published document hyperlinks a few words rather than a URL;
+ *   - email addresses;
+ *   - bare URLs.
+ *
+ * Each is matched without a trailing dot, so an address or URL that closes a
+ * sentence does not swallow the full stop into its href.
+ */
+const AUTO =
+  "(?<email>[\\w.+-]+@[\\w-]+(?:\\.[\\w-]+)+)|(?<url>(?:https?:\\/\\/|www\\.)[^\\s,)]+[^\\s,).])";
 
-function linkify(text: string) {
+const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const LINK_CLASS = "underline underline-offset-2 hover:no-underline";
+
+function linkify(text: string, links?: Record<string, string>) {
+  const named = Object.keys(links ?? {});
+  const pattern = new RegExp(
+    (named.length ? `(?<named>${named.map(escape).join("|")})|` : "") + AUTO,
+    "g",
+  );
+
   const out: (string | React.ReactElement)[] = [];
   let last = 0;
 
-  for (const match of text.matchAll(LINKABLE)) {
-    const [found, email, url] = match;
+  for (const match of text.matchAll(pattern)) {
+    const { named: phrase, email, url } = match.groups ?? {};
+    const found = match[0];
     const at = match.index ?? 0;
     if (at > last) out.push(text.slice(last, at));
 
-    const href = email ? `mailto:${email}` : url.startsWith("http") ? url : `https://${url}`;
-    out.push(
-      <a
-        key={`${at}-${found}`}
-        href={href}
-        // The external ones are third-party policies the document points at,
-        // so they open away from the page; `mailto:` is unaffected by target.
-        {...(email ? {} : { target: "_blank", rel: "noopener noreferrer" })}
-        className="underline underline-offset-2 hover:no-underline"
-      >
-        {found}
-      </a>,
-    );
+    if (phrase) {
+      // Internal, so `Link` rather than an anchor — these are routes on this
+      // site and should not cost a full navigation.
+      out.push(
+        <Link key={`${at}-${found}`} href={links![phrase]} className={LINK_CLASS}>
+          {found}
+        </Link>,
+      );
+    } else {
+      const href = email ? `mailto:${email}` : url.startsWith("http") ? url : `https://${url}`;
+      out.push(
+        <a
+          key={`${at}-${found}`}
+          href={href}
+          // The external ones are third-party policies the document points at,
+          // so they open away from the page; `mailto:` is unaffected by target.
+          {...(email ? {} : { target: "_blank", rel: "noopener noreferrer" })}
+          className={LINK_CLASS}
+        >
+          {found}
+        </a>,
+      );
+    }
     last = at + found.length;
   }
 
@@ -56,14 +87,14 @@ function Block({ block }: { block: LegalBlock }) {
   if (block.type === "ul") {
     return (
       <ul className="mt-[16px] flex list-disc flex-col gap-[12px] pl-[22px] text-[15px] leading-[25px] text-[#3f3f46]">
-        {block.items?.map((item, index) => <li key={index}>{linkify(item)}</li>)}
+        {block.items?.map((item, index) => <li key={index}>{linkify(item, block.links)}</li>)}
       </ul>
     );
   }
 
   return (
     <p className="mt-[16px] text-[15px] leading-[25px] text-[#3f3f46]">
-      {linkify(block.text ?? "")}
+      {linkify(block.text ?? "", block.links)}
     </p>
   );
 }

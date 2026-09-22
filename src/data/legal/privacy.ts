@@ -214,7 +214,7 @@ export const PRIVACY: LegalDoc = {
         "Categories of information that we sell or disclose to third parties",
       ],
     },
-    { type: "p", text: "Right to opt-out of the sharing of personal data: You have the right to direct us to not \u201cshare\u201d as your personal information to any third party. If we sell your personal information, we shall cease to do so upon receipt of your request. Please place your request with us via either of the following two methods of communication: CCPA Form or emailing us at the address given below." },
+    { type: "p", text: "Right to opt-out of the sharing of personal data: You have the right to direct us to not \u201cshare\u201d as your personal information to any third party. If we sell your personal information, we shall cease to do so upon receipt of your request. Please place your request with us via either of the following two methods of communication: CCPA Form or emailing us at the address given below.", links: { "CCPA Form": "/do-not-sell" } },
     {
       type: "ul",
       items: [
@@ -279,7 +279,7 @@ export const PRIVACY: LegalDoc = {
         "The right to have your personal data deleted.",
       ],
     },
-    { type: "p", text: "To make a verifiable request to exercise these rights, you may click the link provided or email privacy@atomapplications.com" },
+    { type: "p", text: "To make a verifiable request to exercise these rights, you may click the link provided or email privacy@atomapplications.com", links: { "the link provided": "/do-not-sell" } },
     { type: "p", text: "To ensure the request is verifiable, it must include information that allows us to confirm your identity and a detailed description of the request. Requests can only be made by you or by someone registered with the Virginia Secretary of State to act on your behalf, and may only be made twice within a 12-month period. We will use the information in the verifiable request solely to verify your identity and process your request. No account creation is necessary to submit a request. We strive to respond to all verifiable requests within 45 days, but if an extension is necessary, we will inform you in writing." },
     { type: "h2", text: "Appeals" },
     { type: "p", text: "In case we refuse a request, you have the right to appeal under the VCDPA. If you wish to file an appeal, please send an email to privacy@atomapplications.com with the subject line \u201cAppeal\u201d. We aim to respond to all verifiable appeals within 60 days." },
