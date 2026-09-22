@@ -3,6 +3,7 @@
 import { useId, useState, type FormEvent } from "react";
 import { siteConfig } from "@/data/site";
 import { cn } from "@/lib/utils";
+import { FIELD, LABEL, SUBMIT } from "@/components/ui/formStyles";
 
 /**
  * The consultation form, on the reference's white card.
@@ -17,14 +18,6 @@ import { cn } from "@/lib/utils";
  * silently loses what somebody typed — wire `POST` to a real handler and drop
  * the early return.
  */
-
-/** Shared shape for the inputs — the reference's filled, borderless fields. */
-const FIELD =
-  "w-full rounded-[10px] bg-[var(--surface)] px-[16px] text-[15px] leading-[20px] text-[var(--foreground)] " +
-  "placeholder:text-[#9a9aa1] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#2774c1]";
-
-const LABEL =
-  "block text-[14px] leading-[18px] font-medium text-[var(--foreground)]";
 
 export function ContactForm() {
   const [sent, setSent] = useState(false);
@@ -96,10 +89,7 @@ export function ContactForm() {
           <div className="mt-[28px] flex">
             <button
               type="submit"
-              // `can-hover:` rather than a bare `hover:` — see globals.css. A
-              // tap on a phone matches `hover:` too, and the state then sticks
-              // on the button until something else is touched.
-              className="inline-flex h-[48px] items-center justify-center rounded-[10px] bg-[#2774c1] px-[32px] text-[15px] leading-[20px] font-medium text-white transition-[background-color,transform] duration-300 ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:-translate-y-[2px] can-hover:hover:bg-[#1f63a8] active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2774c1] motion-reduce:transition-none motion-reduce:can-hover:hover:translate-y-0"
+              className={SUBMIT}
             >
               Submit
             </button>

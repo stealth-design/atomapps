@@ -4,8 +4,9 @@
  *
  * Structured rather than pasted as markup so both legal pages render
  * through the same component and inherit the site's type scale. The
- * wording is the source's, unaltered; only the page's own nav crumbs and
- * its empty "Effective Date:" field were dropped.
+ * wording is the source's, unaltered; only the page's own nav crumbs were
+ * dropped. The source leaves its "Effective Date:" blank, so the date is
+ * carried as a field here rather than as an empty heading in the copy.
  *
  * Emails and bare URLs are linked at render time, so they stay plain
  * text here — see LegalDocument.
@@ -14,6 +15,7 @@ import type { LegalDoc } from "./types";
 
 export const PRIVACY: LegalDoc = {
   title: "Privacy Policy",
+  effective: "22 Sep 2026",
   source: "https://atomapplications.com/atom/terms/privacypolicy.html",
   blocks: [
     { type: "p", text: "Atom Apps LLC /Atom Apps LLC is committed to protecting its users\u2019 (\u201cyou\u201d, \u201cyour\u201d or \u201cuser\u201d) privacy. This policy (hereinafter, \u201cPrivacy Policy\u201d or \u201cPolicy\u201d) is applicable to your use of any associated services like browser extensions (\u201cExtensions\u201d), websites, softwares, mobile and desktop applications, or (collectively the \u201cServices\u201d) owned by Atom Apps LLC /Atom Apps LLC (\u201cus\u201d, \u201cwe\u201d or \u201cour\u201d)." },

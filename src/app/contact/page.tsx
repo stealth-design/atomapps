@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FooterParallax } from "@/components/layout/FooterParallax";
 import { Container } from "@/components/ui/Container";
+import { Sky } from "@/components/ui/Sky";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { TESTIMONIALS } from "@/components/folds/fold07/testimonials";
@@ -23,11 +24,8 @@ export const metadata: Metadata = {
  * type scale, the 1440 content width and the nav's gutters rather than
  * restating them.
  *
- * The sky is CSS, not a photograph. The reference uses a cloud plate we have
- * no equivalent of, so it is built from the brand blue (#2774c1) as a linear
- * wash with three soft radial highlights over it. That keeps the page to
- * assets we own and stays in our palette; drop a real plate in behind it and
- * the layers above need no changes.
+ * The sky is `Sky`, shared with the CCPA request page — CSS rather than a
+ * photograph, so the page stays on assets we own.
  */
 
 /** The quote reads as a partner speaking, which is what this page is for. */
@@ -44,32 +42,7 @@ export default function ContactPage() {
              height, so a taller form still grows the section instead of
              spilling out of it. */}
         <section className="relative overflow-hidden bg-[#2774c1] desktop-xl:min-h-[100dvh]">
-          {/* Sky. Plain `absolute inset-0`, no negative z-index: the section
-              paints its own `bg` first, and a negative-z child would sit
-              *behind* that opaque colour rather than over it — which is what
-              flattened this to one solid blue. DOM order does the stacking
-              instead, so the washes land over the base and the content, which
-              is `relative`, lands over them. */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                "linear-gradient(180deg, #1d5fa8 0%, #2774c1 38%, #5aa0dd 72%, #a8cdec 100%)",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0"
-            style={{
-              backgroundImage: [
-                "radial-gradient(52% 40% at 6% 16%, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0) 66%)",
-                "radial-gradient(40% 34% at 94% 6%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 64%)",
-                "radial-gradient(64% 44% at 84% 88%, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0) 70%)",
-                "radial-gradient(46% 30% at 30% 100%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 68%)",
-              ].join(","),
-            }}
-          />
+          <Sky />
 
           {/* `pt` clears the fixed 50px header, which the folds do not need to
               do because the hero sits under it on purpose. */}

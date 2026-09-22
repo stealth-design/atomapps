@@ -107,7 +107,7 @@ export function Footer() {
             {/* `tablet:contents` dissolves this row above the breakpoint, so the
                 desktop layout still lays both links out as direct children of the
                 flex row with its own spacing. */}
-            <div className="flex gap-[28px] tablet:contents">
+            <div className="flex flex-wrap gap-x-[28px] gap-y-[16px] tablet:contents">
               {siteConfig.legal.map((item, index) => (
                 <a
                   key={item.label}
@@ -118,7 +118,7 @@ export function Footer() {
                   // still leaves 2px between the two, so neither steals the other's
                   // taps.
                   className={`relative before:absolute before:inset-x-0 before:-inset-y-[11px] before:content-[''] ${
-                    index > 0 ? "tablet:ml-[103px]" : ""
+                    index > 0 ? "tablet:ml-[48px] desktop-md:ml-[103px]" : ""
                   }`}
                 >
                   {item.label}

@@ -42,6 +42,12 @@ export const siteConfig: SiteConfig = {
   legal: [
     { label: "Terms & Conditions", href: "/terms" },
     { label: "Privacy Policy", href: "/privacy" },
+    // Third, and last, so `legal[0]` and `legal[1]` still mean what the
+    // contact form's small print expects them to.
+    {
+      label: "Do Not Sell or Share my Personal Information",
+      href: "/do-not-sell",
+    },
   ],
   /** Shown under the footer wordmark, and the address the documents name. */
   email: "contact@atomapplications.com",

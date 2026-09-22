@@ -75,6 +75,12 @@ export function LegalDocument({ doc }: { doc: LegalDoc }) {
         {doc.title}
       </h1>
 
+      {doc.effective && (
+        <p className="mt-[16px] text-[14px] leading-[20px] text-[#61616a]">
+          Effective date: {doc.effective}
+        </p>
+      )}
+
       <div className="mt-[32px] tablet:mt-[48px]">
         {doc.blocks.map((block, index) => (
           <Block key={index} block={block} />

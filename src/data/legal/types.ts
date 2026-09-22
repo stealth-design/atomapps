@@ -15,6 +15,8 @@ export interface LegalBlock {
 
 export interface LegalDoc {
   title: string;
+  /** Rendered under the title. The source page leaves its own field blank. */
+  effective?: string;
   /** Where the wording was transcribed from, so it can be diffed later. */
   source: string;
   blocks: LegalBlock[];
