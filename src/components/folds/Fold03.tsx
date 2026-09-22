@@ -125,10 +125,20 @@ export default function Fold03() {
           <IconScatter />
 
           {/* ---------- heading (paints above the icons, as in Figma) ---------- */}
-          {/* top: 215/626 mobile, 209/886 desktop */}
+          {/* Figma put this at top 215/626 mobile and 209/886 desktop, at
+              18/24/30px. It is set larger and higher than that by request —
+              the type is up roughly a fifth at every breakpoint and the block
+              sits ~4% further up the stage.
+
+              Moving it up is the safe direction: the note below about the
+              halo is bounded by the settled grid's first row, which begins
+              30px under the text, so raising the heading only widens that
+              gap. The widths grow with the type because the two lines are
+              explicit spans — they set the measure each line may not exceed,
+              and "designed with purpose" is the longer of them. */}
           <h2
             data-f03="heading"
-            className="absolute top-[34.35%] left-1/2 isolate w-[276px] -translate-x-1/2 text-center text-[18px] leading-[23px] font-extrabold text-black capitalize tablet:top-[23.59%] tablet:w-[462px] tablet:text-[24px] tablet:leading-[31px] desktop-sm:text-[30px] desktop-sm:leading-[39px]"
+            className="absolute top-[30%] left-1/2 isolate w-[310px] -translate-x-1/2 text-center text-[22px] leading-[28px] font-extrabold text-black capitalize tablet:top-[19.5%] tablet:w-[540px] tablet:text-[30px] tablet:leading-[38px] desktop-sm:text-[38px] desktop-sm:leading-[48px]"
           >
             {/*
              * A white halo hugging the glyphs. The heading already paints
