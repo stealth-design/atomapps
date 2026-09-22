@@ -44,7 +44,7 @@ export interface AppPanel {
    * different place every time (measured off the source art):
    *
    *   image-1  phone 57–79%    image-2  phone 55–72%
-   *   image-3  phone 57–79%    image-4  phone 72–88%
+   *   image-3  phone 57–79%    image-4  phone 57–78%
    *
    * A single shared value sliced the White Noise phone clean in half.
    * Desktop is unaffected — there the scene is centred and barely cropped.
@@ -114,8 +114,11 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "white-noise",
     background: "/images/image-4.webp",
-    ground: "#3d2d29",
-    mobileFocal: "80%",
+    ground: "#3e302f",
+    // 67%, not the 80% the old art wanted: this scene was re-composed and the
+    // phone sits left of where it used to. Centred on the phone rather than on
+    // the panels beside it, which is what the ~28% mobile window has room for.
+    mobileFocal: "67%",
     icon: "/images/fold03/icon-15.jpg",
     title: "White Noise",
     question: "Your Sound. Your Calm.",
