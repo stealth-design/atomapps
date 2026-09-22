@@ -43,7 +43,7 @@ export interface AppPanel {
    * that window sits has to follow each scene's device, which is composed in a
    * different place every time (measured off the source art):
    *
-   *   image-1  phone 57–79%    image-2  phone 55–72%
+   *   image-1  phone 57–79%    image-2  phone 58–78%
    *   image-3  phone 57–79%    image-4  phone 57–78%
    *
    * A single shared value sliced the White Noise phone clean in half.
@@ -82,8 +82,10 @@ export const APP_PANELS: AppPanel[] = [
   {
     id: "steppy",
     background: "/images/image-2.webp",
-    ground: "#5d593a",
-    mobileFocal: "64%",
+    ground: "#5c5839",
+    // Re-composed like image-4: the phone moved right, 55–72% to 58–78%, so
+    // the window centres at 68% rather than 64%.
+    mobileFocal: "68%",
     icon: "/images/apps/steppy.png",
     title: "Steppy",
     question: "Need a push to start walking more? Walk with Steppy.",
