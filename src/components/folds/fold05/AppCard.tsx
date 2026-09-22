@@ -271,13 +271,29 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                   <ul className="flex flex-col gap-[14px] tablet:gap-[20px]">
                     {panel.features.map((feature) => (
                       <li key={feature.icon} className="flex gap-[12px]">
-                        <Image
-                          src={`/images/fold05/icons/${feature.icon}.svg`}
-                          alt=""
-                          width={20}
-                          height={20}
-                          className="mt-[1px] size-[16px] shrink-0 tablet:size-[20px]"
-                        />
+                        {/*
+                         * The icon is centred on the FIRST line of the text,
+                         * not on the block: these rows wrap to two lines at
+                         * the card's width and centring on the block drops
+                         * the icon to the middle of the pair.
+                         *
+                         * The box carries the text's own line height at each
+                         * breakpoint and centres the glyph inside it, rather
+                         * than nudging with a margin. A fixed `mt-[1px]` only
+                         * lined up where the two happened to agree, and from
+                         * `tablet` up they do not: a 20px icon against an
+                         * 18px line was already 1px proud of it before the
+                         * margin pushed it a further 1px down.
+                         */}
+                        <span className="flex h-[16px] shrink-0 items-center tablet:h-[18px] desktop-xl:h-[20px]">
+                          <Image
+                            src={`/images/fold05/icons/${feature.icon}.svg`}
+                            alt=""
+                            width={20}
+                            height={20}
+                            className="size-[16px] tablet:size-[20px]"
+                          />
+                        </span>
                         <p className="text-[12px] leading-[16px] text-black tablet:text-[14px] tablet:leading-[18px] desktop-xl:text-[15px] desktop-xl:leading-[20px]">
                           {feature.text}
                         </p>
