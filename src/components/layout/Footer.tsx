@@ -89,6 +89,19 @@ export function Footer() {
             className="h-auto w-full"
           />
 
+          {/* ---------- contact ---------- */}
+          {/* Directly under the wordmark, inside the same foot block, so it
+              reads as part of the lockup rather than as a third band. The
+              pseudo-element is the same trick the legal links use below: a
+              14px line box is only 17px tall, under the 24px WCAG 2.5.8
+              floor, and growing the hit area into the gap costs no layout. */}
+          <a
+            href={`mailto:${siteConfig.email}`}
+            className="relative mt-[18px] block w-fit text-[14px] leading-[17px] text-white before:absolute before:inset-x-0 before:-inset-y-[5px] before:content-[''] hover:underline tablet:mt-[10px]"
+          >
+            {siteConfig.email}
+          </a>
+
           {/* ---------- legal ---------- */}
           <div className="mt-[26px] flex flex-col gap-[24px] text-[14px] leading-[17px] text-white tablet:mt-[3px] tablet:flex-row tablet:items-center tablet:gap-0">
             {/* `tablet:contents` dissolves this row above the breakpoint, so the

@@ -16,6 +16,7 @@ export interface SiteConfig {
   /** The footer's own call to action. */
   footerCta: NavItem;
   legal: NavItem[];
+  email: string;
   copyright: string;
   social: SocialLink[];
 }
@@ -39,9 +40,11 @@ export const siteConfig: SiteConfig = {
   cta: { label: "Contact Us", href: "/contact" },
   footerCta: { label: "Get in touch", href: "/contact" },
   legal: [
-    { label: "Terms & Conditions", href: "#" },
-    { label: "Privacy Policy", href: "#" },
+    { label: "Terms & Conditions", href: "/terms" },
+    { label: "Privacy Policy", href: "/privacy" },
   ],
+  /** Shown under the footer wordmark, and the address the documents name. */
+  email: "contact@atomapplications.com",
   copyright: "@ATOM All Rights Reserved 2026",
   social: [],
 };
