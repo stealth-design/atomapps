@@ -17,6 +17,7 @@ export interface SiteConfig {
   footerCta: NavItem;
   legal: NavItem[];
   tagline: string;
+  disclaimer: string;
   email: string;
   copyright: string;
   social: SocialLink[];
@@ -56,6 +57,9 @@ export const siteConfig: SiteConfig = {
     "A full-service company that specializes in mobile development, distribution, and monetization for brands across verticles.",
   /** Shown under the footer wordmark, and the address the documents name. */
   email: "contact@atomapplications.com",
+  /** Trademark attribution, on the foot of the footer under the legal row. */
+  disclaimer:
+    "Google Play is a trademark of Google LLC. Our company and apps are not affiliated with or endorsed by Google.",
   copyright: "@ATOM All Rights Reserved 2026",
   social: [],
 };

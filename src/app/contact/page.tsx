@@ -11,7 +11,7 @@ import { TESTIMONIALS } from "@/components/folds/fold07/testimonials";
 import { siteConfig } from "@/data/site";
 
 export const metadata: Metadata = {
-  title: `Contact — ${siteConfig.name}`,
+  title: `Contact | ${siteConfig.name}`,
   description: "Get in touch with our team for any questions.",
 };
 

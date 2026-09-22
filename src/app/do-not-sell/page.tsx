@@ -9,7 +9,7 @@ import { CcpaForm } from "@/components/legal/CcpaForm";
 import { siteConfig } from "@/data/site";
 
 export const metadata: Metadata = {
-  title: `Do Not Sell or Share my Personal Information — ${siteConfig.name}`,
+  title: `Do Not Sell or Share my Personal Information | ${siteConfig.name}`,
   description:
     "Submit a request to access, delete, correct or opt out of the sharing of your personal information.",
 };

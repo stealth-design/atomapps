@@ -8,7 +8,7 @@ import { TERMS } from "@/data/legal/terms";
 import { siteConfig } from "@/data/site";
 
 export const metadata: Metadata = {
-  title: `Terms of Service — ${siteConfig.name}`,
+  title: `Terms of Service | ${siteConfig.name}`,
   description: "The terms governing your use of Atom Apps' services.",
 };
 

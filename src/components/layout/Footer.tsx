@@ -142,6 +142,15 @@ export function Footer() {
             </div>
             <p className="tablet:ml-auto">{siteConfig.copyright}</p>
           </div>
+
+          {/* ---------- trademark attribution ---------- */}
+          {/* Last line of the panel, and deliberately the quietest thing on
+              it: smaller and dimmer than the legal row above, so it reads as
+              a required notice rather than as another link. The measure keeps
+              it to two lines at 1440 instead of one very long one. */}
+          <p className="mx-auto mt-[24px] max-w-[760px] text-center text-[12px] leading-[18px] text-[#8a8a8a] tablet:mt-[28px]">
+            {siteConfig.disclaimer}
+          </p>
         </div>
       </div>
     </footer>

@@ -8,7 +8,7 @@ import { PRIVACY } from "@/data/legal/privacy";
 import { siteConfig } from "@/data/site";
 
 export const metadata: Metadata = {
-  title: `Privacy Policy — ${siteConfig.name}`,
+  title: `Privacy Policy | ${siteConfig.name}`,
   description: "How Atom Apps collects, uses and protects your information.",
 };
 
