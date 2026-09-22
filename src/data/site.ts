@@ -16,6 +16,7 @@ export interface SiteConfig {
   /** The footer's own call to action. */
   footerCta: NavItem;
   legal: NavItem[];
+  tagline: string;
   email: string;
   copyright: string;
   social: SocialLink[];
@@ -49,6 +50,10 @@ export const siteConfig: SiteConfig = {
       href: "/do-not-sell",
     },
   ],
+  /** Sits under the footer wordmark. Distinct from `description`, which is
+      the page's meta description. */
+  tagline:
+    "A full-service company that specializes in mobile development, distribution, and monetization for brands across verticles.",
   /** Shown under the footer wordmark, and the address the documents name. */
   email: "contact@atomapplications.com",
   copyright: "@ATOM All Rights Reserved 2026",

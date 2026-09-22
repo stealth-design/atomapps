@@ -5,11 +5,11 @@ import { siteConfig } from "@/data/site";
 /**
  * Site footer (Figma 1576:4269, 1440x800).
  *
- * The call to action sits on the top right, the AtomApps wordmark runs the full
- * width of the foot, and the legal row tucks under it — links left, copyright
- * right. The middle of the panel is deliberately empty: the two blocks are
- * anchored to opposite ends and the ~273px between them is what the artboard
- * asks for, not slack left over.
+ * The call to action is centred at the top, the AtomApps wordmark runs the full
+ * width of the foot, and under it sit the tagline, the contact address and the
+ * legal row — links left, copyright right. The middle of the panel is
+ * deliberately empty: the blocks are anchored to opposite ends and the space
+ * between them is what the artboard asks for, not slack left over.
  *
  * The composition is the artboard's; the way it is held together is not. Every
  * block used to sit at its measured offset from the top of a panel fixed at
@@ -25,10 +25,11 @@ import { siteConfig } from "@/data/site";
  *     above the ink (box 4.32 wide to tall, ink 5.34). Nothing here depends on
  *     that, because the block is anchored by its foot, but any change to the
  *     padding above it does.
- *   - The gap under the wordmark is 3px. That is the artboard's, and it is
- *     tight on purpose — the legal row reads as part of the lockup rather than
- *     as a separate band. It is measured to the wordmark's box, which ends on
- *     the descenders of "pp", so there is no hidden slack in it.
+ *   - What follows the wordmark is measured to its box, which ends on the
+ *     descenders of "pp", so there is no hidden slack in those gaps. An
+ *     earlier revision had the legal row 3px under the wordmark, reading as
+ *     part of the lockup; the tagline and address now sit between them and the
+ *     row is spaced off the foot instead.
  *
  * An earlier revision carried the three section links between the call to
  * action and the wordmark. This artboard has no such row, so they are gone;
@@ -52,7 +53,7 @@ export function Footer() {
         {/* `Link` for the same reason as the header's: /contact is a route. */}
         <Link
           href={siteConfig.footerCta.href}
-          className="group flex w-fit items-center gap-[0.254em] self-end text-[32px] leading-[1.4] font-medium text-[#f5f5f7] tablet:text-[clamp(67px,calc(var(--locked-vw)*0.04653),104px)]"
+          className="group flex w-fit items-center gap-[0.254em] self-center text-[32px] leading-[1.4] font-medium text-[#f5f5f7] tablet:text-[clamp(67px,calc(var(--locked-vw)*0.04653),104px)]"
         >
           <span>{siteConfig.footerCta.label}</span>
 
@@ -89,21 +90,35 @@ export function Footer() {
             className="h-auto w-full"
           />
 
+          {/* ---------- tagline ---------- */}
+          {/* Centred under the wordmark and held to a measure rather than the
+              panel's width: at 1440 the full width would set this as one
+              120-character line, where the artboard breaks it over two. */}
+          <p className="mx-auto mt-[24px] max-w-[820px] text-center text-[15px] leading-[24px] text-white tablet:mt-[34px] tablet:text-[22px] tablet:leading-[32px]">
+            {siteConfig.tagline}
+          </p>
+
           {/* ---------- contact ---------- */}
-          {/* Directly under the wordmark, inside the same foot block, so it
-              reads as part of the lockup rather than as a third band. The
-              pseudo-element is the same trick the legal links use below: a
-              14px line box is only 17px tall, under the 24px WCAG 2.5.8
-              floor, and growing the hit area into the gap costs no layout. */}
-          <a
-            href={`mailto:${siteConfig.email}`}
-            className="relative mt-[18px] block w-fit text-[14px] leading-[17px] text-white before:absolute before:inset-x-0 before:-inset-y-[5px] before:content-[''] hover:underline tablet:mt-[10px]"
-          >
-            {siteConfig.email}
-          </a>
+          {/* The label is what makes the address read as an invitation rather
+              than as another legal line; it is small, grey and set apart from
+              the address so the two group without competing. */}
+          <div className="mt-[28px] text-center tablet:mt-[40px]">
+            <p className="text-[11px] leading-[14px] font-bold tracking-[0.08em] text-[#8a8a8a] uppercase tablet:text-[12px]">
+              Reach us at
+            </p>
+            {/* The pseudo-element is the same trick the legal links use below:
+                a 14px line box is only 17px tall, under the 24px WCAG 2.5.8
+                floor, and growing the hit area into the gap costs no layout. */}
+            <a
+              href={`mailto:${siteConfig.email}`}
+              className="relative mt-[8px] inline-block text-[14px] leading-[17px] text-white before:absolute before:inset-x-0 before:-inset-y-[5px] before:content-[''] hover:underline tablet:text-[15px] tablet:leading-[19px]"
+            >
+              {siteConfig.email}
+            </a>
+          </div>
 
           {/* ---------- legal ---------- */}
-          <div className="mt-[26px] flex flex-col gap-[24px] text-[14px] leading-[17px] text-white tablet:mt-[3px] tablet:flex-row tablet:items-center tablet:gap-0">
+          <div className="mt-[36px] flex flex-col gap-[24px] text-[14px] leading-[17px] text-white tablet:mt-[48px] tablet:flex-row tablet:items-center tablet:gap-0">
             {/* `tablet:contents` dissolves this row above the breakpoint, so the
                 desktop layout still lays both links out as direct children of the
                 flex row with its own spacing. */}
