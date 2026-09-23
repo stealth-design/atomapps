@@ -148,7 +148,7 @@ export default function Fold07() {
                           className="w-[262px] shrink-0 pr-[10px]"
                           aria-hidden={index >= row.length || undefined}
                         >
-                          <TestimonialCard testimonial={testimonial} />
+                          <TestimonialCard testimonial={testimonial} clone={index >= row.length} />
                         </div>
                       ))}
                     </div>
@@ -184,7 +184,7 @@ export default function Fold07() {
                         className="pb-[16px]"
                         aria-hidden={index >= column.length || undefined}
                       >
-                        <TestimonialCard testimonial={testimonial} />
+                        <TestimonialCard testimonial={testimonial} clone={index >= column.length} />
                       </div>
                     ))}
                   </div>

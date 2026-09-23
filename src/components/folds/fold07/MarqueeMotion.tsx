@@ -22,11 +22,19 @@ import { gsap } from "@/lib/gsap";
  * hidden set would burn frames on something nobody can see.
  */
 
-/** Seconds for one full cycle. Long on purpose: this should barely register. */
-const CYCLE = 55;
-
-/** Rows are shorter than the columns are tall, so they need less time to read as the same speed. */
-const ROW_CYCLE = 38;
+/**
+ * Drift speed, in pixels per second — one for each axis.
+ *
+ * This used to be a fixed cycle time (55s for a column, 38s for a row), which
+ * only reads as one speed while every track is the same length: the tween
+ * covers half the track per cycle, so a track twice as long drifts twice as
+ * fast. With the real reviews in, the two columns carry 18 and 17 cards and
+ * are not the same height as each other, let alone the six-card tracks the
+ * timings were tuned on. Fixing the speed and deriving the duration from
+ * each track's measured length keeps every track at the pace the six-card
+ * version had: ~12px/s vertically, ~20px/s across.
+ */
+const SPEED = { y: 12, x: 20 } as const;
 
 export function MarqueeMotion({ children }: { children: ReactNode }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -39,7 +47,7 @@ export function MarqueeMotion({ children }: { children: ReactNode }) {
       const mm = gsap.matchMedia();
 
       /** One seamless loop per track, on whichever axis it declares. */
-      const drift = (selector: string, axis: "x" | "y", cycle: number) => {
+      const drift = (selector: string, axis: "x" | "y") => {
         const tracks = gsap.utils.toArray<HTMLElement>(selector, root);
         tracks.forEach((track) => {
           // "up" and "left" travel negative; "down" and "right" start shifted
@@ -47,20 +55,24 @@ export function MarqueeMotion({ children }: { children: ReactNode }) {
           const forward =
             track.dataset.f07Track === "up" || track.dataset.f07Track === "left";
           const prop = axis === "x" ? "xPercent" : "yPercent";
+          // The track holds its cards twice and the tween covers one copy, so
+          // the distance travelled per cycle is half the measured length.
+          const length = axis === "x" ? track.offsetWidth : track.offsetHeight;
+          const duration = Math.max(1, length / 2 / SPEED[axis]);
           gsap.fromTo(
             track,
             { [prop]: forward ? 0 : -50 },
-            { [prop]: forward ? -50 : 0, duration: cycle, ease: "none", repeat: -1 },
+            { [prop]: forward ? -50 : 0, duration, ease: "none", repeat: -1 },
           );
         });
       };
 
       mm.add("(max-width: 767px) and (prefers-reduced-motion: no-preference)", () => {
-        drift("[data-f07-track='left'], [data-f07-track='right']", "x", ROW_CYCLE);
+        drift("[data-f07-track='left'], [data-f07-track='right']", "x");
       });
 
       mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
-        drift("[data-f07-track='up'], [data-f07-track='down']", "y", CYCLE);
+        drift("[data-f07-track='up'], [data-f07-track='down']", "y");
       });
 
       return () => mm.revert();

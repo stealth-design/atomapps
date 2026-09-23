@@ -7,7 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { Sky } from "@/components/ui/Sky";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "@/components/contact/ContactForm";
-import { TESTIMONIALS } from "@/components/folds/fold07/testimonials";
+import { CONTACT_QUOTE } from "@/components/folds/fold07/testimonials";
 import { siteConfig } from "@/data/site";
 
 export const metadata: Metadata = {
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
  * photograph, so the page stays on assets we own.
  */
 
-/** The quote reads as a partner speaking, which is what this page is for. */
-const QUOTE = TESTIMONIALS.agencies;
+/** A real review — the one chosen for this page in the testimonials data. */
+const QUOTE = CONTACT_QUOTE;
 
 export default function ContactPage() {
   return (
