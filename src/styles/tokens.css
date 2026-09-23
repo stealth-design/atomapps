@@ -61,6 +61,28 @@
   --content-max-width-wide: 1920px;
   --content-padding: 1.25rem;
   --header-height: 50px;
+  /*
+   * The footer's floor, and what makes the foot of the page land cleanly.
+   *
+   * It used to be a flat 800px (657 on mobile), which is the artboard's
+   * height — but the footer is the last thing in the document, so at full
+   * scroll whatever the footer does not cover is a strip of the fold above it
+   * wedged between the fixed header and the footer's top edge. On a 900px
+   * window that strip was 50px; on a 1200px one, 350px.
+   *
+   * At exactly `100lvh - var(--header-height)` the arithmetic closes: the
+   * document bottoms out with the footer's top edge on the header's foot, so
+   * the page ends as header then footer and nothing else. `max()` keeps the
+   * artboard's height as the floor for short windows, where the footer is
+   * taller than the viewport and covers it anyway.
+   *
+   * `lvh`, not `dvh` or `svh`: `dvh` would re-measure while a mobile address
+   * bar shows and hides, resizing the footer mid-scroll, and `svh` is the
+   * viewport with the bar *shown* — which is the one state the page is not in
+   * once a reader has scrolled to the bottom. `lvh` is stable and is the
+   * height that actually needs covering.
+   */
+  --footer-min-height: max(657px, calc(100lvh - var(--header-height)));
   /* Half the gap between two folds — every content fold uses it top and
      bottom, so adjacent folds always sit 2x this apart. Full-bleed folds
      (hero, app stack) carry none. */
@@ -71,6 +93,8 @@
   :root {
     --content-padding: 2.5rem;
     --fold-gap-y: 44px;
+    /* The desktop artboard's 800px as the floor — see the note above. */
+    --footer-min-height: max(800px, calc(100lvh - var(--header-height)));
   }
 }
 

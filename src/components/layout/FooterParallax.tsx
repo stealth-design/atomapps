@@ -26,10 +26,18 @@ import { gsap } from "@/lib/gsap";
  * component — only this controller ships to the client.
  */
 
-/** Travel, as a share of the footer's own height. Negative trails the scroll. */
-const TRAVEL_DESKTOP = -25;
-/** The mobile footer is ~150px shorter, so the same share reads as more drift. */
-const TRAVEL_MOBILE = -16;
+/**
+ * Travel in pixels. Negative trails the scroll.
+ *
+ * These were a share of the footer's own height — 25% desktop, 16% mobile —
+ * which came to 200px and 105px against the artboard heights they were tuned
+ * on. The footer now grows to fill the window under the header (see
+ * `--footer-min-height`), so a percentage would hand a tall monitor a
+ * proportionally longer drift: 287px on a 1200px window, against the 200 this
+ * was set at. Pixels keep the reveal reading the same at every window height.
+ */
+const TRAVEL_DESKTOP = -200;
+const TRAVEL_MOBILE = -105;
 
 /** Opening shade, cleared as the footer settles. */
 const SHADE = 0.5;
@@ -78,7 +86,7 @@ export function FooterParallax({ children }: { children: ReactNode }) {
           });
 
           timeline.from(inner, {
-            yPercent: isMobile ? TRAVEL_MOBILE : TRAVEL_DESKTOP,
+            y: isMobile ? TRAVEL_MOBILE : TRAVEL_DESKTOP,
             // Holds the compositor layer for the whole scrub rather than
             // letting GSAP promote and demote it around each tween.
             force3D: true,

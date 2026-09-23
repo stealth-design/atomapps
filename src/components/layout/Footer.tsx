@@ -39,11 +39,14 @@ export function Footer() {
   return (
     <footer
       id="contact"
-      // A floor, not a fixed height: at 1440 this is the artboard's 800px, and
-      // above that it gives way rather than clipping the wordmark.
-      className="relative min-h-[657px] w-full overflow-hidden bg-[#171717] tablet:min-h-[800px]"
+      // A floor, not a fixed height: it gives way rather than clipping the
+      // wordmark. The value is the artboard's 800px or whatever it takes to
+      // fill the window under the header, whichever is larger — see
+      // `--footer-min-height`, which is what makes the foot of the page land
+      // on the header's edge with no strip of the fold above showing between.
+      className="relative min-h-[var(--footer-min-height)] w-full overflow-hidden bg-[#171717]"
     >
-      <div className="mx-auto flex min-h-[657px] w-full max-w-[var(--content-max-width)] flex-col px-5 pt-[45px] pb-[38px] tablet:min-h-[800px] tablet:px-10 tablet:pt-[62px] tablet:pb-[37px]">
+      <div className="mx-auto flex min-h-[var(--footer-min-height)] w-full max-w-[var(--content-max-width)] flex-col px-5 pt-[45px] pb-[38px] tablet:px-10 tablet:pt-[62px] tablet:pb-[37px]">
         {/* ---------- call to action ---------- */}
         {/*
          * The ring and its gap are fractions of the call to action's own type
