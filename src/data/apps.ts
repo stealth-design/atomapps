@@ -17,17 +17,28 @@
  * `public/images/` already has.
  *
  * Stats (`rating`, `ratingCount`, `downloads`, `updated`) are a snapshot of
- * the listing on 23 Sep 2026 — see the `snapshot` constant. They are not
- * fetched live; refresh them here when the listings move.
+ * the listing on 23 Sep 2026 — see `APPS_SNAPSHOT`. They are not fetched
+ * live; refresh them here when the listings move.
+ *
+ * The screenshots are the store's own marketing posters — each already has a
+ * phone rendered inside it under a headline — so the page shows them as
+ * posters rather than framing them again. `heroShot`, `launcherShots` and
+ * each feature's `shot` are the hand-made pairings of poster to copy.
  */
 
 export interface AppFeature {
-  /** The glyph the listing leads the item with. Decorative. */
+  /** The glyph the listing leads the item with. Kept for the data; the page numbers features instead. */
   emoji: string;
   title: string;
   text: string;
   /** A short list the item carries, e.g. the Bible versions on offer. */
   bullets?: string[];
+  /**
+   * 1-based index into `screenshots` of the store poster that shows this
+   * feature — paired by hand. A feature with one gets a full row with the
+   * poster beside it; one without is listed in the compact grid after them.
+   */
+  shot?: number;
 }
 
 export interface AppList {
@@ -53,6 +64,25 @@ export interface AppPage {
   name: string;
   /** The listing's one-line description. */
   summary: string;
+  /**
+   * The page's headline — written from the summary, not the store name, the
+   * way the apps' own sites lead. Line breaks are the author's: `\n` forces
+   * one.
+   */
+  headline: string;
+  /**
+   * The app's colour, sampled from its icon and darkened where the icon's own
+   * is too bright to hold type. Tints the hero and numbers the features.
+   */
+  accent: string;
+  /** 1-based index into `screenshots` of the poster beside the headline. */
+  heroShot: number;
+  /**
+   * 1-based indices of the two launcher posters every listing carries — the
+   * "one-swipe access" and "web search widget" shots — shown beside the
+   * launcher benefits.
+   */
+  launcherShots: number[];
   category: string;
   contentRating: string;
   /** Average rating out of 5, one decimal. */
@@ -115,6 +145,10 @@ export const APPS: AppPage[] = [
     title: "Breaking News",
     name: "Breaking News Launcher",
     summary: "Business, Sports, Entertainment, Technology News. Local Weather Forecast Service",
+    headline: "The news,\none swipe away.",
+    accent: "#322553",
+    heroShot: 1,
+    launcherShots: [5, 6],
     category: "News & Magazines",
     contentRating: "Everyone 10+",
     rating: 4.4,
@@ -133,9 +167,9 @@ export const APPS: AppPage[] = [
       "Breaking News Launcher – stay informed anytime, anywhere. Stay up to date with daily news from around the world, along with accurate weather forecasts - all in one place. Explore global news & trending stories, plus daily weather updates. Simply swipe right from your home screen to instantly access the latest updates, top stories, and essential weather information anytime you need it.",
     ],
     features: [
-      { emoji: "📰", title: "Latest news stories", text: "Stay up to date with the most recent headlines and trending articles. Read full stories and catch up on what's happening right now." },
-      { emoji: "📂", title: "News by categories", text: "Explore topics that interest you. Easily navigate through categories like Business, Sports, Entertainment, Technology." },
-      { emoji: "🌦", title: "Weather – complete forecast", text: "Check the current temperature, hourly forecast, 7‑day forecast, and sunrise & sunset times. Plan your day with all the weather details you need." },
+      { emoji: "📰", title: "Latest news stories", text: "Stay up to date with the most recent headlines and trending articles. Read full stories and catch up on what's happening right now.", shot: 2 },
+      { emoji: "📂", title: "News by categories", text: "Explore topics that interest you. Easily navigate through categories like Business, Sports, Entertainment, Technology.", shot: 3 },
+      { emoji: "🌦", title: "Weather – complete forecast", text: "Check the current temperature, hourly forecast, 7‑day forecast, and sunrise & sunset times. Plan your day with all the weather details you need.", shot: 4 },
     ],
     launcherBenefits: [
       { emoji: "🚀", title: "One-swipe access", text: "Open the latest national and global news instantly with just one swipe from your home screen!" },
@@ -162,6 +196,10 @@ export const APPS: AppPage[] = [
     title: "Volume Control",
     name: "Volume Control Sound Launcher",
     summary: "Audio Booster: Volume Control, Sound Enhancer, Make Music, Calls, Alarms Louder",
+    headline: "Every sound,\nexactly as loud as you want.",
+    accent: "#1F5BFF",
+    heroShot: 2,
+    launcherShots: [4, 5],
     category: "Tools",
     contentRating: "Everyone",
     rating: 4.5,
@@ -189,7 +227,10 @@ export const APPS: AppPage[] = [
       "Use smart controls designed for comfortable daily listening and better clarity",
       "Convenient access to all your volume settings in one place",
     ],
-    features: [],
+    features: [
+      { emoji: "🔊", title: "Adjust volume", text: "Easily adjust volume for music, videos, calls, alarms, and notifications — and boost your phone's media volume past its usual ceiling.", shot: 2 },
+      { emoji: "🎛️", title: "All-in-one sound control", text: "Manage all system sounds quickly from one convenient location: ringtone, alarm, media, notifications and system, each on its own slider.", shot: 3 },
+    ],
     launcherBenefits: [
       { emoji: "🚀", title: "One-swipe access", text: "Quickly adjust your device’s volume with just one swipe from your home screen!" },
       { emoji: "📱", title: "Home screen widget", text: "See the time, weather, and more, conveniently on your home screen with our customized widget." },
@@ -210,6 +251,10 @@ export const APPS: AppPage[] = [
     title: "Step Tracker",
     name: "Step Tracker Launcher",
     summary: "Track steps, set goals, view stats & celebrate milestones — all in one app.",
+    headline: "Every step counts.\nCount them.",
+    accent: "#4567FD",
+    heroShot: 1,
+    launcherShots: [7, 8],
     category: "Health & Fitness",
     contentRating: "Everyone",
     rating: 4.4,
@@ -237,11 +282,11 @@ export const APPS: AppPage[] = [
       "Stay consistent and celebrate milestones",
     ],
     features: [
-      { emoji: "🚶", title: "Instant Step Tracking", text: "Track your daily steps instantly with just a swipe from your home screen. Stay informed about your physical activity throughout the day and watch your progress in real-time." },
-      { emoji: "📏", title: "Distance & Calorie Tracking", text: "See how far you’ve walked and how many calories you’ve burned, helping you stay motivated to hit your fitness targets and maintain a healthy lifestyle." },
-      { emoji: "🎯", title: "Set Goals", text: "Set personalized daily step goals to challenge yourself. Achieve new milestones and track your progress as you move towards a healthier and more active routine." },
-      { emoji: "📊", title: "Personalized Insights", text: "Get personalized insights into your daily activity and monitor how you're improving. Track your steps over time and see how your fitness journey evolves." },
-      { emoji: "⏰", title: "Celebrate Milestones", text: "Track your progress and celebrate every milestone, big or small, as you reach your fitness goals and stay motivated on your journey." },
+      { emoji: "🚶", title: "Instant Step Tracking", text: "Track your daily steps instantly with just a swipe from your home screen. Stay informed about your physical activity throughout the day and watch your progress in real-time.", shot: 2 },
+      { emoji: "📏", title: "Distance & Calorie Tracking", text: "See how far you’ve walked and how many calories you’ve burned, helping you stay motivated to hit your fitness targets and maintain a healthy lifestyle.", shot: 4 },
+      { emoji: "🎯", title: "Set Goals", text: "Set personalized daily step goals to challenge yourself. Achieve new milestones and track your progress as you move towards a healthier and more active routine.", shot: 5 },
+      { emoji: "📊", title: "Personalized Insights", text: "Get personalized insights into your daily activity and monitor how you're improving. Track your steps over time and see how your fitness journey evolves.", shot: 6 },
+      { emoji: "⏰", title: "Celebrate Milestones", text: "Track your progress and celebrate every milestone, big or small, as you reach your fitness goals and stay motivated on your journey.", shot: 3 },
     ],
     launcherBenefits: [
       { emoji: "🚀", title: "One-swipe access", text: "Easily track your daily steps, distance, and calories burned with just a swipe from your home screen!" },
@@ -266,6 +311,10 @@ export const APPS: AppPage[] = [
     title: "Find My Phone",
     name: "Find My Phone by Clap Launcher",
     summary: "Lost your phone? Use device finder: locate missing phone with a clap or whistle.",
+    headline: "Lost your phone?\nClap.",
+    accent: "#3455FD",
+    heroShot: 2,
+    launcherShots: [5, 6],
     category: "Tools",
     contentRating: "Everyone",
     rating: 4.6,
@@ -291,9 +340,9 @@ export const APPS: AppPage[] = [
     ],
     features: [
       { emoji: "👏", title: "Find my phone by clap or whistle", text: "Start clapping or whistling to activate advanced sound recognition. Our sound recognition technology helps you locate your device in seconds, even if it is in the next room." },
-      { emoji: "💡", title: "Multi alert system", text: "When activated, Find My Phone by Clap Launcher triggers a powerful combination of loud ringtones and bright flashing lights. This makes your phone easy to spot whether it is hidden under pillows, behind furniture, or in a dark corner." },
+      { emoji: "💡", title: "Multi alert system", text: "When activated, Find My Phone by Clap Launcher triggers a powerful combination of loud ringtones and bright flashing lights. This makes your phone easy to spot whether it is hidden under pillows, behind furniture, or in a dark corner.", shot: 4 },
       { emoji: "⚡", title: "Bright flash and vibration response", text: "The flashlight and vibration make it easy to locate your phone even in noisy or low light environments." },
-      { emoji: "🎵", title: "Customizable alerts", text: "Choose from a variety of attention grabbing sounds. Select from soothing melodies, whistles, playful animal sounds, or modern electronic tones. Adjust volume levels to suit your environment." },
+      { emoji: "🎵", title: "Customizable alerts", text: "Choose from a variety of attention grabbing sounds. Select from soothing melodies, whistles, playful animal sounds, or modern electronic tones. Adjust volume levels to suit your environment.", shot: 3 },
       { emoji: "⏰", title: "Set alert duration", text: "Control how long your phone rings when activated. Choose from 10, 30, 60, or 120 seconds." },
       { emoji: "🔋", title: "Battery friendly design", text: "Find My Phone by Clap Launcher is optimized for minimal battery consumption while running in the background, so your phone is always ready without unnecessary drain." },
       { emoji: "✨", title: "Easy to use", text: "Enjoy a seamless experience with a simple and intuitive interface. No complicated setup required." },
@@ -321,6 +370,10 @@ export const APPS: AppPage[] = [
     title: "AI Chat",
     name: "AI Chat Launcher: AI Assistant",
     summary: "AI Chat & Smart Assistant Chatbot Launcher powered by GPT-5.2, Gemini and Claude",
+    headline: "An AI assistant,\none swipe from home.",
+    accent: "#039471",
+    heroShot: 5,
+    launcherShots: [6, 7],
     category: "Productivity",
     contentRating: "Everyone",
     rating: 4.4,
@@ -340,9 +393,9 @@ export const APPS: AppPage[] = [
       "Your personal AI assistantis always ready - smart, fast, and just one swipe away. Try AI Chat Launcher today!",
     ],
     features: [
-      { emoji: "🎙️", title: "Voice Chat Mode", text: "Chat with AI using voice. Ask questions, get instant answers, brainstorm ideas, or solve problems hands-free. It feels like having a real conversation with your personal assistant anytime." },
-      { emoji: "🖼️", title: "AI Image Generator", text: "Turn your imagination into stunning visuals. Simply type what you want to create, and the AI generates high-quality images for social media, projects, and creative use." },
-      { emoji: "📄", title: "PDF & Document Summarizer", text: "Upload PDFs or documents and get clear, concise summaries in seconds. Perfect for reports, study materials, long articles, and work documents." },
+      { emoji: "🎙️", title: "Voice Chat Mode", text: "Chat with AI using voice. Ask questions, get instant answers, brainstorm ideas, or solve problems hands-free. It feels like having a real conversation with your personal assistant anytime.", shot: 4 },
+      { emoji: "🖼️", title: "AI Image Generator", text: "Turn your imagination into stunning visuals. Simply type what you want to create, and the AI generates high-quality images for social media, projects, and creative use.", shot: 2 },
+      { emoji: "📄", title: "PDF & Document Summarizer", text: "Upload PDFs or documents and get clear, concise summaries in seconds. Perfect for reports, study materials, long articles, and work documents.", shot: 3 },
       { emoji: "📧", title: "Draft Professional Emails", text: "Struggling with writing? Let the AI create polished emails, messages, and responses in seconds for work or personal use." },
       { emoji: "📚", title: "Grammar, Writing & Text Help", text: "Fix grammar, rewrite content, generate ideas, and improve writing instantly with AI assistance." },
       { emoji: "🌍", title: "Language Translation", text: "Translate text quickly and accurately across multiple languages to communicate effortlessly." },
@@ -371,6 +424,10 @@ export const APPS: AppPage[] = [
     title: "2026 Calendar",
     name: "2026 Calendar Launcher",
     summary: "Daily Calendar Launcher 2026 - Reminder, event planner & appointment scheduler",
+    headline: "Your month,\nat a glance.",
+    accent: "#3B5FC4",
+    heroShot: 6,
+    launcherShots: [7, 8],
     category: "Productivity",
     contentRating: "Everyone",
     rating: 4.4,
@@ -395,9 +452,9 @@ export const APPS: AppPage[] = [
       "Reminders",
     ],
     features: [
-      { emoji: "📅", title: "Easy schedule management", text: "Get a complete picture of your monthly schedule with our simple launcher app. Easily switch between months, view events scheduled on specific dates and plan your time." },
-      { emoji: "📌", title: "Create events", text: "From important appointments and deadlines to birthdays and brunch with friends, this launcher application allows you to easily add events to your calendar." },
-      { emoji: "🔔", title: "Set reminders", text: "Stay on top of your schedule and never miss a beat. Add reminders for events including vacations, anniversaries, birthdays, business meetings, and calls on the calendar launcher app." },
+      { emoji: "📅", title: "Easy schedule management", text: "Get a complete picture of your monthly schedule with our simple launcher app. Easily switch between months, view events scheduled on specific dates and plan your time.", shot: 6 },
+      { emoji: "📌", title: "Create events", text: "From important appointments and deadlines to birthdays and brunch with friends, this launcher application allows you to easily add events to your calendar.", shot: 4 },
+      { emoji: "🔔", title: "Set reminders", text: "Stay on top of your schedule and never miss a beat. Add reminders for events including vacations, anniversaries, birthdays, business meetings, and calls on the calendar launcher app.", shot: 5 },
     ],
     launcherBenefits: [
       { emoji: "🚀", title: "One-swipe access", text: "Schedule calendar events by simply swiping right from your home screen!" },
@@ -423,6 +480,10 @@ export const APPS: AppPage[] = [
     title: "Daily Horoscope",
     name: "Daily Horoscope Launcher",
     summary: "Astrology Birth Chart & Zodiac compatibility for all zodiac signs. Check yours!",
+    headline: "What the stars have in store,\nevery day.",
+    accent: "#5B0A4F",
+    heroShot: 1,
+    launcherShots: [7, 8],
     category: "Lifestyle",
     contentRating: "Everyone",
     rating: 4.5,
@@ -442,15 +503,16 @@ export const APPS: AppPage[] = [
       "Get the Daily Horoscope Launcher to access daily horoscopes, horoscope predictions by category, birth charts, lucky signs, and compatibility insights—all from your home screen!",
     ],
     highlights: [
-      "Personalized birth chart: Get deep astrology insights based on your birth details.",
       "Lucky number, letter & color: Find out which signs are lucky for you  to attract positivity and good fortune.",
       "Compatibility by zodiac sign: Discover how compatible you are with your partner based on zodiac insights.",
       "Daily horoscopes for all zodiac signs: Get horoscope readings tailored for Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, and Pisces.",
       "Horoscope predictions by category: Explore specific categories like love horoscopes, career horoscopes, health horoscopes, and mood horoscopes to see what the future holds.",
     ],
     features: [
-      { emoji: "🌟", title: "Daily Horoscope & Astrology Guidance", text: "Horoscope Launcher provides daily insights on love, career, health, emotions, and fortune. Get yesterday's, today’s, and tomorrow’s predictions for each zodiac sign and let the stars guide your life’s path. Find out your lucky number, color, and letter and bring extra clarity to life’s important decisions. Share your astrological readings with friends and family!" },
-      { emoji: "🔥", title: "Love Compatibility", text: "Find out what the stars have in store for your love life. Simply enter your zodiac sign and your partner’s to discover if your relationship is astrologically aligned. Find out if your zodiac signs are a perfect match or need extra work with the unique wisdom of astrology." },
+      { emoji: "🌟", title: "Daily Horoscope & Astrology Guidance", text: "Horoscope Launcher provides daily insights on love, career, health, emotions, and fortune. Get yesterday's, today’s, and tomorrow’s predictions for each zodiac sign and let the stars guide your life’s path. Find out your lucky number, color, and letter and bring extra clarity to life’s important decisions. Share your astrological readings with friends and family!", shot: 5 },
+      { emoji: "🔮", title: "Personalized birth chart", text: "Get deep astrology insights based on your birth details — your sun, moon and ascendant signs, and what each says about you.", shot: 2 },
+      { emoji: "🍀", title: "Lucky number, letter & color", text: "Find out which signs are lucky for you to attract positivity and good fortune, refreshed every day.", shot: 6 },
+      { emoji: "🔥", title: "Love Compatibility", text: "Find out what the stars have in store for your love life. Simply enter your zodiac sign and your partner’s to discover if your relationship is astrologically aligned. Find out if your zodiac signs are a perfect match or need extra work with the unique wisdom of astrology.", shot: 3 },
     ],
     launcherBenefits: [
       { emoji: "🚀", title: "One-swipe access", text: "Get your personalized horoscope by simply swiping right from your home screen!" },
@@ -476,6 +538,10 @@ export const APPS: AppPage[] = [
     title: "Notes & To Do",
     name: "Notes, Notepad, To Do Launcher",
     summary: "Notes & Notepad Launcher with Color Note, To Do List Planner, Reminders, Widgets",
+    headline: "Jot it down\nbefore it's gone.",
+    accent: "#896040",
+    heroShot: 1,
+    launcherShots: [6, 7],
     category: "Productivity",
     contentRating: "Everyone",
     rating: 4.3,
@@ -496,13 +562,13 @@ export const APPS: AppPage[] = [
     features: [
       { emoji: "📝", title: "Create notes & checklists", text: "Quickly jot down ideas and important information on the go. Make a grocery list, a wish list, or a to-do list, then check off items as you accomplish them." },
       { emoji: "✨", title: "Text formatting tools", text: "Enhance your notes with the rich-text editor. Change font sizes, italicize or underline text, and create bulleted or numbered lists." },
-      { emoji: "🎨", title: "Color-code notes", text: "Choose a note color to easily categorize and prioritize information. Whether it's managing work tasks or weekend plans, color-coding makes organizing your notes easier." },
-      { emoji: "🔐", title: "Lock notes", text: "Secure sensitive information like passwords, bank account details, medical prescriptions and more in a locked note." },
+      { emoji: "🎨", title: "Color-code notes", text: "Choose a note color to easily categorize and prioritize information. Whether it's managing work tasks or weekend plans, color-coding makes organizing your notes easier.", shot: 3 },
+      { emoji: "🔐", title: "Lock notes", text: "Secure sensitive information like passwords, bank account details, medical prescriptions and more in a locked note.", shot: 4 },
       { emoji: "🗂️", title: "Categorize", text: "Save notes under custom categories like vacation checklists or emergency contacts. Group related notes together to instantly access them at any time." },
       { emoji: "🚦", title: "Sort", text: "Use the sorting filter to arrange notes by the date they were modified or in ascending/descending order of creation to easily find what you need." },
       { emoji: "🕵️", title: "Find", text: "Quickly find what you're looking for with Notes, Notepad, To-Do Launcher's intuitive search feature. Enter a keyword or phrase in the app's search bar to quickly locate relevant notes." },
       { emoji: "🤝", title: "Share", text: "Planning a travel itinerary? Working on a group project? Share your notes with family and friends through email, social media and other messaging apps." },
-      { emoji: "🎤", title: "Speech to Text", text: "Quickly create notes using voice input. Just speak and your words will be transcribed into text instantly." },
+      { emoji: "🎤", title: "Speech to Text", text: "Quickly create notes using voice input. Just speak and your words will be transcribed into text instantly.", shot: 2 },
     ],
     launcherBenefits: [
       { emoji: "🚀", title: "One-swipe access", text: "Create notes & to-do lists instantly by simply swiping right from your home screen!" },
@@ -527,6 +593,10 @@ export const APPS: AppPage[] = [
     title: "Live Weather Radar",
     name: "Live Weather Radar Launcher",
     summary: "All-in-one weather radar launcher with rain, temperature maps & local forecast.",
+    headline: "See the weather\nbefore it arrives.",
+    accent: "#0591F3",
+    heroShot: 5,
+    launcherShots: [7, 8],
     category: "Weather",
     contentRating: "Everyone",
     rating: 4.2,
@@ -545,12 +615,12 @@ export const APPS: AppPage[] = [
       "Live Weather Radar Launcher is your all-in-one weather app for knowing what is happening outside before changing weather affects your plans. Swipe right from your home screen to access live weather radar and detailed weather maps. Follow rain, wind, temperature, cloud cover, air quality, storm conditions, and hurricane weather in your area. Check local weather forecasts, an hourly forecast, and a 7-day forecast to plan with confidence.",
     ],
     features: [
-      { emoji: "🌧️", title: "Live Weather Radar", text: "Use live weather radar and rain radar maps to view areas of rain and snow. Follow changing storm conditions, wind, rain, and hurricane weather in your area with a local weather app built for quick access. Weather radar helps you see conditions before heading outside." },
+      { emoji: "🌧️", title: "Live Weather Radar", text: "Use live weather radar and rain radar maps to view areas of rain and snow. Follow changing storm conditions, wind, rain, and hurricane weather in your area with a local weather app built for quick access. Weather radar helps you see conditions before heading outside.", shot: 1 },
       { emoji: "▶️", title: "Radar Forecast Map", text: "Review recent weather patterns and use the radar forecast map to view expected movement for up to six hours. Use this short-term weather forecast to check expected rain movement, then compare rain radar and storm radar views with your local weather forecast." },
       { emoji: "🗺️", title: "Radar Map Layers", text: "Explore weather map layers for rain and snow, temperature, cloud cover, wind, and sea-level pressure. Use wind maps and rain radar views in light, dark, and satellite modes, and choose the map that works best for you." },
-      { emoji: "📆", title: "Hourly and 7-Day Weather Forecast", text: "Check the hourly forecast for up to 96 hours and plan ahead with a detailed 7-day weather forecast. Review the daily forecast for rain, wind, temperature, air quality, and other local weather conditions throughout the week." },
+      { emoji: "📆", title: "Hourly and 7-Day Weather Forecast", text: "Check the hourly forecast for up to 96 hours and plan ahead with a detailed 7-day weather forecast. Review the daily forecast for rain, wind, temperature, air quality, and other local weather conditions throughout the week.", shot: 2 },
       { emoji: "🌡️", title: "Temperature and Air Quality", text: "Use this weather and air quality app to check local temperature, air quality, and the air quality index before outdoor activities. Understand how wind, rain, storm conditions, and air quality may affect your plans." },
-      { emoji: "📰", title: "Weather News", text: "Read weather news about storms, hurricane weather, major hurricane events, hurricane conditions, storm conditions, and climate trends. Follow weather updates when changing storm activity, hurricane weather, or local conditions may affect your plans." },
+      { emoji: "📰", title: "Weather News", text: "Read weather news about storms, hurricane weather, major hurricane events, hurricane conditions, storm conditions, and climate trends. Follow weather updates when changing storm activity, hurricane weather, or local conditions may affect your plans.", shot: 6 },
     ],
     launcherBenefits: [
       { emoji: "🚀", title: "One-swipe access", text: "View live weather radar maps and accurate weather forecasts by simply swiping right from your home screen!" },
@@ -576,6 +646,10 @@ export const APPS: AppPage[] = [
     title: "Calculator",
     name: "Calculator Launcher",
     summary: "Perform quick calculations & unit conversions with this easy calculator launcher",
+    headline: "Every calculator\nyou'll ever need.",
+    accent: "#5E8A14",
+    heroShot: 1,
+    launcherShots: [7, 8],
     category: "Tools",
     contentRating: "Everyone",
     rating: 4.2,
@@ -595,10 +669,10 @@ export const APPS: AppPage[] = [
     ],
     features: [
       { emoji: "➗", title: "Simple Calculator", text: "Perform quick and clear calculations anytime. Use the basic calculator to total expenses, manage your daily budget, double-check bills, or help with math homework. Fast, reliable, and simple to use." },
-      { emoji: "💲", title: "Tip Calculator", text: "Make dining out easier with our tip calculator. Enter the bill amount, choose a tip percentage, and instantly split bills with friends. Calculate tips in seconds for stress-free meals." },
-      { emoji: "🔄", title: "Unit Converter", text: "Switch between units easily with the unit converter calculator. Convert length (mile ↔ kilometer), temperature (Fahrenheit ↔ Celsius), weight, volume, speed, and more. Great for cooking, travel, and everyday tasks." },
-      { emoji: "💱", title: "Currency Converter", text: "Convert currencies in a simple and convenient way with our currency converter calculator. Check conversions for USD, EUR, GBP, INR, CAD, AUD, JPY and more. Ideal for travel, online shopping, and general budgeting needs." },
-      { emoji: "❤️", title: "BMI Calculator", text: "Get a quick view of your body mass index using the BMI calculator. Enter your height and weight to understand your general BMI range. Designed for simple tracking—not medical guidance." },
+      { emoji: "💲", title: "Tip Calculator", text: "Make dining out easier with our tip calculator. Enter the bill amount, choose a tip percentage, and instantly split bills with friends. Calculate tips in seconds for stress-free meals.", shot: 5 },
+      { emoji: "🔄", title: "Unit Converter", text: "Switch between units easily with the unit converter calculator. Convert length (mile ↔ kilometer), temperature (Fahrenheit ↔ Celsius), weight, volume, speed, and more. Great for cooking, travel, and everyday tasks.", shot: 4 },
+      { emoji: "💱", title: "Currency Converter", text: "Convert currencies in a simple and convenient way with our currency converter calculator. Check conversions for USD, EUR, GBP, INR, CAD, AUD, JPY and more. Ideal for travel, online shopping, and general budgeting needs.", shot: 2 },
+      { emoji: "❤️", title: "BMI Calculator", text: "Get a quick view of your body mass index using the BMI calculator. Enter your height and weight to understand your general BMI range. Designed for simple tracking—not medical guidance.", shot: 3 },
       { emoji: "🏡", title: "Mortgage Calculator", text: "Estimate monthly payments and long-term costs with the mortgage calculator. Get a clearer picture when planning home purchases or comparing mortgage options." },
       { emoji: "💼", title: "Loan Calculator", text: "Use the loan calculator to view EMIs, interest estimates, and total payable amounts. Helpful for car loans, personal loans, education expenses, and more." },
       { emoji: "📈", title: "Compound Interest Calculator", text: "Explore how your savings may grow over time with the compound interest calculator. View projected growth using customizable inputs for long-term planning." },
@@ -627,6 +701,10 @@ export const APPS: AppPage[] = [
     title: "Brightest Flashlight",
     name: "Brightest Flashlight Launcher",
     summary: "Powerful LED flashlight, alert torch, screen light & magnifying glass launcher",
+    headline: "The brightest light\nin your pocket.",
+    accent: "#059C54",
+    heroShot: 1,
+    launcherShots: [6, 7],
     category: "Tools",
     contentRating: "Everyone",
     rating: 4.3,
@@ -652,11 +730,11 @@ export const APPS: AppPage[] = [
       "Screen light",
     ],
     features: [
-      { emoji: "🔦", title: "Flashlight", text: "Turn your device into a powerful flashlight with one tap. Whether you're finding your way in the dark to searching for lost items, easily illuminate your surroundings with Flashlight Launcher." },
-      { emoji: "🔍", title: "Magnifier", text: "Flashlight Launcher's magnifier turns your phone into a magnifying glass with light. This makes it perfect for reading small print on food packaging, product labels, and examining objects up close. Plus, the built-in flashlight provides illumination for clear viewing, even in dim lighting." },
-      { emoji: "🧭", title: "Compass", text: "The built-in compass ensures you'll never lose your way. Whether you're hiking, camping, or exploring the outdoors, this flashlight app is your trusted navigation companion." },
+      { emoji: "🔦", title: "Flashlight", text: "Turn your device into a powerful flashlight with one tap. Whether you're finding your way in the dark to searching for lost items, easily illuminate your surroundings with Flashlight Launcher.", shot: 2 },
+      { emoji: "🔍", title: "Magnifier", text: "Flashlight Launcher's magnifier turns your phone into a magnifying glass with light. This makes it perfect for reading small print on food packaging, product labels, and examining objects up close. Plus, the built-in flashlight provides illumination for clear viewing, even in dim lighting.", shot: 3 },
+      { emoji: "🧭", title: "Compass", text: "The built-in compass ensures you'll never lose your way. Whether you're hiking, camping, or exploring the outdoors, this flashlight app is your trusted navigation companion.", shot: 5 },
       { emoji: "🆘", title: "SOS Alerts", text: "Your personal safety is important. That's why Flashlight Launcher offers SOS alerts - a potential lifesaver in emergency situations. Activate it to flash an SOS signal that can be seen from a distance, ensuring you can receive help as quickly as possible." },
-      { emoji: "💡", title: "Screen Light", text: "Flashlight Launcher’s screen light allows you to use your smartphone's display as a light source. It's perfect for enhancing visibility in low-light conditions." },
+      { emoji: "💡", title: "Screen Light", text: "Flashlight Launcher’s screen light allows you to use your smartphone's display as a light source. It's perfect for enhancing visibility in low-light conditions.", shot: 4 },
     ],
     launcherBenefits: [
       { emoji: "🚀", title: "One-swipe access", text: "Access flashlight, magnifier & other safety essentials instantly by simply swiping right from your home screen!" },
@@ -685,6 +763,10 @@ export const APPS: AppPage[] = [
     title: "QR & Barcode Scanner",
     name: "QR & Barcode Scanner Launcher",
     summary: "Easy to use QR code scanner and barcode reader. Scan codes quickly and easily.",
+    headline: "Point.\nScan. Done.",
+    accent: "#2D9E94",
+    heroShot: 1,
+    launcherShots: [7, 6],
     category: "Tools",
     contentRating: "Everyone",
     rating: 4.3,
@@ -711,9 +793,9 @@ export const APPS: AppPage[] = [
       "Vibrate or beep notifications",
     ],
     features: [
-      { emoji: "📷", title: "QR Code Scanner", text: "Effortlessly scan QR codes with your smartphone’s built-in camera. Just point your device's camera at the QR code, and our app will instantly decode it. Access Wi-Fi credentials, event invitations, contact details, coupons, and more." },
-      { emoji: "🛒", title: "Barcode Scanner", text: "Enjoy the convenience of our user-friendly Barcode Scanner! Quickly and accurately scan barcodes to access essential product information in real time. The app provides detailed descriptions, helping you make informed purchasing decisions." },
-      { emoji: "📚", title: "Scan History", text: "Keep your scanning experience organized and efficient with our Scan History feature. This intuitive function automatically stores all your previously scanned QR codes and barcodes in one convenient location, allowing you to easily revisit important links, product details, and information whenever you need." },
+      { emoji: "📷", title: "QR Code Scanner", text: "Effortlessly scan QR codes with your smartphone’s built-in camera. Just point your device's camera at the QR code, and our app will instantly decode it. Access Wi-Fi credentials, event invitations, contact details, coupons, and more.", shot: 2 },
+      { emoji: "🛒", title: "Barcode Scanner", text: "Enjoy the convenience of our user-friendly Barcode Scanner! Quickly and accurately scan barcodes to access essential product information in real time. The app provides detailed descriptions, helping you make informed purchasing decisions.", shot: 3 },
+      { emoji: "📚", title: "Scan History", text: "Keep your scanning experience organized and efficient with our Scan History feature. This intuitive function automatically stores all your previously scanned QR codes and barcodes in one convenient location, allowing you to easily revisit important links, product details, and information whenever you need.", shot: 5 },
       { emoji: "📋", title: "Auto-copy to clipboard", text: "Say goodbye to the hassle of manually copying links or text from barcodes or QR codes. QR & Barcode Scanner & Launcher automatically copies the scanned content to your clipboard, allowing you to paste it wherever you want." },
       { emoji: "🔊", title: "Vibration or beep notifications", text: "Get instantly notified through vibration or a beep, confirming the QR code or Barcode is scanned correctly. Choose your preferred notification style so you never miss a successful QR code or Barcode scan." },
     ],
@@ -740,6 +822,10 @@ export const APPS: AppPage[] = [
     title: "Holy Bible",
     name: "Holy Bible Launcher: KJV+Audio",
     summary: "Holy Bible (KJV) launcher with audio. Read verses daily & study the word of God.",
+    headline: "God's Word,\none swipe away.",
+    accent: "#733B02",
+    heroShot: 1,
+    launcherShots: [6, 8],
     category: "Books & Reference",
     contentRating: "Everyone",
     rating: 4.8,
@@ -761,12 +847,12 @@ export const APPS: AppPage[] = [
     ],
     features: [
       { emoji: "📖", title: "Easy-to-use Holy Bible", text: "Read in more than one language, with the Reina-Valera 1909 (Spanish) and Smith-Van Dyke (Arabic) alongside the KJV, and share Bible verses via text, email, or Bluetooth® to inspire others." },
-      { emoji: "🎧", title: "Audio Bible", text: "Enjoy audio for select versions like the KJV. Listen while commuting, exercising, or relaxing. Offline access keeps you connected to scripture anywhere." },
+      { emoji: "🎧", title: "Audio Bible", text: "Enjoy audio for select versions like the KJV. Listen while commuting, exercising, or relaxing. Offline access keeps you connected to scripture anywhere.", shot: 2 },
       { emoji: "✝️", title: "Study God’s Word", text: "Access 10 popular Bible versions for free, with quick verse lookup: search by keywords like “hope,” or browse by book and chapter with ease.",
-        bullets: ["King James Version (KJV)", "Reina-Valera 1909", "Smith-Van Dyke", "American Standard Version (ASV) 1901", "Bible in Basic English", "Darby English Bible", "KJV 1611", "Webster Bible", "World English Bible"] },
-      { emoji: "🕊️", title: "Spiritual Devotionals", text: "Find daily devotionals that offer encouragement from the Holy Bible KJV and other versions. Get insights to strengthen your faith, with the Bible KJV as your guide." },
+        bullets: ["King James Version (KJV)", "Reina-Valera 1909", "Smith-Van Dyke", "American Standard Version (ASV) 1901", "Bible in Basic English", "Darby English Bible", "KJV 1611", "Webster Bible", "World English Bible"], shot: 3 },
+      { emoji: "🕊️", title: "Spiritual Devotionals", text: "Find daily devotionals that offer encouragement from the Holy Bible KJV and other versions. Get insights to strengthen your faith, with the Bible KJV as your guide.", shot: 7 },
       { emoji: "😇", title: "Customize Your Bible", text: "Make the app your own.",
-        bullets: ["Highlight your favorite KJV Bible verses for quick access.", "Take notes on Bible passages to enhance your Bible study experience.", "Adjust font size to make reading more comfortable."] },
+        bullets: ["Highlight your favorite KJV Bible verses for quick access.", "Take notes on Bible passages to enhance your Bible study experience.", "Adjust font size to make reading more comfortable."], shot: 5 },
     ],
     launcherBenefits: [
       { emoji: "🚀", title: "One-swipe access", text: "Get access to the Holy Bible KJV by simply swiping right from your home screen!" },
@@ -792,6 +878,10 @@ export const APPS: AppPage[] = [
     title: "Alarm Clock",
     name: "Alarm Clock Launcher",
     summary: "Wake up & get tasks done! Add alarms & reminders on the Alarm Clock Launcher.",
+    headline: "Wake up on time,\nevery time.",
+    accent: "#107D82",
+    heroShot: 1,
+    launcherShots: [7, 8],
     category: "Productivity",
     contentRating: "Everyone",
     rating: 4.2,
@@ -818,10 +908,10 @@ export const APPS: AppPage[] = [
       "Stopwatch",
     ],
     features: [
-      { emoji: "⏰", title: "Alarm Clock", text: "Wake up and start your day right with our personalized alarm clock. Customize alarms to fit your lifestyle. Set daily or weekly alarms, choose from different tones, and select the perfect snooze duration to ensure you wake up comfortably." },
-      { emoji: "🌎", title: "International time", text: "This app is perfect if you are a frequent traveler or have international meetings. Check the clock reading for any city and track time differences with our accurate world clock. Save your favorite cities for easy reference." },
+      { emoji: "⏰", title: "Alarm Clock", text: "Wake up and start your day right with our personalized alarm clock. Customize alarms to fit your lifestyle. Set daily or weekly alarms, choose from different tones, and select the perfect snooze duration to ensure you wake up comfortably.", shot: 3 },
+      { emoji: "🌎", title: "International time", text: "This app is perfect if you are a frequent traveler or have international meetings. Check the clock reading for any city and track time differences with our accurate world clock. Save your favorite cities for easy reference.", shot: 5 },
       { emoji: "🔔", title: "Reminders", text: "Never miss an important appointment again. Set travel reminders for flights and event reminders to keep track of personal and business events." },
-      { emoji: "⏳", title: "Timer", text: "Our easy-to-use timer lets you set reminders for cooking, workouts, or that important phone call. No more burnt dinners or missed deadlines." },
+      { emoji: "⏳", title: "Timer", text: "Our easy-to-use timer lets you set reminders for cooking, workouts, or that important phone call. No more burnt dinners or missed deadlines.", shot: 6 },
       { emoji: "⏱", title: "Stopwatch", text: "Use the highly accurate stopwatch to define workout durations and track progress. Monitor your improvement in fitness." },
     ],
     launcherBenefits: [
