@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "@/lib/gsap";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { scrollToTop } from "@/lib/lenis";
+import { navHref } from "@/lib/utils";
 import { siteConfig } from "@/data/site";
 
 /**
@@ -241,7 +242,9 @@ export function Header({ transparentOverHero = false }: HeaderProps) {
             {siteConfig.nav.map((item) => (
               <a
                 key={item.label}
-                href={item.href}
+                // Section anchors are home-page targets; from any other route
+                // they go home first — see `navHref`.
+                href={navHref(item.href, pathname)}
                 data-underline-link
                 // Black on the white bar, matching the wordmark; white over
                 // the hero, where the scrim is what carries it.

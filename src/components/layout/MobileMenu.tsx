@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { setScrollLocked } from "@/lib/lenis";
 import { siteConfig } from "@/data/site";
+import { navHref } from "@/lib/utils";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -39,6 +41,7 @@ interface MobileMenuProps {
 const MENU_ORDER = ["About Us", "Our Apps", "Our Approach"];
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+  const pathname = usePathname();
   // Freeze the page behind the overlay. Lenis has to be told directly — it
   // drives a virtual scroll position and ignores a CSS overflow lock.
   useEffect(() => {
@@ -116,7 +119,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         {items.map((item) => (
           <a
             key={item.label}
-            href={item.href}
+            href={navHref(item.href, pathname)}
             onClick={onClose}
             className="text-[20px] leading-[26px] text-white"
           >

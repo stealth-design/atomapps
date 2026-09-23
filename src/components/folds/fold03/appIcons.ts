@@ -150,11 +150,11 @@ export const MOBILE_ICONS: IconPlacement[] = [
  * reference. Row lengths differ per breakpoint but this reading order is
  * preserved, so the grid is always the same sequence of apps.
  *
- *   row 1  clap · moon · volume · steps · weather · calculator · clock
- *   row 2  zodiac · torch · scanner · AI · calendar · notes · news · bible
+ *   row 1  clap · moon · volume · steps · weather · calculator · clock · penguin
+ *   row 2  torch · scanner · AI · calendar · notes · news · bible · zodiac
  *
- * icon-16 is appended rather than slotted in: it postdates the reference
- * frame, so there is no position in that reading order it belongs to.
+ * icon-16 (the zodiac) is appended rather than slotted in: it postdates the
+ * reference frame, so there is no position in that reading order it belongs to.
  */
 export const END_ORDER = [
   "icon-05",
@@ -214,21 +214,32 @@ export const END_GRID: { desktop: GridConfig; mobile: GridConfig } = {
    grid, so nothing needs the face geometry. */
 
 /**
- * Where each icon goes when clicked — a Play Store listing, its own page, or
- * the app's site. Keyed by the same icon id as everything else here.
+ * Where each icon goes when clicked — its page on this site, at `/apps/<slug>`.
+ * Keyed by the same icon id as everything else here; the pages themselves are
+ * defined in `@/data/apps`, and this is the join between the two.
  *
- * Empty on purpose: an icon with no entry renders exactly as it always has,
- * decorative and unclickable, so adding a link is a one-line change here and
- * nothing else. `label` is the accessible name, since the artwork itself
- * carries no text.
+ * An icon with no entry renders exactly as it always has, decorative and
+ * unclickable. Two are left that way on purpose: icon-08 (the penguin) and
+ * icon-15 (White Noise) have no Play Store listing to build a page from yet.
+ * Adding one is a line here and an entry in `@/data/apps`.
  *
- * Order below follows END_ORDER's row 2 naming, for whoever fills them in:
- *   icon-05 · icon-15 · icon-02 · icon-03 · icon-10 · icon-11 · icon-01
- *   icon-08 · icon-12 · icon-13 · icon-06 · icon-07 · icon-09 · icon-04
- *   icon-14 (the bible)
+ * `label` is the accessible name, since the artwork itself carries no text.
  */
 export const ICON_LINKS: Partial<Record<string, { label: string; href: string }>> = {
-  // "icon-14": { label: "Holy Bible", href: "https://play.google.com/store/apps/details?id=..." },
+  "icon-01": { label: "Alarm Clock Launcher", href: "/apps/alarm-clock" },
+  "icon-02": { label: "Volume Control Sound Launcher", href: "/apps/volume-control" },
+  "icon-03": { label: "Step Tracker Launcher", href: "/apps/step-tracker" },
+  "icon-04": { label: "Breaking News Launcher", href: "/apps/breaking-news" },
+  "icon-05": { label: "Find My Phone by Clap Launcher", href: "/apps/find-my-phone" },
+  "icon-06": { label: "AI Chat Launcher: AI Assistant", href: "/apps/ai-chat" },
+  "icon-07": { label: "2026 Calendar Launcher", href: "/apps/calendar" },
+  "icon-09": { label: "Notes, Notepad, To Do Launcher", href: "/apps/notes" },
+  "icon-10": { label: "Live Weather Radar Launcher", href: "/apps/weather-radar" },
+  "icon-11": { label: "Calculator Launcher", href: "/apps/calculator" },
+  "icon-12": { label: "Brightest Flashlight Launcher", href: "/apps/flashlight" },
+  "icon-13": { label: "QR & Barcode Scanner Launcher", href: "/apps/qr-scanner" },
+  "icon-14": { label: "Holy Bible Launcher: KJV+Audio", href: "/apps/holy-bible" },
+  "icon-16": { label: "Daily Horoscope Launcher", href: "/apps/daily-horoscope" },
 };
 
 /** The white fade Figma lays over the phone plate (gradient stops preserved). */
