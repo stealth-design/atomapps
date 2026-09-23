@@ -309,7 +309,7 @@ export const APPS: AppPage[] = [
     slug: "find-my-phone",
     icon: "icon-05",
     title: "Find My Phone",
-    name: "Find My Phone by Clap Launcher",
+    name: "Find My Phone",
     summary: "Lost your phone? Use device finder: locate missing phone with a clap or whistle.",
     headline: "Lost your phone?\nClap.",
     accent: "#3455FD",
@@ -330,7 +330,7 @@ export const APPS: AppPage[] = [
       privacy: "https://findmyphonelauncher.com/privacy-policy",
     },
     intro: [
-      "Do you often misplace or lose your phone? Then Find My Phone by Clap Launcher is the perfect app for you! Find My Phone by Clap Launcher is a smart device finder designed to help you quickly locate a missing phone simply by clapping or whistling. When you clap or whistle, your phone will make a sound, vibrate, and flash, making it easy to find your device in seconds.",
+      "Do you often misplace or lose your phone? Then Find My Phone is the perfect app for you! Find My Phone is a smart device finder designed to help you quickly locate a missing phone simply by clapping or whistling. When you clap or whistle, your phone will make a sound, vibrate, and flash, making it easy to find your device in seconds.",
     ],
     highlights: [
       "Clap or whistle to find phone",
@@ -340,11 +340,11 @@ export const APPS: AppPage[] = [
     ],
     features: [
       { emoji: "👏", title: "Find my phone by clap or whistle", text: "Start clapping or whistling to activate advanced sound recognition. Our sound recognition technology helps you locate your device in seconds, even if it is in the next room." },
-      { emoji: "💡", title: "Multi alert system", text: "When activated, Find My Phone by Clap Launcher triggers a powerful combination of loud ringtones and bright flashing lights. This makes your phone easy to spot whether it is hidden under pillows, behind furniture, or in a dark corner.", shot: 4 },
+      { emoji: "💡", title: "Multi alert system", text: "When activated, Find My Phone triggers a powerful combination of loud ringtones and bright flashing lights. This makes your phone easy to spot whether it is hidden under pillows, behind furniture, or in a dark corner.", shot: 4 },
       { emoji: "⚡", title: "Bright flash and vibration response", text: "The flashlight and vibration make it easy to locate your phone even in noisy or low light environments." },
       { emoji: "🎵", title: "Customizable alerts", text: "Choose from a variety of attention grabbing sounds. Select from soothing melodies, whistles, playful animal sounds, or modern electronic tones. Adjust volume levels to suit your environment.", shot: 3 },
       { emoji: "⏰", title: "Set alert duration", text: "Control how long your phone rings when activated. Choose from 10, 30, 60, or 120 seconds." },
-      { emoji: "🔋", title: "Battery friendly design", text: "Find My Phone by Clap Launcher is optimized for minimal battery consumption while running in the background, so your phone is always ready without unnecessary drain." },
+      { emoji: "🔋", title: "Battery friendly design", text: "Find My Phone is optimized for minimal battery consumption while running in the background, so your phone is always ready without unnecessary drain." },
       { emoji: "✨", title: "Easy to use", text: "Enjoy a seamless experience with a simple and intuitive interface. No complicated setup required." },
       { emoji: "📲", title: "Versatile compatibility", text: "Works across multiple phone models and functions whether your phone is on silent, vibrate, or full volume." },
     ],

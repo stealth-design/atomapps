@@ -230,7 +230,7 @@ export const ICON_LINKS: Partial<Record<string, { label: string; href: string }>
   "icon-02": { label: "Volume Control Sound Launcher", href: "/apps/volume-control" },
   "icon-03": { label: "Step Tracker Launcher", href: "/apps/step-tracker" },
   "icon-04": { label: "Breaking News Launcher", href: "/apps/breaking-news" },
-  "icon-05": { label: "Find My Phone by Clap Launcher", href: "/apps/find-my-phone" },
+  "icon-05": { label: "Find My Phone", href: "/apps/find-my-phone" },
   "icon-06": { label: "AI Chat Launcher: AI Assistant", href: "/apps/ai-chat" },
   "icon-07": { label: "2026 Calendar Launcher", href: "/apps/calendar" },
   "icon-09": { label: "Notes, Notepad, To Do Launcher", href: "/apps/notes" },
