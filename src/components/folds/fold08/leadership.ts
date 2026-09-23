@@ -67,7 +67,7 @@ export interface TeamMember {
 
 export const TEAM: TeamMember[] = [
   { name: "Dan Rabin", role: "CEO", photo: "team-dan.png" },
-  { name: "Ekaterina Samohovets", role: "CMO", photo: "team-ektarina.jpg" },
+  { name: "Ekaterina Samohovets", role: "CMO", photo: "team-ekaterina.png" },
   {
     name: "Tarika Maini Soni",
     role: "Director of Strategic Initiatives",

@@ -78,9 +78,15 @@ export default function Fold08() {
                         first 13%. There is no way to keep both: the crop only
                         exists to be panned, so anchoring the photo costs the
                         travel.
-                        It costs nothing else. The frame is 376x329 and the
-                        photos are 752x658 — the same 1.143 — so at `inset-0`
-                        `object-cover` shows each one whole, uncropped. */}
+                        It costs nothing else. The frame is 376x329 and every
+                        photo is the same 1.143, so at `inset-0` `object-cover`
+                        shows each one whole, uncropped.
+
+                        The sources are not all the same size, though: Dan and
+                        Tarika are 1341x1173, Ekaterina 376x329. The frame is
+                        376 wide, so hers is a 1x asset where theirs are better
+                        than 2x — she will read soft on a retina screen until
+                        the portrait is re-exported at 752 or above. */}
                     <div className="absolute inset-0">
                       <Image
                         src={`/images/fold08/${member.photo}`}
