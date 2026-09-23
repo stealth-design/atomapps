@@ -218,10 +218,10 @@ export const END_GRID: { desktop: GridConfig; mobile: GridConfig } = {
  * Keyed by the same icon id as everything else here; the pages themselves are
  * defined in `@/data/apps`, and this is the join between the two.
  *
- * An icon with no entry renders exactly as it always has, decorative and
- * unclickable. Two are left that way on purpose: icon-08 (the penguin) and
- * icon-15 (White Noise) have no Play Store listing to build a page from yet.
- * Adding one is a line here and an entry in `@/data/apps`.
+ * Every icon in the grid now has one. The two with no Play Store listing —
+ * icon-08 (Steppy's penguin) and icon-15 (White Noise) — point at their
+ * coming-soon landers, which are built from `COMING_SOON` in `@/data/apps`
+ * rather than from a listing.
  *
  * `label` is the accessible name, since the artwork itself carries no text.
  */
@@ -233,12 +233,14 @@ export const ICON_LINKS: Partial<Record<string, { label: string; href: string }>
   "icon-05": { label: "Find My Phone", href: "/apps/find-my-phone" },
   "icon-06": { label: "AI Chat Launcher: AI Assistant", href: "/apps/ai-chat" },
   "icon-07": { label: "2026 Calendar Launcher", href: "/apps/calendar" },
+  "icon-08": { label: "Steppy — coming soon", href: "/apps/steppy" },
   "icon-09": { label: "Notes, Notepad, To Do Launcher", href: "/apps/notes" },
   "icon-10": { label: "Live Weather Radar Launcher", href: "/apps/weather-radar" },
   "icon-11": { label: "Calculator Launcher", href: "/apps/calculator" },
   "icon-12": { label: "Brightest Flashlight Launcher", href: "/apps/flashlight" },
   "icon-13": { label: "QR & Barcode Scanner Launcher", href: "/apps/qr-scanner" },
   "icon-14": { label: "Holy Bible Launcher: KJV+Audio", href: "/apps/holy-bible" },
+  "icon-15": { label: "White Noise — coming soon", href: "/apps/white-noise" },
   "icon-16": { label: "Daily Horoscope Launcher", href: "/apps/daily-horoscope" },
 };
 

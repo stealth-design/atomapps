@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FooterParallax } from "@/components/layout/FooterParallax";
 import { Container } from "@/components/ui/Container";
+import { ComingSoonPage } from "@/components/apps/ComingSoonPage";
 import { MoreApps } from "@/components/apps/MoreApps";
 import { PlayStoreButton } from "@/components/apps/PlayStoreButton";
 import { Poster } from "@/components/apps/Poster";
@@ -14,11 +15,12 @@ import { StarRating } from "@/components/apps/StarRating";
 import { ICON_RADIUS } from "@/components/folds/fold03/appIcons";
 import { REVIEWS } from "@/components/folds/fold07/testimonials";
 import {
-  APPS,
+  APP_INDEX,
   APPS_SNAPSHOT,
   LAUNCHER_NOTE,
   appIconSrc,
   getApp,
+  getComingSoon,
   type AppFeature,
 } from "@/data/apps";
 import { siteConfig } from "@/data/site";
@@ -52,13 +54,20 @@ import { siteConfig } from "@/data/site";
  */
 
 export function generateStaticParams() {
-  return APPS.map((app) => ({ slug: app.slug }));
+  return APP_INDEX.map((app) => ({ slug: app.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/apps/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const app = getApp(slug);
-  if (!app) return {};
+  if (!app) {
+    // The unreleased apps have no listing to describe, so the metadata says
+    // what the page says.
+    const soon = getComingSoon(slug);
+    return soon
+      ? { title: `${soon.name} | ${siteConfig.name}`, description: `${soon.summary} Coming soon.` }
+      : {};
+  }
   const hero = app.screenshots[app.heroShot - 1];
   return {
     title: `${app.name} | ${siteConfig.name}`,
@@ -86,7 +95,22 @@ const LINK = "underline underline-offset-2 hover:no-underline";
 export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]">) {
   const { slug } = await params;
   const app = getApp(slug);
-  if (!app) notFound();
+
+  // An app with no listing gets the lander instead of the full layout — see
+  // ComingSoonPage for what it leaves out and why.
+  if (!app) {
+    const soon = getComingSoon(slug);
+    if (!soon) notFound();
+    return (
+      <>
+        <Header />
+        <ComingSoonPage app={soon} />
+        <FooterParallax>
+          <Footer />
+        </FooterParallax>
+      </>
+    );
+  }
 
   const featured = app.features.filter((feature) => feature.shot !== undefined);
   const others = app.features.filter((feature) => feature.shot === undefined);
@@ -429,7 +453,7 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
 
         {/* ================= the rest of the family ================= */}
         <Container className="pt-[72px] pb-[80px] tablet:pt-[112px] tablet:pb-[120px]">
-          <MoreApps current={app} />
+          <MoreApps currentSlug={app.slug} />
         </Container>
       </main>
 

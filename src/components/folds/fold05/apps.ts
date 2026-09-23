@@ -56,7 +56,7 @@ export interface AppPanel {
   /** Lead-in line. Volume Control doesn't have one. */
   question?: string;
   description: string;
-  /** Steppy is unreleased, so it shows a badge instead of a CTA. */
+  /** Every panel links to the app's page; Steppy carries the badge as well. */
   cta?: { label: string; href: string };
   badge?: string;
   /** Volume Control carries a review quote above its stats. */
@@ -76,7 +76,7 @@ export const APP_PANELS: AppPanel[] = [
     question: "Can't find your phone when you need it most?",
     description:
       "Find My Phone helps you quickly find your phone by clapping or whistling.",
-    cta: { label: "Learn More", href: "#fold-05" },
+    cta: { label: "Learn More", href: "/apps/find-my-phone" },
     stats: { downloads: "1M+", rating: "4.5" },
   },
   {
@@ -91,6 +91,9 @@ export const APP_PANELS: AppPanel[] = [
     question: "Need a push to start walking more?\nWalk with Steppy.",
     description:
       "Turn your steps into real rewards, the more you walk, the more you can earn.",
+    // Steppy has a page of its own now, so it carries the CTA as well as the
+    // badge — the card puts the two on one row.
+    cta: { label: "Learn More", href: "/apps/steppy" },
     badge: "Coming soon",
     features: [
       { icon: "ic-footprints", text: "Track your daily steps" },
@@ -108,7 +111,7 @@ export const APP_PANELS: AppPanel[] = [
     question: "Tired of not knowing how to set ringtone, alarm, or text volumes?",
     description:
       "Easily control all your volume settings in one place with Volume Control Launcher.",
-    cta: { label: "Learn More", href: "#fold-05" },
+    cta: { label: "Learn More", href: "/apps/volume-control" },
     quote:
       "“Great app! I can control all my app volumes separately and the boost is incredible!”",
     stats: { downloads: "1M+", rating: "4.5" },
@@ -126,7 +129,7 @@ export const APP_PANELS: AppPanel[] = [
     question: "Your Sound. Your Calm.",
     description:
       "Find your calm with soothing sounds designed to help you sleep, focus, and unwind.",
-    cta: { label: "Learn More", href: "#fold-05" },
+    cta: { label: "Learn More", href: "/apps/white-noise" },
     features: [
       { icon: "ic-headphones", text: "Relax with soothing white noise and calming audio." },
       { icon: "ic-sliders", text: "Choose from white noise, nature sounds, ambient audio, and more." },

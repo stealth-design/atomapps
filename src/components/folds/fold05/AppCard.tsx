@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 import { StarRating } from "./StarRating";
 import type { AppPanel } from "./apps";
@@ -31,7 +32,10 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
       // `--focal` is the scene's own horizontal focal point, consumed by both
       // the scene and its blurred copy below so the two stay in register.
       style={
-        { "--focal": panel.mobileFocal, backgroundColor: panel.ground } as CSSProperties
+        {
+          "--focal": panel.mobileFocal,
+          backgroundColor: panel.ground,
+        } as CSSProperties
       }
       // Past 1920 the card stops filling the panel and takes the reference
       // frame's own 1764:1087, so it reads as a landscape card rather than the
@@ -182,75 +186,87 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 {panel.description}
               </p>
 
-              {panel.cta && (
-                <a
-                  href={panel.cta.href}
-                  // `w-fit` is enough now that all three labels read "Learn More".
-                  // This used to be pinned to 240px past 1920 with the arrow pushed
-                  // out by `justify-between`, because the labels were "Explore <app
-                  // name>" and ran 204-230px — four pills of four different widths.
-                  // Identical labels size identically on their own, so the fixed
-                  // width would only add empty pill to the right of the type.
-                  className="group/cta relative mt-[18px] flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-black pr-[10px] pl-[16px] transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:bg-white motion-reduce:transition-none tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px]"
-                >
-                  {/*
-                   * The whole pill inverts on hover: black ground and white type
-                   * become white ground and black type, and the arrow's disc
-                   * flips with them.
-                   *
-                   * The hairline is what keeps the pill's edge honest once it
-                   * turns white, because the card behind it is white too. On the
-                   * black fill it has nothing to do, so it runs the opposite way
-                   * from the ground: solid at rest, 15% on hover, where the edge
-                   * is actually at risk of disappearing.
-                   *
-                   * The fill is `hover:` on the pill while everything inside it
-                   * is `group-hover:` — a group's own element is not a descendant
-                   * of itself, so `group-hover` never matches it. That mismatch
-                   * is what left the ground white while the label went white too.
-                   *
-                   * The stroke is a ring on its own element rather than a `border`
-                   * on the pill: a border is part of the box, so bringing one in
-                   * would shift the label by its own width. An inset ring paints
-                   * inside the same box and moves nothing — the CTA measures the
-                   * same at rest and on hover.
-                   */}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-black transition-[box-shadow] duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:ring-black/15 motion-reduce:transition-none"
-                  />
+              {/* The CTA and the badge share a row. They used to be siblings
+                  in the column, each with its own top margin, which was fine
+                  while no panel had both — Steppy showed the badge instead of
+                  a CTA. Steppy has a page of its own now, so it carries both,
+                  and stacked they read as two buttons rather than one button
+                  and a status. */}
+              {(panel.cta || panel.badge) && (
+                <div className="mt-[18px] flex flex-wrap items-center gap-[12px] tablet:mt-[30px] desktop-xl:mt-[22px]">
+                  {panel.cta && (
+                    <Link
+                      href={panel.cta.href}
+                      // `w-fit` is enough now that all three labels read "Learn More".
+                      // This used to be pinned to 240px past 1920 with the arrow pushed
+                      // out by `justify-between`, because the labels were "Explore <app
+                      // name>" and ran 204-230px — four pills of four different widths.
+                      // Identical labels size identically on their own, so the fixed
+                      // width would only add empty pill to the right of the type.
+                      className="group/cta relative flex h-[40px] w-fit max-w-full shrink-0 items-center gap-[10px] rounded-full bg-black pr-[10px] pl-[16px] transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:hover:bg-white motion-reduce:transition-none desktop-xl:h-[44px]"
+                    >
+                      {/*
+                       * The whole pill inverts on hover: black ground and white type
+                       * become white ground and black type, and the arrow's disc
+                       * flips with them.
+                       *
+                       * The hairline is what keeps the pill's edge honest once it
+                       * turns white, because the card behind it is white too. On the
+                       * black fill it has nothing to do, so it runs the opposite way
+                       * from the ground: solid at rest, 15% on hover, where the edge
+                       * is actually at risk of disappearing.
+                       *
+                       * The fill is `hover:` on the pill while everything inside it
+                       * is `group-hover:` — a group's own element is not a descendant
+                       * of itself, so `group-hover` never matches it. That mismatch
+                       * is what left the ground white while the label went white too.
+                       *
+                       * The stroke is a ring on its own element rather than a `border`
+                       * on the pill: a border is part of the box, so bringing one in
+                       * would shift the label by its own width. An inset ring paints
+                       * inside the same box and moves nothing — the CTA measures the
+                       * same at rest and on hover.
+                       */}
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-black transition-[box-shadow] duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:ring-black/15 motion-reduce:transition-none"
+                      />
 
-                  <span className="relative text-[14px] leading-[18px] text-white transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:text-black motion-reduce:transition-none desktop-xl:text-[15px] desktop-xl:leading-[20px]">
-                    {panel.cta.label}
-                  </span>
+                      <span className="relative text-[14px] leading-[18px] text-white transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:text-black motion-reduce:transition-none desktop-xl:text-[15px] desktop-xl:leading-[20px]">
+                        {panel.cta.label}
+                      </span>
 
-                  {/*
-                   * The same arrow move as the footer's ring: one copy leaves
-                   * through the top-right and its replacement arrives from the
-                   * bottom-left, both clipped to the circle by `overflow-hidden`,
-                   * so it reads as one arrow travelling through rather than a
-                   * glyph that jumps back. Two copies rather than one going out
-                   * and returning — a single arrow has to come back along the
-                   * diagonal it just left by, which reads as a recoil.
-                   */}
-                  {/* `text-*` on the disc rather than a colour on the arrows:
+                      {/*
+                       * The same arrow move as the footer's ring: one copy leaves
+                       * through the top-right and its replacement arrives from the
+                       * bottom-left, both clipped to the circle by `overflow-hidden`,
+                       * so it reads as one arrow travelling through rather than a
+                       * glyph that jumps back. Two copies rather than one going out
+                       * and returning — a single arrow has to come back along the
+                       * diagonal it just left by, which reads as a recoil.
+                       */}
+                      {/* `text-*` on the disc rather than a colour on the arrows:
                       both copies draw with `currentColor`, so one declaration
                       here inverts the pair and they cannot fall out of step. */}
-                  <span className="relative grid size-[20px] shrink-0 place-items-center overflow-hidden rounded-full bg-white text-black transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:bg-black can-hover:group-hover/cta:text-white motion-reduce:transition-none">
-                    <CtaArrow className="translate-x-0 translate-y-0 can-hover:group-hover/cta:translate-x-[150%] can-hover:group-hover/cta:-translate-y-[150%]" />
-                    <CtaArrow className="-translate-x-[150%] translate-y-[150%] can-hover:group-hover/cta:translate-x-0 can-hover:group-hover/cta:translate-y-0" />
-                  </span>
-                </a>
-              )}
+                      <span className="relative grid size-[20px] shrink-0 place-items-center overflow-hidden rounded-full bg-white text-black transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] can-hover:group-hover/cta:bg-black can-hover:group-hover/cta:text-white motion-reduce:transition-none">
+                        <CtaArrow className="translate-x-0 translate-y-0 can-hover:group-hover/cta:translate-x-[150%] can-hover:group-hover/cta:-translate-y-[150%]" />
+                        <CtaArrow className="-translate-x-[150%] translate-y-[150%] can-hover:group-hover/cta:translate-x-0 can-hover:group-hover/cta:translate-y-0" />
+                      </span>
+                    </Link>
+                  )}
 
-              {panel.badge && (
-                <span // Matches the CTA pill past 1920 — the same 240x44 box with a centred
-                  // label — so the "coming soon" card sits in the row rather than
-                  // beside it.
-                  className="mt-[18px] flex h-[38px] w-fit shrink-0 items-center rounded-full bg-[#909090] px-[17px] text-[14px] leading-[18px] text-white tablet:mt-[30px] desktop-xl:mt-[22px] desktop-xl:h-[44px] desktop-xl:w-[240px] desktop-xl:justify-center desktop-xl:text-[15px] desktop-xl:leading-[20px]"
-                >
-                  {panel.badge}
-                </span>
+                  {panel.badge && (
+                    <span // Sized to its label. It used to be pinned to the CTA pill's
+                      // 240x44 past 1920, which was how a panel showing only the badge
+                      // kept the row's weight; now that it sits next to the pill rather
+                      // than in place of it, a 240px chip reading "Coming soon" is just
+                      // empty grey.
+                      className="flex h-[38px] w-fit shrink-0 items-center rounded-full bg-[#909090] px-[17px] text-[14px] leading-[18px] text-white desktop-xl:h-[44px] desktop-xl:text-[15px] desktop-xl:leading-[20px]"
+                    >
+                      {panel.badge}
+                    </span>
+                  )}
+                </div>
               )}
 
               {/* ---- closing block, anchored to the bottom of the card ---- */}
@@ -317,7 +333,10 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                         <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
                           {panel.stats.rating}
                         </p>
-                        <StarRating rating={panel.stats.rating} className="block h-[11px] tablet:h-[18px]" />
+                        <StarRating
+                          rating={panel.stats.rating}
+                          className="block h-[11px] tablet:h-[18px]"
+                        />
                       </div>
                       <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">
                         App Store Rating

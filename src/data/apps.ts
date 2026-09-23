@@ -26,6 +26,8 @@
  * each feature's `shot` are the hand-made pairings of poster to copy.
  */
 
+import { ICON_EXT } from "@/components/folds/fold03/appIcons";
+
 export interface AppFeature {
   /** The glyph the listing leads the item with. Kept for the data; the page numbers features instead. */
   emoji: string;
@@ -129,12 +131,100 @@ export function playStoreUrl(app: Pick<AppPage, "packageId">): string {
   return `https://play.google.com/store/apps/details?id=${app.packageId}`;
 }
 
-export function appIconSrc(app: Pick<AppPage, "icon">): string {
-  return `/images/fold03/${app.icon}.jpg`;
+/**
+ * The icon file for an app, released or not.
+ *
+ * The extension comes from `ICON_EXT` rather than being assumed: every icon
+ * came out of Figma as a `.jpg` except icon-08, Steppy's penguin, which is a
+ * `.webp` — and hard-coding `.jpg` here pointed that one at a file that does
+ * not exist.
+ */
+export function appIconSrc(app: { icon: string }): string {
+  return `/images/fold03/${app.icon}.${ICON_EXT[app.icon] ?? "jpg"}`;
 }
 
 export function getApp(slug: string): AppPage | undefined {
   return APPS.find((app) => app.slug === slug);
+}
+
+/**
+ * An app with no Play Store listing yet.
+ *
+ * Its page is a lander rather than the full layout: there are no stats to
+ * print, no store posters to lay out and no store to link to, so inventing
+ * any of the three would be inventing the app's reception. What it does have
+ * is the copy the home page already shows for it in Fold 05, which is where
+ * all of this comes from — so the two cannot drift apart.
+ */
+export interface ComingSoonApp {
+  slug: string;
+  /** Fold 03 icon id — the same artwork the home page's grid shows. */
+  icon: string;
+  title: string;
+  /** The name as it will read on the store. */
+  name: string;
+  /** The page's headline, in the same voice as the released apps'. */
+  headline: string;
+  summary: string;
+  accent: string;
+  intro: string[];
+  /** `icon` is an SVG basename in `public/images/fold05/icons/`. */
+  features: { icon: string; text: string }[];
+}
+
+/**
+ * The two apps in the home page's icon grid that have no listing yet.
+ *
+ * Both are already on the home page — Steppy and White Noise are two of Fold
+ * 05's four panels — so their copy is taken from there rather than written
+ * again here.
+ */
+export const COMING_SOON: ComingSoonApp[] = [
+  {
+    slug: "steppy",
+    // The same penguin as `public/images/apps/steppy.png`, which is what Fold
+    // 05 loads; the grid's copy is the one used here so the icon a reader
+    // clicks is the icon they land on.
+    icon: "icon-08",
+    title: "Steppy",
+    name: "Steppy",
+    headline: "Walk more.\nEarn more.",
+    summary:
+      "Turn your steps into real rewards — the more you walk, the more you can earn.",
+    accent: "#3E63C6",
+    intro: [
+      "Steppy counts the steps you were taking anyway and pays you for them. Hit an achievable daily milestone, collect coins, and trade them in for gift cards from brands you already shop with.",
+      "It is in development now. The home screen, the step count and the rewards are being built together, so the walking and the earning are one thing rather than an app with a loyalty scheme bolted on.",
+    ],
+    features: [
+      { icon: "ic-footprints", text: "Track your daily steps" },
+      { icon: "ic-coins", text: "Earn coins for hitting achievable milestones" },
+      { icon: "ic-gift", text: "Redeem your coins for gift cards from your favorite brands" },
+    ],
+  },
+  {
+    slug: "white-noise",
+    icon: "icon-15",
+    title: "White Noise",
+    name: "White Noise",
+    headline: "Your sound.\nYour calm.",
+    summary:
+      "Soothing sounds designed to help you sleep, focus, and unwind.",
+    accent: "#574A9D",
+    intro: [
+      "White Noise is a library of sounds for the parts of the day that need quiet: rain and static to sleep through, steady tones to work against, and slow ambient beds to come down to.",
+      "It is in development now. Everything is built to be started in a second and then left alone — you should not have to look at your phone again once the sound is playing.",
+    ],
+    features: [
+      { icon: "ic-headphones", text: "Relax with soothing white noise and calming audio." },
+      { icon: "ic-sliders", text: "Choose from white noise, nature sounds, ambient audio, and more." },
+      { icon: "ic-clock", text: "Set sounds to automatically stop after you fall asleep." },
+    ],
+  },
+];
+
+export function getComingSoon(slug: string): ComingSoonApp | undefined {
+  return COMING_SOON.find((app) => app.slug === slug);
 }
 
 /** Order follows the Play Store's "More by AtomApplications" row. */
@@ -932,4 +1022,20 @@ export const APPS: AppPage[] = [
       { src: "/images/apps/alarm-clock/shot-8.webp", width: 720, height: 1280 },
     ],
   },
+];
+
+/**
+ * Every app that has a page, released or not — what the "more apps" grid and
+ * the route's static params are built from.
+ */
+export interface AppLink {
+  slug: string;
+  icon: string;
+  title: string;
+  comingSoon: boolean;
+}
+
+export const APP_INDEX: AppLink[] = [
+  ...APPS.map((app) => ({ slug: app.slug, icon: app.icon, title: app.title, comingSoon: false })),
+  ...COMING_SOON.map((app) => ({ slug: app.slug, icon: app.icon, title: app.title, comingSoon: true })),
 ];

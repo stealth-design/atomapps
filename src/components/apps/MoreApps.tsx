@@ -1,15 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
-import { APPS, appIconSrc, type AppPage } from "@/data/apps";
+import { APP_INDEX, appIconSrc } from "@/data/apps";
 import { ICON_RADIUS } from "@/components/folds/fold03/appIcons";
 
 /**
  * The rest of the family, at the foot of every app page. The same artwork as
  * Fold 03's grid, at the same corner radius, so it reads as the same set of
  * icons a reader came in through — just with names under them this time.
+ *
+ * Built from `APP_INDEX`, so the two unreleased apps are in it too, marked as
+ * such rather than left out: they have pages of their own, and a grid missing
+ * two of the icons the reader just came from would read as a gap.
  */
-export function MoreApps({ current }: { current: AppPage }) {
-  const others = APPS.filter((app) => app.slug !== current.slug);
+export function MoreApps({ currentSlug }: { currentSlug: string }) {
+  const others = APP_INDEX.filter((app) => app.slug !== currentSlug);
 
   return (
     <section aria-labelledby="more-apps-heading">
@@ -43,6 +47,9 @@ export function MoreApps({ current }: { current: AppPage }) {
               <span className="text-[13px] leading-[18px] font-medium text-[var(--foreground)] tablet:text-[14px] tablet:leading-[19px]">
                 {app.title}
               </span>
+              {app.comingSoon && (
+                <span className="-mt-[8px] text-[11px] leading-[16px] text-[#8a8a92]">Coming soon</span>
+              )}
             </Link>
           </li>
         ))}
