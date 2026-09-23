@@ -30,9 +30,11 @@ import { siteConfig } from "@/data/site";
  * pill white on black type. It is the hero's own frame that makes that legible
  * — the scrim is 50% black on the top edge and clear by the bar's foot, which
  * reads against a photograph and does nothing at all against the white folds
- * below it. So the inversion is scoped to the hero rather than applied for the
- * whole page: past it the bar returns to the solid white below, and pages with
- * no hero (there is one, /contact) never leave it. Both cuts of the mark are
+ * below it. So the inversion is scoped to the top of the page, not to the
+ * hero's whole height: it holds only while the page is at rest at the top, and
+ * the first real scroll brings the solid white bar in — which is also the
+ * moment the hero's photograph starts moving under it. Pages with no hero
+ * (/contact, the app pages) never leave the white. Both cuts of the mark are
  * in the bar and cross-fade, because an `src` swap cannot be transitioned.
  *
  * The mark is `final-atom-logo-dark.png` / `-white.png` — see the note at the
@@ -44,6 +46,14 @@ import { siteConfig } from "@/data/site";
  * ScrollTrigger from the same ticker (see SmoothScroll), so reading direction
  * from it means one source of truth and no second listener firing on a
  * position Lenis has not finished settling.
+ *
+ * It also comes back, and stays, once the footer is on screen. Arriving at the
+ * foot of the page is the one place a reader has run out of page and is most
+ * likely to want the nav again, and it is exactly where the retract would
+ * otherwise have hidden it — the last movement before the page bottoms out is
+ * always downward. While any part of the footer is in view the direction rule
+ * is suspended, so the bar cannot flicker away on the small downward drifts a
+ * settling scroll makes there.
  */
 
 /**
@@ -54,8 +64,14 @@ import { siteConfig } from "@/data/site";
  */
 const DIRECTION_THRESHOLD = 8;
 
-/** The bar's own height, in pixels — mirrors `--header-height`. */
-const HEADER_HEIGHT = 50;
+/**
+ * How far the page may scroll and still count as "at the top", in pixels.
+ *
+ * The scrim is only ever shown here. A few pixels of slack rather than an
+ * exact zero, because a trackpad rarely comes to rest on 0 exactly and the
+ * bar would otherwise flicker between its two states at the top of the page.
+ */
+const TOP_THRESHOLD = 24;
 
 /**
  * The bar's ground over the hero, straight off the artboard (Figma 1551:4258):
@@ -90,6 +106,8 @@ export function Header({ transparentOverHero = false }: HeaderProps) {
   // depending on state and rebuilding the trigger on every toggle.
   const lastScroll = useRef(0);
   const retracted = useRef(false);
+  /** True while the footer is on screen — see the footer trigger below. */
+  const overFooter = useRef(false);
 
   const setRetracted = useCallback((next: boolean) => {
     if (retracted.current === next) return;
@@ -103,37 +121,55 @@ export function Header({ transparentOverHero = false }: HeaderProps) {
       end: "max",
       onUpdate: (self) => {
         const y = self.scroll();
+
+        // The scrim is for the top of the page only. Read before the direction
+        // threshold below, which would otherwise hold the swap back until the
+        // page had moved a further 8px.
+        if (transparentOverHero) setIsOverHero(y <= TOP_THRESHOLD);
+
         const delta = y - lastScroll.current;
         if (Math.abs(delta) < DIRECTION_THRESHOLD) return;
         lastScroll.current = y;
 
         // Never retracted over the top of the page: the first 50px is the bar's
         // own height, and hiding it there would take it away as the hero
-        // arrives rather than once the reader is into the page.
-        setRetracted(y > 50 && delta > 0);
+        // arrives rather than once the reader is into the page. Nor over the
+        // footer, where the bar is held out on purpose.
+        setRetracted(y > 50 && delta > 0 && !overFooter.current);
       },
     });
 
-    // The bar is inverted only while it is genuinely over the hero: the swap
-    // lands when the hero's bottom edge reaches the bar's foot, so it never
-    // holds white type over the white fold underneath.
-    const hero = transparentOverHero ? document.getElementById("fold-01") : null;
-    const heroTrigger = hero
+    // The footer is wrapped by FooterParallax, whose root is where the footer
+    // sits in the layout — the parallax only moves the footer *inside* that
+    // box, so the box is the right thing to measure against. `top bottom` is
+    // the moment its first pixel enters the viewport.
+    const footer = document.querySelector<HTMLElement>("[data-footer-parallax]");
+    const footerTrigger = footer
       ? ScrollTrigger.create({
-          trigger: hero,
-          start: `bottom top+=${HEADER_HEIGHT}`,
+          trigger: footer,
+          start: "top bottom",
           end: "max",
-          onToggle: (self) => setIsOverHero(!self.isActive),
+          onToggle: (self) => {
+            overFooter.current = self.isActive;
+            if (self.isActive) setRetracted(false);
+          },
         })
       : null;
-    // `onToggle` only fires on a crossing, so the initial state has to be read
-    // off the trigger — otherwise a load already scrolled past the hero (a
+    // As with the hero trigger: `onToggle` only fires on a crossing, so a load
+    // that lands already at the foot of the page has to read the state off.
+    if (footerTrigger?.isActive) {
+      overFooter.current = true;
+      setRetracted(false);
+    }
+
+    // `onUpdate` only fires on movement, so the initial state is read off the
+    // scroll position directly — otherwise a load already down the page (a
     // hash link, or a restored position) would come up inverted.
-    if (heroTrigger) setIsOverHero(!heroTrigger.isActive);
+    if (transparentOverHero) setIsOverHero(trigger.scroll() <= TOP_THRESHOLD);
 
     return () => {
       trigger.kill();
-      heroTrigger?.kill();
+      footerTrigger?.kill();
     };
   }, [setRetracted, transparentOverHero]);
 
