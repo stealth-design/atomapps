@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { APP_PAGES_LINKED } from "@/data/apps";
 import type { Testimonial } from "./testimonials";
 
 /**
@@ -40,11 +41,10 @@ export function TestimonialCard({
        * sizes that stay comfortable; desktop is untouched.
        */}
       <figcaption>
-        <Link
-          href={testimonial.href}
-          tabIndex={clone ? -1 : undefined}
-          className="flex h-[46px] w-fit items-center gap-[8px] rounded-[9px] border border-[#e8e8e8] bg-white px-[12px] transition-colors duration-300 can-hover:hover:border-[#c9c9c9] motion-reduce:transition-none tablet:h-[60px] tablet:gap-[10px] tablet:rounded-[12px] tablet:px-[10px]"
-        >
+        {/* A link only while the app pages are linked at all — see
+            APP_PAGES_LINKED. Off, the chip is the plain card header it was
+            before those pages existed, so nothing here dead-ends. */}
+        <Chip href={APP_PAGES_LINKED ? testimonial.href : undefined} clone={clone}>
           <Image
             src={testimonial.icon}
             alt=""
@@ -61,7 +61,7 @@ export function TestimonialCard({
           >
             ★★★★★
           </span>
-        </Link>
+        </Chip>
       </figcaption>
 
       {/* The quotation marks are the card's, not the data's, so every review
@@ -70,5 +70,35 @@ export function TestimonialCard({
         &ldquo;{testimonial.quote}&rdquo;
       </blockquote>
     </figure>
+  );
+}
+
+/**
+ * The app chip: one box, rendered as a link or as plain text depending on
+ * whether there is a page to reach. Kept as one component so the two cannot
+ * drift apart on padding, height or border.
+ */
+function Chip({
+  href,
+  clone,
+  children,
+}: {
+  href?: string;
+  clone?: boolean;
+  children: React.ReactNode;
+}) {
+  const className =
+    "flex h-[46px] w-fit items-center gap-[8px] rounded-[9px] border border-[#e8e8e8] bg-white px-[12px] tablet:h-[60px] tablet:gap-[10px] tablet:rounded-[12px] tablet:px-[10px]";
+
+  if (!href) return <span className={className}>{children}</span>;
+
+  return (
+    <Link
+      href={href}
+      tabIndex={clone ? -1 : undefined}
+      className={`${className} transition-colors duration-300 can-hover:hover:border-[#c9c9c9] motion-reduce:transition-none`}
+    >
+      {children}
+    </Link>
   );
 }

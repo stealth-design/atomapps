@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { APP_PAGES_LINKED } from "@/data/apps";
 import { ICON_EXT, BLUR_SCALE, ICON_LINKS, DESKTOP_ICONS, DESKTOP_ICONS_WIDE, DESKTOP_STAGE, END_ORDER, ICON_RADIUS, MOBILE_ICONS, MOBILE_STAGE, type IconPlacement } from "./appIcons";
 
 /**
@@ -60,7 +61,9 @@ export function IconScatter() {
       <style>{START_CSS}</style>
 
       {END_ORDER.map((icon) => {
-        const link = ICON_LINKS[icon];
+        // `APP_PAGES_LINKED` is off: every icon renders exactly as it did
+        // before the pages existed — decorative, and out of the a11y tree.
+        const link = APP_PAGES_LINKED ? ICON_LINKS[icon] : undefined;
 
         const art = (
           <div

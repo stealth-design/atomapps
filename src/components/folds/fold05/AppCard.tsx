@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { StarRating } from "./StarRating";
 import type { AppPanel } from "./apps";
+import { APP_PAGES_LINKED } from "@/data/apps";
 
 /**
  * One panel of the Fold 05 stack: the pre-composed scene with the frosted app
@@ -192,9 +193,13 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                   a CTA. Steppy has a page of its own now, so it carries both,
                   and stacked they read as two buttons rather than one button
                   and a status. */}
-              {(panel.cta || panel.badge) && (
+              {/* The pill is gated on APP_PAGES_LINKED, which is off: the app
+                  pages exist but nothing links to them yet. Steppy is back to
+                  the badge alone, which is what this card showed before it had
+                  a page to point at. */}
+              {((APP_PAGES_LINKED && panel.cta) || panel.badge) && (
                 <div className="mt-[18px] flex flex-wrap items-center gap-[12px] tablet:mt-[30px] desktop-xl:mt-[22px]">
-                  {panel.cta && (
+                  {APP_PAGES_LINKED && panel.cta && (
                     <Link
                       href={panel.cta.href}
                       // `w-fit` is enough now that all three labels read "Learn More".

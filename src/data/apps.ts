@@ -117,6 +117,22 @@ export interface AppPage {
   screenshots: AppScreenshot[];
 }
 
+/**
+ * Whether anything on the site links into `/apps/*`.
+ *
+ * The pages are built and reachable by URL — `generateStaticParams` still
+ * covers every slug — but while they are unreleased nothing on the public
+ * site points at them. One flag rather than commented-out links in four
+ * files, so turning them back on is this line and nothing else.
+ *
+ * What it gates: the Fold 03 icon grid, Fold 05's "Learn More" pills and the
+ * Fold 07 review chips. It deliberately does NOT gate the "more apps" grid at
+ * the foot of an app page — that one is inside the section it would be
+ * disabling, and a reader who has the URL should still be able to move
+ * between them.
+ */
+export const APP_PAGES_LINKED = false;
+
 /** When the stats below were read off the listings. */
 export const APPS_SNAPSHOT = "23 September 2026";
 
