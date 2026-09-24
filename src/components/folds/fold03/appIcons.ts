@@ -34,12 +34,21 @@ export const MOBILE_STAGE = { width: 393, height: 626 };
 
 /**
  * Source extension per icon. Everything came out of Figma as `.jpg`; anything
- * added since carries its own here rather than being re-encoded to match.
- * Next/Image re-encodes to webp/avif on the way out either way, so the source
- * format only decides what sits in `public/`.
+ * added or replaced since carries its own here rather than being re-encoded to
+ * match. Next/Image re-encodes to webp/avif on the way out either way, so the
+ * source format only decides what sits in `public/`.
+ *
+ * It is also what makes replacing an icon safe. Files under `/images/` are
+ * served `immutable` for a year (see next.config.ts), so art swapped in under
+ * the same name would never reach anyone who already has the old one cached —
+ * the URL has to change. The three PNGs below are new artwork for icons that
+ * were JPEGs, and the extension alone is the cache break.
  */
 export const ICON_EXT: Record<string, string> = {
+  "icon-03": "png", // Step Tracker
+  "icon-07": "png", // 2026 Calendar
   "icon-08": "webp",
+  "icon-13": "png", // QR & Barcode Scanner
 };
 
 /** Corner radius as a share of icon width (Figma: 20.8% at every size). */
