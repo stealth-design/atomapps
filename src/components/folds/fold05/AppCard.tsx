@@ -191,9 +191,9 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                   a CTA. Steppy has a page of its own now, so it carries both,
                   and stacked they read as two buttons rather than one button
                   and a status. */}
-              {/* The pill and the badge share a row. Steppy is the only panel
-                  that carries a badge, and it has no CTA beside it — the app
-                  has no site to send anyone to yet. */}
+              {/* The pill and the badge share a row, though no panel has both
+                  at once: the two unreleased apps carry a badge and no CTA,
+                  because neither has a site to send anyone to yet. */}
               {(panel.cta || panel.badge) && (
                 <div className="mt-[18px] flex flex-wrap items-center gap-[12px] tablet:mt-[30px] desktop-xl:mt-[22px]">
                   {panel.cta && (

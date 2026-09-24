@@ -14,10 +14,10 @@
  * Every revision needs the next number. `ground` and `mobileFocal` below were
  * re-measured off the current art.
  *
- * The four cards are deliberately not the same shape — Steppy swaps the CTA for
- * a "Coming soon" badge and adds a feature list, Volume Control carries a
- * pull-quote, White Noise has both a CTA and features. Each block below is
- * optional, and the card renders whatever is present.
+ * The four cards are deliberately not the same shape — the two unreleased apps
+ * swap the CTA for a "Coming soon" badge, Volume Control carries a pull-quote,
+ * Find My Phone has a CTA, features and stats. Each block below is optional,
+ * and the card renders whatever is present.
  *
  * Figma sources: 1136:3208 (Find My Phone), 1136:3261 (Steppy),
  * 1136:3064 (Volume Control), 1136:2679 (White Noise).
@@ -67,9 +67,9 @@ export interface AppPanel {
    * The panel's "Learn More", pointing at the app's own website.
    *
    * It used to point at the app's page on this site; those are unreleased (see
-   * APP_PAGES_LINKED) so it goes to the product site instead. The two panels
-   * for unreleased apps have no site to send anyone to, so they carry no CTA —
-   * Steppy shows its badge in place of one.
+   * APP_PAGES_LINKED) so it goes to the product site instead. Only the two
+   * released apps have a site to send anyone to; Steppy and White Noise carry
+   * a "Coming soon" badge in place of a CTA.
    */
   cta?: { label: string; href: string };
   badge?: string;
@@ -139,6 +139,7 @@ export const APP_PANELS: AppPanel[] = [
     question: "Your Sound. Your Calm.",
     description:
       "Find your calm with soothing sounds designed to help you sleep, focus, and unwind.",
+    badge: "Coming soon",
     features: [
       { icon: "ic-headphones", text: "Relax with soothing white noise and calming audio." },
       { icon: "ic-sliders", text: "Choose from white noise, nature sounds, ambient audio, and more." },
