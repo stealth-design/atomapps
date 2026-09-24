@@ -290,7 +290,15 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 )}
 
                 {panel.features && (
-                  <ul className="flex flex-col gap-[14px] tablet:gap-[20px]">
+                  // Find My Phone is the one panel carrying features AND
+                  // stats, and the two are adjacent siblings — so the list
+                  // takes a bottom margin only when there is a stats block
+                  // under it to be separated from.
+                  <ul
+                    className={`flex flex-col gap-[14px] tablet:gap-[20px] ${
+                      panel.stats ? "mb-[20px] tablet:mb-[28px]" : ""
+                    }`}
+                  >
                     {panel.features.map((feature) => (
                       <li key={feature.icon} className="flex gap-[12px]">
                         {/*

@@ -91,6 +91,10 @@ export const APP_PANELS: AppPanel[] = [
     description:
       "Find My Phone helps you quickly find your phone by clapping or whistling.",
     cta: { label: "Learn More", href: "https://findmyphonelauncher.com/" },
+    features: [
+      { icon: "ic-target", text: "Find your phone from anywhere!" },
+      { icon: "ic-moon", text: "Works even when your phone is asleep" },
+    ],
     stats: { downloads: "1M+", rating: "4.5" },
   },
   {
