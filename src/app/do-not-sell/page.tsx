@@ -41,7 +41,7 @@ export default function DoNotSellPage() {
             <div className="flex flex-col gap-[40px] desktop-md:flex-row desktop-md:items-start desktop-md:gap-[80px]">
               {/* ---------- left column ---------- */}
               <Reveal variant="stagger" start="top bottom" className="min-w-0 flex-1">
-                <h1 className="max-w-[620px] text-[40px] leading-[46px] font-bold text-white tablet:text-[52px] tablet:leading-[58px] desktop-sm:text-[58px] desktop-sm:leading-[64px]">
+                <h1 className="max-w-[620px] text-[40px] leading-[46px] font-normal text-white tablet:text-[52px] tablet:leading-[58px] desktop-sm:text-[58px] desktop-sm:leading-[64px]">
                   Do Not Sell or Share my Personal Information
                 </h1>
 

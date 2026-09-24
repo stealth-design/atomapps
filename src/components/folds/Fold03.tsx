@@ -148,7 +148,7 @@ export default function Fold03() {
               changes how far it travels, and nothing else. */}
           <h2
             data-f03="heading"
-            className="absolute top-[6%] left-1/2 isolate w-[346px] -translate-x-1/2 text-center text-[26px] leading-[33px] font-extrabold text-black capitalize tablet:top-[4%] tablet:w-[640px] tablet:text-[36px] tablet:leading-[45px] desktop-sm:text-[46px] desktop-sm:leading-[57px]"
+            className="absolute top-[6%] left-1/2 isolate w-[346px] -translate-x-1/2 text-center text-[26px] leading-[33px] font-normal text-black capitalize tablet:top-[4%] tablet:w-[640px] tablet:text-[36px] tablet:leading-[45px] desktop-sm:text-[46px] desktop-sm:leading-[57px]"
           >
             {/*
              * A white halo hugging the glyphs. The heading already paints

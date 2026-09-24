@@ -63,7 +63,7 @@ export default function ContactPage() {
                     two sentences are the ask and the answer, and at this size
                     they wrap mid-sentence on their own — "Got a question? Send
                     it" against "our way." — which reads as a typo. */}
-                <h1 className="max-w-[620px] text-[40px] leading-[46px] font-bold text-white tablet:text-[56px] tablet:leading-[62px] desktop-sm:text-[64px] desktop-sm:leading-[70px]">
+                <h1 className="max-w-[620px] text-[40px] leading-[46px] font-normal text-white tablet:text-[56px] tablet:leading-[62px] desktop-sm:text-[64px] desktop-sm:leading-[70px]">
                   <span className="block">Got a question?</span>
                   <span className="block">Send it our way.</span>
                 </h1>

@@ -19,7 +19,7 @@ export function MoreApps({ currentSlug }: { currentSlug: string }) {
     <section aria-labelledby="more-apps-heading">
       <h2
         id="more-apps-heading"
-        className="text-[24px] leading-[30px] font-extrabold text-[var(--foreground)] tablet:text-[30px] tablet:leading-[38px]"
+        className="text-[24px] leading-[30px] font-normal text-[var(--foreground)] tablet:text-[30px] tablet:leading-[38px]"
       >
         More from Atom Apps
       </h2>

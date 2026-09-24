@@ -87,7 +87,7 @@ const formatCount = (count: number) =>
 const two = (index: number) => String(index + 1).padStart(2, "0");
 
 const H2 =
-  "text-[28px] leading-[34px] font-extrabold text-[var(--foreground)] tablet:text-[36px] tablet:leading-[42px] desktop-sm:text-[42px] desktop-sm:leading-[48px]";
+  "text-[28px] leading-[34px] font-normal text-[var(--foreground)] tablet:text-[36px] tablet:leading-[42px] desktop-sm:text-[42px] desktop-sm:leading-[48px]";
 const BODY = "text-[16px] leading-[26px] text-[#3f3f46] tablet:text-[17px] tablet:leading-[28px]";
 const EYEBROW = "text-[13px] leading-[18px] font-semibold tracking-[0.08em] uppercase text-[var(--accent)]";
 const LINK = "underline underline-offset-2 hover:no-underline";
@@ -169,7 +169,7 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
                   </span>
                 </p>
 
-                <h1 className="mt-[24px] text-[40px] leading-[44px] font-extrabold tracking-[-0.01em] text-[var(--foreground)] tablet:mt-[28px] tablet:text-[56px] tablet:leading-[60px] desktop-md:text-[68px] desktop-md:leading-[72px]">
+                <h1 className="mt-[24px] text-[40px] leading-[44px] font-normal tracking-[-0.01em] text-[var(--foreground)] tablet:mt-[28px] tablet:text-[56px] tablet:leading-[60px] desktop-md:text-[68px] desktop-md:leading-[72px]">
                   {headlineLines.map((line, index) => (
                     <span key={index} className="block">
                       {line}
@@ -271,7 +271,7 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
                   className="flex flex-col gap-[12px] rounded-[18px] border border-[var(--border)] p-[24px] tablet:p-[28px]"
                 >
                   <span className={EYEBROW}>{two(featured.length + index)}</span>
-                  <h3 className="text-[19px] leading-[26px] font-bold text-[var(--foreground)]">{feature.title}</h3>
+                  <h3 className="text-[19px] leading-[26px] font-normal text-[var(--foreground)]">{feature.title}</h3>
                   {feature.text && <p className="text-[15px] leading-[24px] text-[#3f3f46]">{feature.text}</p>}
                   {feature.bullets && <Bullets items={feature.bullets} />}
                 </li>
@@ -296,7 +296,7 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
                     <li key={benefit.title} className="flex gap-[16px]">
                       <span className={`${EYEBROW} mt-[4px] w-[28px] shrink-0`}>{two(index)}</span>
                       <div className="min-w-0">
-                        <h3 className="text-[17px] leading-[24px] font-bold text-[var(--foreground)]">{benefit.title}</h3>
+                        <h3 className="text-[17px] leading-[24px] font-normal text-[var(--foreground)]">{benefit.title}</h3>
                         <p className="mt-[4px] text-[15px] leading-[24px] text-[#3f3f46]">{benefit.text}</p>
                       </div>
                     </li>
@@ -402,7 +402,7 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
                 className="aspect-square w-full object-cover"
               />
             </span>
-            <h2 className="mt-[28px] max-w-[18ch] text-[32px] leading-[38px] font-extrabold tablet:text-[48px] tablet:leading-[54px]">
+            <h2 className="mt-[28px] max-w-[18ch] text-[32px] leading-[38px] font-normal tablet:text-[48px] tablet:leading-[54px]">
               Get {app.title} on Google Play
             </h2>
             <p className="mt-[16px] text-[16px] leading-[24px] text-white/70 tablet:text-[17px] tablet:leading-[26px]">

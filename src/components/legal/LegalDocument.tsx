@@ -78,7 +78,7 @@ function linkify(text: string, links?: Record<string, string>) {
 function Block({ block }: { block: LegalBlock }) {
   if (block.type === "h2") {
     return (
-      <h2 className="mt-[40px] text-[20px] leading-[28px] font-bold text-[var(--foreground)] first:mt-0 tablet:mt-[56px] tablet:text-[24px] tablet:leading-[32px]">
+      <h2 className="mt-[40px] text-[20px] leading-[28px] font-normal text-[var(--foreground)] first:mt-0 tablet:mt-[56px] tablet:text-[24px] tablet:leading-[32px]">
         {block.text}
       </h2>
     );
@@ -102,7 +102,7 @@ function Block({ block }: { block: LegalBlock }) {
 export function LegalDocument({ doc }: { doc: LegalDoc }) {
   return (
     <article className="max-w-[75ch]">
-      <h1 className="text-[32px] leading-[40px] font-extrabold text-[var(--foreground)] tablet:text-[44px] tablet:leading-[52px]">
+      <h1 className="text-[32px] leading-[40px] font-normal text-[var(--foreground)] tablet:text-[44px] tablet:leading-[52px]">
         {doc.title}
       </h1>
 

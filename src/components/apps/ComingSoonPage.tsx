@@ -21,7 +21,7 @@ import { appIconSrc, type ComingSoonApp } from "@/data/apps";
  */
 
 const H2 =
-  "text-[28px] leading-[34px] font-extrabold text-[var(--foreground)] tablet:text-[36px] tablet:leading-[42px] desktop-sm:text-[42px] desktop-sm:leading-[48px]";
+  "text-[28px] leading-[34px] font-normal text-[var(--foreground)] tablet:text-[36px] tablet:leading-[42px] desktop-sm:text-[42px] desktop-sm:leading-[48px]";
 const EYEBROW = "text-[13px] leading-[18px] font-semibold tracking-[0.08em] uppercase text-[var(--accent)]";
 
 export function ComingSoonPage({ app }: { app: ComingSoonApp }) {
@@ -63,7 +63,7 @@ export function ComingSoonPage({ app }: { app: ComingSoonApp }) {
                 </span>
               </p>
 
-              <h1 className="mt-[24px] text-[40px] leading-[44px] font-extrabold tracking-[-0.01em] text-[var(--foreground)] tablet:mt-[28px] tablet:text-[56px] tablet:leading-[60px] desktop-md:text-[68px] desktop-md:leading-[72px]">
+              <h1 className="mt-[24px] text-[40px] leading-[44px] font-normal tracking-[-0.01em] text-[var(--foreground)] tablet:mt-[28px] tablet:text-[56px] tablet:leading-[60px] desktop-md:text-[68px] desktop-md:leading-[72px]">
                 {headlineLines.map((line, index) => (
                   <span key={index} className="block">
                     {line}
@@ -168,7 +168,7 @@ export function ComingSoonPage({ app }: { app: ComingSoonApp }) {
               className="aspect-square w-full object-cover"
             />
           </span>
-          <h2 className="mt-[28px] max-w-[18ch] text-[32px] leading-[38px] font-extrabold tablet:text-[48px] tablet:leading-[54px]">
+          <h2 className="mt-[28px] max-w-[18ch] text-[32px] leading-[38px] font-normal tablet:text-[48px] tablet:leading-[54px]">
             {app.title} is on the way
           </h2>
           <p className="mt-[16px] max-w-[46ch] text-[16px] leading-[26px] text-white/70 tablet:text-[17px]">

@@ -167,7 +167,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                   aria-hidden="true"
                   className="size-[40px] shrink-0 rounded-[20.8%] tablet:size-[65px] desktop-xl:size-[54px]"
                 />
-                <h3 className="text-[20px] leading-[26px] font-extrabold text-black tablet:text-[35px] tablet:leading-[46px]">
+                <h3 className="text-[20px] leading-[26px] font-normal text-black tablet:text-[35px] tablet:leading-[46px]">
                   {panel.title}
                 </h3>
               </div>

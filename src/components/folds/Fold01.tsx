@@ -300,7 +300,7 @@ export default function Fold01() {
               {/* `max-w` grows with the type past 1920 — 527px holds
                   "Everyday tasks" on one line at 60px and would break it at
                   68px, which 600 clears. */}
-              <h1 className="max-w-[355px] text-center text-[40px] leading-[43px] font-bold text-white max-mobile-sm:text-[35px] max-mobile-sm:leading-[38px] tablet:max-w-[440px] tablet:text-[48px] tablet:leading-[52px] desktop-sm:max-w-[527px] desktop-sm:text-[60px] desktop-sm:leading-[62px] desktop-xl:max-w-[720px] desktop-xl:text-[80px] desktop-xl:leading-[84px]">
+              <h1 className="max-w-[355px] text-center text-[40px] leading-[43px] font-normal text-white max-mobile-sm:text-[35px] max-mobile-sm:leading-[38px] tablet:max-w-[440px] tablet:text-[48px] tablet:leading-[52px] desktop-sm:max-w-[527px] desktop-sm:text-[60px] desktop-sm:leading-[62px] desktop-xl:max-w-[720px] desktop-xl:text-[80px] desktop-xl:leading-[84px]">
                 <span className="block overflow-hidden pb-[0.14em] -mb-[0.14em]">
                   <span data-hero-line className="block">
                     Everyday tasks

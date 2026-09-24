@@ -75,13 +75,13 @@ export default function Fold07() {
               {/* Mobile runs it as one sentence that simply wraps, with no
                   forced breaks and no subtext under it. The two colours are the
                   artboard's: near-black lead-ins, #2774c1 on the two nouns. */}
-              <h2 className="text-[26px] leading-[34px] font-extrabold text-[#111116] tablet:hidden">
+              <h2 className="text-[26px] leading-[34px] font-normal text-[#111116] tablet:hidden">
                 Millions of <span className="text-[#2774c1]">Downloads.</span> Millions of{" "}
                 <span className="text-[#2774c1]">Experiences.</span>
               </h2>
 
               {/* tablet up keeps the artboard's two stacked blocks */}
-              <h2 className="hidden text-[26px] leading-[27px] font-extrabold text-[#111116] tablet:block tablet:text-[44px] tablet:leading-[51px]">
+              <h2 className="hidden text-[26px] leading-[27px] font-normal text-[#111116] tablet:block tablet:text-[44px] tablet:leading-[51px]">
                 <span className="block">
                   Millions of
                   <br />

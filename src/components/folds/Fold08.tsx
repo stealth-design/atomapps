@@ -60,7 +60,7 @@ export default function Fold08() {
             <p className="text-center text-[12px] leading-[16px] font-bold text-[#111116] uppercase tablet:hidden">
               Leadership
             </p>
-            <h2 className="mt-[8px] text-center text-[26px] leading-[34px] font-extrabold text-[#111116] tablet:mt-0 tablet:text-[48px] tablet:leading-[55px]">
+            <h2 className="mt-[8px] text-center text-[26px] leading-[34px] font-normal text-[#111116] tablet:mt-0 tablet:text-[48px] tablet:leading-[55px]">
               <span className="tablet:hidden">Meet the team</span>
               <span className="hidden tablet:inline">Leadership Team</span>
             </h2>

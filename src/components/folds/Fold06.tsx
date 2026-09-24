@@ -73,7 +73,7 @@ export default function Fold06() {
             Our Approach
           </p>
 
-          <h2 className="mt-[24px] text-[28px] leading-[34px] font-extrabold text-black capitalize tablet:mt-[29px] tablet:text-[50px] tablet:leading-[60px]">
+          <h2 className="mt-[24px] text-[28px] leading-[34px] font-normal text-black capitalize tablet:mt-[29px] tablet:text-[50px] tablet:leading-[60px]">
             We start with real life.
           </h2>
 
@@ -109,7 +109,7 @@ export default function Fold06() {
                 className="size-[39px]"
               />
 
-              <h3 className="mt-[16px] text-[25px] leading-[33px] font-bold text-[#1e1e1e]">
+              <h3 className="mt-[16px] text-[25px] leading-[33px] font-normal text-[#1e1e1e]">
                 {step.title}
               </h3>
 
