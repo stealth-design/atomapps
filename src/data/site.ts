@@ -13,11 +13,9 @@ export interface SiteConfig {
   description: string;
   nav: NavItem[];
   cta: NavItem;
-  /** The footer's own call to action. */
-  footerCta: NavItem;
   legal: NavItem[];
-  tagline: string;
-  disclaimer: string;
+  /** The notices on the foot of the footer, one line each. */
+  disclaimers: string[];
   email: string;
   copyright: string;
   social: SocialLink[];
@@ -37,10 +35,9 @@ export const siteConfig: SiteConfig = {
     { label: "Our Approach", href: "#fold-06" },
     { label: "About Us", href: "#fold-03" },
   ],
-  // Both point at the /contact page rather than the footer anchor. The
-  // footer keeps its own `id="contact"`, so existing anchors still resolve.
+  // Points at the /contact page rather than the footer anchor. The footer
+  // keeps its own `id="contact"`, so existing anchors still resolve.
   cta: { label: "Contact Us", href: "/contact" },
-  footerCta: { label: "Get in touch", href: "/contact" },
   legal: [
     { label: "Terms & Conditions", href: "/terms" },
     { label: "Privacy Policy", href: "/privacy" },
@@ -51,15 +48,13 @@ export const siteConfig: SiteConfig = {
       href: "/do-not-sell",
     },
   ],
-  /** Sits under the footer wordmark. Distinct from `description`, which is
-      the page's meta description. */
-  tagline:
-    "A full-service company that specializes in mobile development, distribution, and monetization for brands across verticles.",
-  /** Shown under the footer wordmark, and the address the documents name. */
+  /** The address the legal documents name. The footer no longer prints it. */
   email: "contact@atomapplications.com",
   /** Trademark attribution, on the foot of the footer under the legal row. */
-  disclaimer:
+  disclaimers: [
     "Google Play is a trademark of Google LLC. Our company and apps are not affiliated with or endorsed by Google.",
-  copyright: "@ATOM All Rights Reserved 2026",
+    "All third-party names, trademarks, and logos are the property of their respective owners. Their use does not imply endorsement or sponsorship of Atom Apps LLC.",
+  ],
+  copyright: "© 2026 Atom Apps LLC. All rights reserved.",
   social: [],
 };

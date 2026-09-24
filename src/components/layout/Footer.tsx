@@ -1,15 +1,18 @@
 import Image from "next/image";
-import Link from "next/link";
 import { siteConfig } from "@/data/site";
 
 /**
  * Site footer (Figma 1576:4269, 1440x800).
  *
- * The call to action is centred at the top, the AtomApps wordmark runs the full
- * width of the foot, and under it sit the tagline, the contact address and the
- * legal row — links left, copyright right. The middle of the panel is
- * deliberately empty: the blocks are anchored to opposite ends and the space
- * between them is what the artboard asks for, not slack left over.
+ * One centred column on the foot of the panel: the AtomApps wordmark running
+ * the full width, then the legal links, the trademark notices and the
+ * copyright. The rest of the panel is deliberately empty — the block is
+ * anchored to the bottom and the space above it is what is left.
+ *
+ * It used to open with a "Get in touch" call to action and carry the tagline
+ * and the contact address under the wordmark, with the copyright pushed to the
+ * right of the legal row. All of that is gone by request; the address still
+ * lives in `siteConfig.email`, which the legal pages use.
  *
  * The composition is the artboard's; the way it is held together is not. Every
  * block used to sit at its measured offset from the top of a panel fixed at
@@ -26,10 +29,7 @@ import { siteConfig } from "@/data/site";
  *     that, because the block is anchored by its foot, but any change to the
  *     padding above it does.
  *   - What follows the wordmark is measured to its box, which ends on the
- *     descenders of "pp", so there is no hidden slack in those gaps. An
- *     earlier revision had the legal row 3px under the wordmark, reading as
- *     part of the lockup; the tagline and address now sit between them and the
- *     row is spaced off the foot instead.
+ *     descenders of "pp", so there is no hidden slack in that gap.
  *
  * An earlier revision carried the three section links between the call to
  * action and the wordmark. This artboard has no such row, so they are gone;
@@ -47,35 +47,6 @@ export function Footer() {
       className="relative min-h-[var(--footer-min-height)] w-full overflow-hidden bg-[#171717]"
     >
       <div className="mx-auto flex min-h-[var(--footer-min-height)] w-full max-w-[var(--content-max-width)] flex-col px-5 pt-[45px] pb-[38px] tablet:px-10 tablet:pt-[62px] tablet:pb-[37px]">
-        {/* ---------- call to action ---------- */}
-        {/*
-         * The ring and its gap are fractions of the call to action's own type
-         * size, so the three stay in proportion at any width — the artboard's
-         * 67 / 47 / 17px at 1440, and still that lockup at 2560.
-         */}
-        {/* `Link` for the same reason as the header's: /contact is a route. */}
-        <Link
-          href={siteConfig.footerCta.href}
-          className="group flex w-fit items-center gap-[0.254em] self-center text-[32px] leading-[1.4] font-medium text-[#f5f5f7] tablet:text-[clamp(67px,calc(var(--locked-vw)*0.04653),104px)]"
-        >
-          <span>{siteConfig.footerCta.label}</span>
-
-          {/*
-           * The arrow leaves through the top-right corner and its replacement
-           * arrives from the bottom-left, so the ring reads as one arrow
-           * travelling through rather than a glyph that swaps. Two copies
-           * rather than one moving out and back: a single arrow would have to
-           * return along the diagonal it just left by, which reads as a recoil.
-           *
-           * `overflow-hidden` on the ring is what sells it — both are clipped
-           * to the circle, so neither is ever seen outside it.
-           */}
-          <span className="relative grid size-[40px] shrink-0 place-items-center overflow-hidden rounded-full bg-white tablet:size-[0.701em]">
-            <Arrow className="translate-x-0 translate-y-0 group-hover:translate-x-[150%] group-hover:-translate-y-[150%]" />
-            <Arrow className="-translate-x-[150%] translate-y-[150%] group-hover:translate-x-0 group-hover:translate-y-0" />
-          </span>
-        </Link>
-
         {/* ---------- wordmark and legal, on the foot ---------- */}
         {/* `mt-auto` is what holds the artboard's shape: the call to action
             stays at the top and these two sit together on the foot however
@@ -93,92 +64,45 @@ export function Footer() {
             className="h-auto w-full"
           />
 
-          {/* ---------- tagline ---------- */}
-          {/* Centred under the wordmark and held to a measure rather than the
-              panel's width: at 1440 the full width would set this as one
-              120-character line, where the artboard breaks it over two. */}
-          <p className="mx-auto mt-[24px] max-w-[820px] text-center text-[15px] leading-[24px] text-white tablet:mt-[34px] tablet:text-[22px] tablet:leading-[32px]">
-            {siteConfig.tagline}
-          </p>
-
-          {/* ---------- contact ---------- */}
-          {/* The label is what makes the address read as an invitation rather
-              than as another legal line; it is small, grey and set apart from
-              the address so the two group without competing. */}
-          <div className="mt-[28px] text-center tablet:mt-[40px]">
-            <p className="text-[11px] leading-[14px] font-bold tracking-[0.08em] text-[#8a8a8a] uppercase tablet:text-[12px]">
-              Reach us at
-            </p>
-            {/* The pseudo-element is the same trick the legal links use below:
-                a 14px line box is only 17px tall, under the 24px WCAG 2.5.8
-                floor, and growing the hit area into the gap costs no layout. */}
-            <a
-              href={`mailto:${siteConfig.email}`}
-              className="relative mt-[8px] inline-block text-[14px] leading-[17px] text-white before:absolute before:inset-x-0 before:-inset-y-[5px] before:content-[''] hover:underline tablet:text-[15px] tablet:leading-[19px]"
-            >
-              {siteConfig.email}
-            </a>
-          </div>
-
           {/* ---------- legal ---------- */}
-          <div className="mt-[36px] flex flex-col gap-[24px] text-[14px] leading-[17px] text-white tablet:mt-[48px] tablet:flex-row tablet:items-center tablet:gap-0">
-            {/* `tablet:contents` dissolves this row above the breakpoint, so the
-                desktop layout still lays both links out as direct children of the
-                flex row with its own spacing. */}
-            <div className="flex flex-wrap gap-x-[28px] gap-y-[16px] tablet:contents">
-              {siteConfig.legal.map((item, index) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  // A 14px line box is a 17px-tall touch target, under the 24px WCAG
-                  // 2.5.8 floor. The pseudo-element grows the hit area into the 24px
-                  // stack gap without moving anything: 11px a side lands at 39px and
-                  // still leaves 2px between the two, so neither steals the other's
-                  // taps.
-                  className={`relative before:absolute before:inset-x-0 before:-inset-y-[11px] before:content-[''] ${
-                    index > 0 ? "tablet:ml-[48px] desktop-md:ml-[103px]" : ""
-                  }`}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </div>
-            <p className="tablet:ml-auto">{siteConfig.copyright}</p>
-          </div>
+          {/* Centred under the wordmark, and the copyright is no longer in
+              this row: the foot of the panel is one centred column now, so a
+              line pushed to the right edge would be the only thing in it that
+              is not. */}
+          <nav className="mt-[36px] flex flex-wrap justify-center gap-x-[28px] gap-y-[16px] text-[14px] leading-[17px] text-white tablet:mt-[48px] tablet:gap-x-[56px]">
+            {siteConfig.legal.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                // A 14px line box is a 17px-tall touch target, under the 24px
+                // WCAG 2.5.8 floor. The pseudo-element grows the hit area into
+                // the 16px stack gap without moving anything: 11px a side lands
+                // at 39px and still leaves 2px between two stacked rows, so
+                // neither steals the other's taps.
+                className="relative before:absolute before:inset-x-0 before:-inset-y-[11px] before:content-['']"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
 
           {/* ---------- trademark attribution ---------- */}
-          {/* Last line of the panel, and deliberately the quietest thing on
-              it: smaller and dimmer than the legal row above, so it reads as
-              a required notice rather than as another link. The measure keeps
-              it to two lines at 1440 instead of one very long one. */}
-          <p className="mx-auto mt-[24px] max-w-[760px] text-center text-[12px] leading-[18px] text-[#8a8a8a] tablet:mt-[28px]">
-            {siteConfig.disclaimer}
+          {/* The quietest thing on the panel: smaller and dimmer than the
+              legal row above, so it reads as a required notice rather than as
+              another link. The measure holds each notice to one line at 1440
+              and lets both wrap on a phone. */}
+          <div className="mx-auto mt-[40px] flex max-w-[1040px] flex-col gap-[6px] text-center text-[12px] leading-[18px] text-[#8a8a8a] tablet:mt-[56px]">
+            {siteConfig.disclaimers.map((notice) => (
+              <p key={notice}>{notice}</p>
+            ))}
+          </div>
+
+          {/* ---------- copyright ---------- */}
+          <p className="mt-[18px] text-center text-[14px] leading-[20px] text-white tablet:mt-[22px]">
+            {siteConfig.copyright}
           </p>
         </div>
       </div>
     </footer>
-  );
-}
-
-/**
- * The ring's arrow. Sized in `em` so it tracks the call to action's type, and
- * transitioned on the same curve the rest of the page's hovers use.
- */
-function Arrow({ className }: { className: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      fill="none"
-      className={`col-start-1 row-start-1 size-[22px] transition-transform duration-[600ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none tablet:size-[0.388em] ${className}`}
-    >
-      <path
-        d="M6 18 18 6M9 6h9v9"
-        stroke="#171717"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
