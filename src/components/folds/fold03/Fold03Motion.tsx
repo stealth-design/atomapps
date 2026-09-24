@@ -16,6 +16,7 @@ import { END_GRID, END_ORDER, type GridConfig } from "./appIcons";
  *   0.00–0.10  start frame, ambient float easing off
  *   0.05–0.30  the phone dissolves out
  *   0.05–1.00  icons travel to the grid, shrinking and clearing their blur
+ *   0.05–1.00  the heading comes down from the top of the stage to meet them
  *
  * `arrive` is 1, not a little short of it. It used to be 0.92, which left the
  * last 8% of the pin — about a scroll gesture — with nothing happening in it:
@@ -107,8 +108,26 @@ function layoutBox(el: HTMLElement): Box {
   };
 }
 
-/** Final grid boxes in END_ORDER, centred on the stage and clear of the heading. */
-function gridBoxes(config: GridConfig, stage: HTMLElement, heading: HTMLElement | null): Box[] {
+interface EndLayout {
+  /** Final grid boxes, in END_ORDER. */
+  boxes: Box[];
+  /** Where the heading's top edge belongs once the sequence has settled. */
+  headingTop: number;
+}
+
+/**
+ * The end frame: the heading and the grid as ONE block, centred on the stage.
+ *
+ * The grid used to be centred on its own and the heading simply stayed where
+ * CSS put it, with a `max()` here to stop the icons riding up into it. That
+ * left the settled frame lopsided — the type sat wherever the start position
+ * happened to leave it, usually well above the block it belonged to.
+ *
+ * Measuring the pair together instead gives the heading a destination, which
+ * is what the timeline moves it to: heading, its clearance, then the rows, and
+ * whatever is left over split evenly above and below.
+ */
+function endLayout(config: GridConfig, stage: HTMLElement, heading: HTMLElement | null): EndLayout {
   const stageWidth = stage.offsetWidth;
   const stageHeight = stage.offsetHeight;
   const k = stageWidth / config.reference;
@@ -119,9 +138,16 @@ function gridBoxes(config: GridConfig, stage: HTMLElement, heading: HTMLElement 
   const rowWidth = (count: number) => count * size + (count - 1) * gap;
   const blockHeight = config.rows.length * size + (config.rows.length - 1) * rowGap;
 
-  // Prefer the artboard's optical centre, but never ride up into the heading.
-  const headingBottom = heading ? heading.offsetTop + heading.offsetHeight : 0;
-  const top = Math.max((stageHeight - blockHeight) / 2, headingBottom + config.headingGap * k);
+  // The heading's own height plus its clearance, or nothing at all if the
+  // fold is rendered without one.
+  const headingHeight = heading ? heading.offsetHeight : 0;
+  const lead = heading ? headingHeight + config.headingGap * k : 0;
+
+  // `max(0, …)` for the case the pair is taller than the stage, where the
+  // block starts at the top edge and overflows the bottom rather than being
+  // centred half off each end.
+  const headingTop = Math.max(0, (stageHeight - (lead + blockHeight)) / 2);
+  const top = headingTop + lead;
 
   const boxes: Box[] = [];
   config.rows.forEach((count, rowIndex) => {
@@ -135,7 +161,7 @@ function gridBoxes(config: GridConfig, stage: HTMLElement, heading: HTMLElement 
       });
     }
   });
-  return boxes;
+  return { boxes, headingTop };
 }
 
 export function Fold03Motion({ children }: { children: ReactNode }) {
@@ -250,7 +276,8 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
 
           // Reduced motion: no pin, no scrub — just present the finished grid.
           if (reduce) {
-            const grid = gridBoxes(config, stage, heading);
+            const { boxes: grid, headingTop } = endLayout(config, stage, heading);
+            if (heading) gsap.set(heading, { y: headingTop - heading.offsetTop });
             icons.forEach((el, index) => {
               const from = layoutBox(el);
               gsap.set(el, {
@@ -281,12 +308,12 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
             });
           });
 
-          let grid = gridBoxes(config, stage, heading);
+          let { boxes: grid, headingTop } = endLayout(config, stage, heading);
           let starts = icons.map(layoutBox);
 
           const remeasure = () => {
             fitScatter();
-            grid = gridBoxes(config, stage, heading);
+            ({ boxes: grid, headingTop } = endLayout(config, stage, heading));
             starts = icons.map(layoutBox);
           };
 
@@ -382,6 +409,29 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
             },
             PHASE.settle / 2,
           );
+
+          // PHASE 4 — the heading travels with them.
+          //
+          // It starts high on the stage, near the top edge, and comes down to
+          // the block's own top as the icons arrive, so the settled frame is
+          // heading and grid centred together. It runs the whole travel window
+          // rather than the icons' shorter, staggered one, which lands it
+          // exactly as the last icon does instead of well before.
+          //
+          // `y` composes with the `-translate-x-1/2` that centres the heading:
+          // that utility writes the `translate` property and GSAP writes
+          // `transform`, so the two do not fight over one declaration.
+          if (heading) {
+            timeline.to(
+              heading,
+              {
+                y: () => headingTop - heading.offsetTop,
+                duration: travelWindow,
+                ease: "power2.inOut",
+              },
+              PHASE.settle / 2,
+            );
+          }
         },
       );
 

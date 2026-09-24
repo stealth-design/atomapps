@@ -13,8 +13,9 @@ import { DESKTOP_STAGE, MOBILE_STAGE, PHONE_FADE } from "@/components/folds/fold
  *
  * A pinned, scroll-scrubbed sequence: the scattered app icons are pulled into
  * the phone, the phone dissolves, and the same icons expand into the final
- * two-row grid. The start frame is the Figma composition; the timeline and the
- * end grid live in Fold03Motion / appIcons.
+ * two-row grid. The heading travels with them, from the top of the stage down
+ * to the block it heads. The start frame is the Figma composition; the
+ * timeline and the end layout live in Fold03Motion / appIcons.
  *
  * The stage is one viewport tall so the composition is always fully in frame
  * while pinned. Icon start boxes come from IconScatter's stylesheet; the
@@ -138,13 +139,16 @@ export default function Fold03() {
               either side and no room for another step up without the line
               breaking in three.
 
-              Moving it up is the safe direction: the settled grid's first row
-              is placed against the heading's own bottom edge (see END_GRID's
-              headingGap), so raising the heading only widens the gap the halo
-              below has to clear. */}
+              The `top` here is only where it STARTS. The heading is no longer
+              held still while the icons move past it: it begins near the top
+              of the stage and the timeline brings it down to meet them, so the
+              settled frame is the heading and the grid centred together as one
+              block. Its destination is measured, not written here — see
+              `endLayout` in Fold03Motion. Raising or lowering this start
+              changes how far it travels, and nothing else. */}
           <h2
             data-f03="heading"
-            className="absolute top-[24%] left-1/2 isolate w-[346px] -translate-x-1/2 text-center text-[26px] leading-[33px] font-extrabold text-black capitalize tablet:top-[14%] tablet:w-[640px] tablet:text-[36px] tablet:leading-[45px] desktop-sm:text-[46px] desktop-sm:leading-[57px]"
+            className="absolute top-[6%] left-1/2 isolate w-[346px] -translate-x-1/2 text-center text-[26px] leading-[33px] font-extrabold text-black capitalize tablet:top-[4%] tablet:w-[640px] tablet:text-[36px] tablet:leading-[45px] desktop-sm:text-[46px] desktop-sm:leading-[57px]"
           >
             {/*
              * A white halo hugging the glyphs. The heading already paints
