@@ -186,8 +186,8 @@ export const COMING_SOON: ComingSoonApp[] = [
     // 05 loads; the grid's copy is the one used here so the icon a reader
     // clicks is the icon they land on.
     icon: "icon-08",
-    title: "Steppy",
-    name: "Steppy",
+    title: "Steppy Rewards Launcher",
+    name: "Steppy Rewards Launcher",
     headline: "Walk more.\nEarn more.",
     summary:
       "Turn your steps into real rewards — the more you walk, the more you can earn.",
@@ -205,8 +205,8 @@ export const COMING_SOON: ComingSoonApp[] = [
   {
     slug: "white-noise",
     icon: "icon-15",
-    title: "White Noise",
-    name: "White Noise",
+    title: "White Noise Launcher",
+    name: "White Noise Launcher",
     headline: "Your sound.\nYour calm.",
     summary:
       "Soothing sounds designed to help you sleep, focus, and unwind.",
@@ -232,7 +232,7 @@ export const APPS: AppPage[] = [
   {
     slug: "breaking-news",
     icon: "icon-04",
-    title: "Breaking News",
+    title: "Breaking News Launcher",
     name: "Breaking News Launcher",
     summary: "Business, Sports, Entertainment, Technology News. Local Weather Forecast Service",
     headline: "The news,\none swipe away.",
@@ -283,7 +283,7 @@ export const APPS: AppPage[] = [
   {
     slug: "volume-control",
     icon: "icon-02",
-    title: "Volume Control",
+    title: "Volume Control Launcher",
     name: "Volume Control Sound Launcher",
     summary: "Audio Booster: Volume Control, Sound Enhancer, Make Music, Calls, Alarms Louder",
     headline: "Every sound,\nexactly as loud as you want.",
@@ -338,7 +338,7 @@ export const APPS: AppPage[] = [
   {
     slug: "step-tracker",
     icon: "icon-03",
-    title: "Step Tracker",
+    title: "Step Tracker Launcher",
     name: "Step Tracker Launcher",
     summary: "Track steps, set goals, view stats & celebrate milestones — all in one app.",
     headline: "Every step counts.\nCount them.",
@@ -398,8 +398,8 @@ export const APPS: AppPage[] = [
   {
     slug: "find-my-phone",
     icon: "icon-05",
-    title: "Find My Phone",
-    name: "Find My Phone",
+    title: "Find My Phone Launcher",
+    name: "Find My Phone Launcher",
     summary: "Lost your phone? Use device finder: locate missing phone with a clap or whistle.",
     headline: "Lost your phone?\nClap.",
     accent: "#3455FD",
@@ -457,7 +457,7 @@ export const APPS: AppPage[] = [
   {
     slug: "ai-chat",
     icon: "icon-06",
-    title: "AI Chat",
+    title: "AI Chat Launcher",
     name: "AI Chat Launcher: AI Assistant",
     summary: "AI Chat & Smart Assistant Chatbot Launcher powered by GPT-5.2, Gemini and Claude",
     headline: "An AI assistant,\none swipe from home.",
@@ -511,7 +511,7 @@ export const APPS: AppPage[] = [
   {
     slug: "calendar",
     icon: "icon-07",
-    title: "2026 Calendar",
+    title: "2026 Calendar Launcher",
     name: "2026 Calendar Launcher",
     summary: "Daily Calendar Launcher 2026 - Reminder, event planner & appointment scheduler",
     headline: "Your month,\nat a glance.",
@@ -567,7 +567,7 @@ export const APPS: AppPage[] = [
   {
     slug: "daily-horoscope",
     icon: "icon-16",
-    title: "Daily Horoscope",
+    title: "Daily Horoscope Launcher",
     name: "Daily Horoscope Launcher",
     summary: "Astrology Birth Chart & Zodiac compatibility for all zodiac signs. Check yours!",
     headline: "What the stars have in store,\nevery day.",
@@ -625,7 +625,7 @@ export const APPS: AppPage[] = [
   {
     slug: "notes",
     icon: "icon-09",
-    title: "Notes & To Do",
+    title: "Notes & To Do Launcher",
     name: "Notes, Notepad, To Do Launcher",
     summary: "Notes & Notepad Launcher with Color Note, To Do List Planner, Reminders, Widgets",
     headline: "Jot it down\nbefore it's gone.",
@@ -680,7 +680,7 @@ export const APPS: AppPage[] = [
   {
     slug: "weather-radar",
     icon: "icon-10",
-    title: "Live Weather Radar",
+    title: "Live Weather Radar Launcher",
     name: "Live Weather Radar Launcher",
     summary: "All-in-one weather radar launcher with rain, temperature maps & local forecast.",
     headline: "See the weather\nbefore it arrives.",
@@ -733,7 +733,7 @@ export const APPS: AppPage[] = [
   {
     slug: "calculator",
     icon: "icon-11",
-    title: "Calculator",
+    title: "Calculator Launcher",
     name: "Calculator Launcher",
     summary: "Perform quick calculations & unit conversions with this easy calculator launcher",
     headline: "Every calculator\nyou'll ever need.",
@@ -788,7 +788,7 @@ export const APPS: AppPage[] = [
   {
     slug: "flashlight",
     icon: "icon-12",
-    title: "Brightest Flashlight",
+    title: "Brightest Flashlight Launcher",
     name: "Brightest Flashlight Launcher",
     summary: "Powerful LED flashlight, alert torch, screen light & magnifying glass launcher",
     headline: "The brightest light\nin your pocket.",
@@ -850,7 +850,7 @@ export const APPS: AppPage[] = [
   {
     slug: "qr-scanner",
     icon: "icon-13",
-    title: "QR & Barcode Scanner",
+    title: "QR & Barcode Scanner Launcher",
     name: "QR & Barcode Scanner Launcher",
     summary: "Easy to use QR code scanner and barcode reader. Scan codes quickly and easily.",
     headline: "Point.\nScan. Done.",
@@ -909,7 +909,7 @@ export const APPS: AppPage[] = [
   {
     slug: "holy-bible",
     icon: "icon-14",
-    title: "Holy Bible",
+    title: "Holy Bible Launcher",
     name: "Holy Bible Launcher: KJV+Audio",
     summary: "Holy Bible (KJV) launcher with audio. Read verses daily & study the word of God.",
     headline: "God's Word,\none swipe away.",
@@ -965,7 +965,7 @@ export const APPS: AppPage[] = [
   {
     slug: "alarm-clock",
     icon: "icon-01",
-    title: "Alarm Clock",
+    title: "Alarm Clock Launcher",
     name: "Alarm Clock Launcher",
     summary: "Wake up & get tasks done! Add alarms & reminders on the Alarm Clock Launcher.",
     headline: "Wake up on time,\nevery time.",
