@@ -6,6 +6,12 @@
  * floating UI panels, all baked in), so a panel is just its scene plus the
  * frosted card.
  *
+ * All four were re-shot and carry a `-v2` filename. That suffix is
+ * not decoration: everything under `/images/` is served `immutable` for a year
+ * (see next.config.ts), so art replaced under the same name would never reach
+ * anyone who already had the old one. The next revision needs `-v3`, and so
+ * on. `ground` and `mobileFocal` below were re-measured off the new art.
+ *
  * The four cards are deliberately not the same shape — Steppy swaps the CTA for
  * a "Coming soon" badge and adds a feature list, Volume Control carries a
  * pull-quote, White Noise has both a CTA and features. Each block below is
@@ -39,14 +45,13 @@ export interface AppPanel {
    * Horizontal focal point of the scene, as a percentage of its width.
    *
    * The scenes are landscape (1.625) and the mobile panel is portrait (~0.46),
-   * so `object-cover` only ever shows a ~28%-wide window of the source. Where
-   * that window sits has to follow each scene's device, which is composed in a
-   * different place every time (measured off the source art):
+   * so `object-cover` only ever shows a ~28%-wide window of the source, and
+   * where that window sits has to follow each scene's device. It used to
+   * differ per scene, because the old art composed the phone in a different
+   * place every time and a single shared value sliced the White Noise one
+   * clean in half. The new set is consistent: measured off all four, the
+   * phone centres within half a percent of 67% in every one.
    *
-   *   image-1  phone 57–79%    image-2  phone 58–78%
-   *   image-3  phone 57–79%    image-4  phone 57–78%
-   *
-   * A single shared value sliced the White Noise phone clean in half.
    * Desktop is unaffected — there the scene is centred and barely cropped.
    */
   mobileFocal: string;
@@ -68,9 +73,9 @@ export interface AppPanel {
 export const APP_PANELS: AppPanel[] = [
   {
     id: "find-my-phone",
-    background: "/images/image-1.webp",
-    ground: "#897b6a",
-    mobileFocal: "68%",
+    background: "/images/image-1-v2.webp",
+    ground: "#908272",
+    mobileFocal: "67%",
     icon: "/images/fold03/icon-05.jpg",
     title: "Find My Phone",
     question: "Can't find your phone when you need it most?",
@@ -81,11 +86,9 @@ export const APP_PANELS: AppPanel[] = [
   },
   {
     id: "steppy",
-    background: "/images/image-2.webp",
-    ground: "#5c5839",
-    // Re-composed like image-4: the phone moved right, 55–72% to 58–78%, so
-    // the window centres at 68% rather than 64%.
-    mobileFocal: "68%",
+    background: "/images/image-2-v2.webp",
+    ground: "#5d5a3c",
+    mobileFocal: "67%",
     icon: "/images/apps/steppy.png",
     title: "Steppy",
     question: "Need a push to start walking more?\nWalk with Steppy.",
@@ -103,9 +106,9 @@ export const APP_PANELS: AppPanel[] = [
   },
   {
     id: "volume-control",
-    background: "/images/image-3.webp",
-    ground: "#2f2015",
-    mobileFocal: "66%",
+    background: "/images/image-3-v2.webp",
+    ground: "#2f2117",
+    mobileFocal: "67%",
     icon: "/images/fold03/icon-02.jpg",
     title: "Volume Control",
     question: "Tired of not knowing how to set ringtone, alarm, or text volumes?",
@@ -118,11 +121,8 @@ export const APP_PANELS: AppPanel[] = [
   },
   {
     id: "white-noise",
-    background: "/images/image-4.webp",
-    ground: "#3e302f",
-    // 67%, not the 80% the old art wanted: this scene was re-composed and the
-    // phone sits left of where it used to. Centred on the phone rather than on
-    // the panels beside it, which is what the ~28% mobile window has room for.
+    background: "/images/image-4-v2.webp",
+    ground: "#3c3030",
     mobileFocal: "67%",
     icon: "/images/fold03/icon-15.jpg",
     title: "White Noise",
