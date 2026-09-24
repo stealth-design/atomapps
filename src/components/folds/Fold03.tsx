@@ -126,19 +126,25 @@ export default function Fold03() {
 
           {/* ---------- heading (paints above the icons, as in Figma) ---------- */}
           {/* Figma put this at top 215/626 mobile and 209/886 desktop, at
-              18/24/30px. It is set larger and higher than that by request —
-              the type is up roughly a fifth at every breakpoint and the block
-              sits ~4% further up the stage.
+              18/24/30px. It is set larger and higher than that by request, and
+              has been raised twice since: the type now runs 26/36/46 against
+              the artboard's 18/24/30, and the block sits 6 points further up
+              the stage than the first pass put it.
 
-              Moving it up is the safe direction: the note below about the
-              halo is bounded by the settled grid's first row, which begins
-              30px under the text, so raising the heading only widens that
-              gap. The widths grow with the type because the two lines are
-              explicit spans — they set the measure each line may not exceed,
-              and "designed with purpose" is the longer of them. */}
+              The widths grow with the type because the two lines are explicit
+              spans — they set the measure each line may not exceed, and
+              "designed with purpose" is the longer of them. On mobile 346 is
+              near the ceiling: the stage is only 393 wide, so there are 23px
+              either side and no room for another step up without the line
+              breaking in three.
+
+              Moving it up is the safe direction: the settled grid's first row
+              is placed against the heading's own bottom edge (see END_GRID's
+              headingGap), so raising the heading only widens the gap the halo
+              below has to clear. */}
           <h2
             data-f03="heading"
-            className="absolute top-[30%] left-1/2 isolate w-[310px] -translate-x-1/2 text-center text-[22px] leading-[28px] font-extrabold text-black capitalize tablet:top-[19.5%] tablet:w-[540px] tablet:text-[30px] tablet:leading-[38px] desktop-sm:text-[38px] desktop-sm:leading-[48px]"
+            className="absolute top-[24%] left-1/2 isolate w-[346px] -translate-x-1/2 text-center text-[26px] leading-[33px] font-extrabold text-black capitalize tablet:top-[14%] tablet:w-[640px] tablet:text-[36px] tablet:leading-[45px] desktop-sm:text-[46px] desktop-sm:leading-[57px]"
           >
             {/*
              * A white halo hugging the glyphs. The heading already paints
