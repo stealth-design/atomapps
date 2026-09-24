@@ -57,9 +57,15 @@ export default function ContactPage() {
                 {/* One weight, no italic. The reference sets its last line in a
                     script face and we have no equivalent to reach for, so this
                     stays in DM Sans at the same weight as every other heading
-                    on the site. */}
+                    on the site.
+
+                    The break is explicit rather than left to the measure: the
+                    two sentences are the ask and the answer, and at this size
+                    they wrap mid-sentence on their own — "Got a question? Send
+                    it" against "our way." — which reads as a typo. */}
                 <h1 className="max-w-[620px] text-[40px] leading-[46px] font-bold text-white tablet:text-[56px] tablet:leading-[62px] desktop-sm:text-[64px] desktop-sm:leading-[70px]">
-                  Get in touch with our team for any questions
+                  <span className="block">Got a question?</span>
+                  <span className="block">Send it our way.</span>
                 </h1>
 
                 {/* Quote card. The frosted treatment is the one Fold 05's card
