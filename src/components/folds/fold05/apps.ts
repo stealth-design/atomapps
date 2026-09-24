@@ -6,11 +6,13 @@
  * floating UI panels, all baked in), so a panel is just its scene plus the
  * frosted card.
  *
- * All four were re-shot and carry a `-v2` filename. That suffix is
- * not decoration: everything under `/images/` is served `immutable` for a year
+ * All four were re-shot and carry a version suffix. That suffix is not
+ * decoration: everything under `/images/` is served `immutable` for a year
  * (see next.config.ts), so art replaced under the same name would never reach
- * anyone who already had the old one. The next revision needs `-v3`, and so
- * on. `ground` and `mobileFocal` below were re-measured off the new art.
+ * anyone who already had the old one. Volume Control is already on `-v3` for
+ * exactly that reason — its `-v2` had shipped before the next cut arrived.
+ * Every revision needs the next number. `ground` and `mobileFocal` below were
+ * re-measured off the current art.
  *
  * The four cards are deliberately not the same shape — Steppy swaps the CTA for
  * a "Coming soon" badge and adds a feature list, Volume Control carries a
@@ -61,7 +63,14 @@ export interface AppPanel {
   /** Lead-in line. Volume Control doesn't have one. */
   question?: string;
   description: string;
-  /** Every panel links to the app's page; Steppy carries the badge as well. */
+  /**
+   * The panel's "Learn More", pointing at the app's own website.
+   *
+   * It used to point at the app's page on this site; those are unreleased (see
+   * APP_PAGES_LINKED) so it goes to the product site instead. The two panels
+   * for unreleased apps have no site to send anyone to, so they carry no CTA —
+   * Steppy shows its badge in place of one.
+   */
   cta?: { label: string; href: string };
   badge?: string;
   /** Volume Control carries a review quote above its stats. */
@@ -81,7 +90,7 @@ export const APP_PANELS: AppPanel[] = [
     question: "Can't find your phone when you need it most?",
     description:
       "Find My Phone helps you quickly find your phone by clapping or whistling.",
-    cta: { label: "Learn More", href: "/apps/find-my-phone" },
+    cta: { label: "Learn More", href: "https://findmyphonelauncher.com/" },
     stats: { downloads: "1M+", rating: "4.5" },
   },
   {
@@ -94,9 +103,6 @@ export const APP_PANELS: AppPanel[] = [
     question: "Need a push to start walking more?\nWalk with Steppy.",
     description:
       "Turn your steps into real rewards, the more you walk, the more you can earn.",
-    // Steppy has a page of its own now, so it carries the CTA as well as the
-    // badge — the card puts the two on one row.
-    cta: { label: "Learn More", href: "/apps/steppy" },
     badge: "Coming soon",
     features: [
       { icon: "ic-footprints", text: "Track your daily steps" },
@@ -106,7 +112,7 @@ export const APP_PANELS: AppPanel[] = [
   },
   {
     id: "volume-control",
-    background: "/images/image-3-v2.webp",
+    background: "/images/image-3-v3.webp",
     ground: "#2f2117",
     mobileFocal: "67%",
     icon: "/images/fold03/icon-02.jpg",
@@ -114,7 +120,7 @@ export const APP_PANELS: AppPanel[] = [
     question: "Tired of not knowing how to set ringtone, alarm, or text volumes?",
     description:
       "Easily control all your volume settings in one place with Volume Control Launcher.",
-    cta: { label: "Learn More", href: "/apps/volume-control" },
+    cta: { label: "Learn More", href: "https://phonevolumecontrol.com/" },
     quote:
       "“Great app! I can control all my app volumes separately and the boost is incredible!”",
     stats: { downloads: "1M+", rating: "4.5" },
@@ -129,7 +135,6 @@ export const APP_PANELS: AppPanel[] = [
     question: "Your Sound. Your Calm.",
     description:
       "Find your calm with soothing sounds designed to help you sleep, focus, and unwind.",
-    cta: { label: "Learn More", href: "/apps/white-noise" },
     features: [
       { icon: "ic-headphones", text: "Relax with soothing white noise and calming audio." },
       { icon: "ic-sliders", text: "Choose from white noise, nature sounds, ambient audio, and more." },

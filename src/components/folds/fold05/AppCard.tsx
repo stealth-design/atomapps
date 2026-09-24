@@ -1,9 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { CSSProperties } from "react";
 import { StarRating } from "./StarRating";
 import type { AppPanel } from "./apps";
-import { APP_PAGES_LINKED } from "@/data/apps";
 
 /**
  * One panel of the Fold 05 stack: the pre-composed scene with the frosted app
@@ -193,15 +191,18 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                   a CTA. Steppy has a page of its own now, so it carries both,
                   and stacked they read as two buttons rather than one button
                   and a status. */}
-              {/* The pill is gated on APP_PAGES_LINKED, which is off: the app
-                  pages exist but nothing links to them yet. Steppy is back to
-                  the badge alone, which is what this card showed before it had
-                  a page to point at. */}
-              {((APP_PAGES_LINKED && panel.cta) || panel.badge) && (
+              {/* The pill and the badge share a row. Steppy is the only panel
+                  that carries a badge, and it has no CTA beside it — the app
+                  has no site to send anyone to yet. */}
+              {(panel.cta || panel.badge) && (
                 <div className="mt-[18px] flex flex-wrap items-center gap-[12px] tablet:mt-[30px] desktop-xl:mt-[22px]">
-                  {APP_PAGES_LINKED && panel.cta && (
-                    <Link
+                  {panel.cta && (
+                    // The app's own site, so a plain anchor opening away from
+                    // the page rather than a client-side `Link`.
+                    <a
                       href={panel.cta.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       // `w-fit` is enough now that all three labels read "Learn More".
                       // This used to be pinned to 240px past 1920 with the arrow pushed
                       // out by `justify-between`, because the labels were "Explore <app
@@ -257,7 +258,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                         <CtaArrow className="translate-x-0 translate-y-0 can-hover:group-hover/cta:translate-x-[150%] can-hover:group-hover/cta:-translate-y-[150%]" />
                         <CtaArrow className="-translate-x-[150%] translate-y-[150%] can-hover:group-hover/cta:translate-x-0 can-hover:group-hover/cta:translate-y-0" />
                       </span>
-                    </Link>
+                    </a>
                   )}
 
                   {panel.badge && (
