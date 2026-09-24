@@ -3,26 +3,31 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * The hero plate as a video, laid over the stills rather than instead of them.
+ * A video laid over a still rather than instead of it.
  *
- * The two `<Image>` plates stay exactly where they are and this sits on top of
- * them, transparent until the video is genuinely playing. That ordering is the
+ * The `<Image>` underneath stays exactly where it is and this sits on top of
+ * it, transparent until the video is genuinely playing. That ordering is the
  * whole design, and it buys three things at once:
  *
  *   - It is a trial that cannot break the fold. A missing file, a codec the
  *     browser will not take, a blocked autoplay, a slow connection — every one
- *     of them leaves the video at opacity 0 and the hero looking exactly as it
- *     does today. There is no empty black box state.
- *   - The stills are already the right two crops (portrait under 640, landscape
- *     over it) and already `priority`, so they are a better poster than the
- *     `poster` attribute could be, which takes one image for every breakpoint.
- *   - Reverting is deleting one line in Fold01 — the images are never touched.
+ *     of them leaves the video at opacity 0 and the fold looking exactly as it
+ *     does without it. There is no empty black box state.
+ *   - The still is already the right crop and often already `priority`, so it
+ *     is a better poster than the `poster` attribute could be, which takes one
+ *     image for every breakpoint.
+ *   - Reverting is deleting one element — the image is never touched.
  *
- * It plays once and holds its last frame: no `loop`, and nothing restarts it
- * after `ended`, including coming back into view.
+ * By default it plays once and holds its last frame: nothing restarts it after
+ * `ended`, including coming back into view. Pass `loop` for a mascot or an
+ * ambient plate that should keep running.
+ *
+ * It lived in `folds/fold01/` as `HeroVideo` while the hero was the only thing
+ * that wanted it. Fold 07's rabbit wants exactly the same behaviour, so it is
+ * here rather than copied.
  */
 
-interface HeroVideoProps {
+interface OverlayVideoProps {
   /** Landscape cut. Used at every width unless `mobileSrc` is set. */
   src: string;
   /**
@@ -34,13 +39,30 @@ interface HeroVideoProps {
    * and worth knowing if you are testing by dragging the window.
    */
   mobileSrc?: string;
+  /** Keep running rather than stopping on the last frame. */
+  loop?: boolean;
+  /**
+   * `"auto"` for a plate that should be ready the moment it scrolls in.
+   *
+   * `"none"` holds the request back until the observer below asks to play,
+   * which is what a heavy decorative file wants: nothing is fetched for a
+   * reader who never reaches that fold, or who is on a breakpoint where the
+   * element is `display: none`.
+   */
+  preload?: "auto" | "metadata" | "none";
   className?: string;
 }
 
 /** Matches the stills' own 640px portrait/landscape switch. */
 const MOBILE_MEDIA = "(max-width: 639px)";
 
-export function HeroVideo({ src, mobileSrc, className }: HeroVideoProps) {
+export function OverlayVideo({
+  src,
+  mobileSrc,
+  loop = false,
+  preload = "auto",
+  className,
+}: OverlayVideoProps) {
   const ref = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -93,9 +115,11 @@ export function HeroVideo({ src, mobileSrc, className }: HeroVideoProps) {
       ref={ref}
       muted
       playsInline
-      // No `loop` and no `autoplay`, both deliberate: it runs once, driven by
-      // the effect above, and stops on its final frame.
-      preload="auto"
+      loop={loop}
+      // No `autoplay`: playback is driven by the effect above so that the
+      // reduced-motion preference can opt out of it, which the attribute
+      // gives no way to do.
+      preload={preload}
       aria-hidden="true"
       // `onPlaying` rather than `onCanPlay`: frames are on screen by then, so
       // the cross-fade cannot reveal an undecoded black frame over the stills.

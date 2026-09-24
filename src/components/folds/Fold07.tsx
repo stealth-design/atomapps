@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
+import { OverlayVideo } from "@/components/ui/OverlayVideo";
 import { TestimonialCard } from "@/components/folds/fold07/TestimonialCard";
 import { MarqueeMotion } from "@/components/folds/fold07/MarqueeMotion";
 import { DESKTOP_COLUMNS, MOBILE_ROWS } from "@/components/folds/fold07/testimonials";
@@ -108,15 +109,68 @@ export default function Fold07() {
                 * 310px against the column's 460, set well in from the type's
                 * left edge. The column has the room either way, and the inset
                 * keeps the mascot from crowding the quotes beside it. */}
-              <Image
-                src="/images/rabbit.webp"
-                alt=""
-                width={2934}
-                height={4305}
-                aria-hidden="true"
-                sizes="310px"
-                className="mt-[32px] ml-[64px] hidden h-auto w-[310px] desktop-md:block"
-              />
+              {/*
+               * The still is the poster and the video lays over it — see
+               * OverlayVideo. Until the file is decoded and genuinely playing,
+               * the fold looks exactly as it did with the still alone.
+               *
+               * The geometry is the awkward part, because the two assets frame
+               * the rabbit differently. Both were measured rather than guessed:
+               *
+               *   still  drawn 310 wide; the rabbit reads 304 x 392 in that box,
+               *          its feet on 409
+               *   video  1112x834. The rabbit is a squash-and-stretch idle, so
+               *          it has no one size — sampled across the 8.1s loop it
+               *          runs 424-503 wide and 697-736 tall. What does not move
+               *          is the floor: its feet sit on y=783 in every frame.
+               *
+               * So the two are matched on the things that hold still. The
+               * resting height, ~700, is scaled to the still's 392 (k = 0.56),
+               * which puts the video at 623x467, and the offsets below drop its
+               * y=783 onto the still's 409 and centre the two horizontally. At
+               * rest the rabbit lands 280 x 392 against the still's 304 x 392:
+               * the same height and feet, 8% narrower. Every frame of the loop
+               * stays inside the box, the widest at 11-293 and the tallest
+               * reaching y=0 with 43 to spare at the foot.
+               *
+               * The wrapper keeps the still's own 310x455 box and clips: the
+               * white frame around the rabbit never reaches the paragraph above
+               * or the quotes beside.
+               *
+               * `max-w-none` because the base stylesheet caps every video at
+               * `max-width: 100%`, which would clamp the box back to the
+               * wrapper and shrink the rabbit.
+               *
+               * `brightness-[1.03]` because the video's ground is not the
+               * fold's white: sampled off a decoded frame it is (250, 251,
+               * 253), a blue-tinted off-white that reads as a pale rectangle
+               * against the #fff behind it. 1.03 lifts 250 past 255, so the
+               * ground clips to pure white and the edge disappears. It is the
+               * smallest factor that does it, and the rabbit's own mid-tones
+               * move by 3%, which is not perceptible.
+               *
+               * `preload="none"` because the file is 6MB and this only renders
+               * from 1280px up: nothing is fetched until the observer asks to
+               * play, so no phone, and no reader who stops short of this fold,
+               * pays for it.
+               */}
+              <div className="relative mt-[32px] ml-[64px] hidden h-[455px] w-[310px] overflow-hidden desktop-md:block">
+                <Image
+                  src="/images/rabbit.webp"
+                  alt=""
+                  width={2934}
+                  height={4305}
+                  aria-hidden="true"
+                  sizes="310px"
+                  className="h-full w-full"
+                />
+                <OverlayVideo
+                  src="/videos/rabbit.mp4"
+                  loop
+                  preload="none"
+                  className="absolute top-[-26px] left-[-122px] h-[467px] w-[623px] max-w-none brightness-[1.03]"
+                />
+              </div>
             </Reveal>
           </div>
 

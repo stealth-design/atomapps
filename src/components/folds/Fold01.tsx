@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 import { HeroMotion } from "@/components/folds/fold01/HeroMotion";
-import { HeroVideo } from "@/components/folds/fold01/HeroVideo";
+import { OverlayVideo } from "@/components/ui/OverlayVideo";
 
 /**
  * Fold 01 — Hero
@@ -66,7 +66,7 @@ const HERO_LAG = 35;
  *
  *   const HERO_VIDEO = { src: "/videos/hero.mp4", mobileSrc: "/videos/hero-mobile.mp4" };
  *
- * It plays once and holds its last frame — no loop. See HeroVideo for how it
+ * It plays once and holds its last frame — no loop. See OverlayVideo for how it
  * degrades (reduced motion, blocked autoplay, missing file all fall back to
  * the stills).
  * ---------------------------------------------------------------------------
@@ -247,7 +247,7 @@ export default function Fold01() {
                       composition: bottom-anchored on the portrait stage,
                       centred once the landscape one takes over. */}
                   {HERO_VIDEO && (
-                    <HeroVideo
+                    <OverlayVideo
                       src={HERO_VIDEO.src}
                       mobileSrc={HERO_VIDEO.mobileSrc}
                       className="absolute inset-0 h-full w-full object-cover object-bottom min-[640px]:object-center"
