@@ -14,10 +14,10 @@
  * Every revision needs the next number. `ground` and `mobileFocal` below were
  * re-measured off the current art.
  *
- * The four cards are deliberately not the same shape — the two unreleased apps
- * swap the CTA for a "Coming soon" badge, Volume Control carries a pull-quote,
- * Find My Phone has a CTA, features and stats. Each block below is optional,
- * and the card renders whatever is present.
+ * The four cards are deliberately not the same shape — Steppy swaps the CTA
+ * for a "Coming soon" badge, Volume Control carries a pull-quote, Find My
+ * Phone has a CTA, features and stats. Each block below is optional, and the
+ * card renders whatever is present.
  *
  * Figma sources: 1136:3208 (Find My Phone), 1136:3261 (Steppy),
  * 1136:3064 (Volume Control), 1136:2679 (White Noise).
@@ -67,9 +67,9 @@ export interface AppPanel {
    * The panel's "Learn More", pointing at the app's own website.
    *
    * It used to point at the app's page on this site; those are unreleased (see
-   * APP_PAGES_LINKED) so it goes to the product site instead. Only the two
-   * released apps have a site to send anyone to; Steppy and White Noise carry
-   * a "Coming soon" badge in place of a CTA.
+   * APP_PAGES_LINKED) so it goes to the product site instead. Steppy is the
+   * only panel with no site to send anyone to, and carries a "Coming soon"
+   * badge in place of a CTA.
    */
   cta?: { label: string; href: string };
   badge?: string;
@@ -139,11 +139,9 @@ export const APP_PANELS: AppPanel[] = [
     question: "Your Sound. Your Calm.",
     description:
       "Find your calm with soothing sounds designed to help you sleep, focus, and unwind.",
-    // Not on Google Play yet, but it has a site to read about it on — so this
-    // is the one card carrying a CTA and the badge at once, which is what the
-    // row in AppCard was built for.
+    // Not on Google Play yet, but it has a site of its own to send people to,
+    // so it reads as a released app here rather than carrying a badge.
     cta: { label: "Learn More", href: "https://whitenoiseapp.ai/" },
-    badge: "Coming soon",
     features: [
       { icon: "ic-headphones", text: "Relax with soothing white noise and calming audio." },
       { icon: "ic-sliders", text: "Choose from white noise, nature sounds, ambient audio, and more." },
