@@ -51,7 +51,7 @@ export default function Fold04() {
         // by then, so the gutter here would inset the copy a second time.
         className="mx-auto max-w-[var(--content-max-width)] px-5 text-center tablet:px-10 desktop-xl:px-0"
       >
-        <h2 className="text-[28px] leading-[36px] font-normal text-[#111111] tablet:text-[clamp(38px,calc(var(--locked-vw)*0.05),72px)] tablet:leading-[1.3] tablet:text-black tablet:capitalize">
+        <h2 className="text-[28px] leading-[34px] font-normal text-[#111111] tablet:text-[50px] tablet:leading-[60px] tablet:text-black tablet:capitalize">
           {/* Mobile breaks after "apps" so the second line reads "for
               different needs" instead of orphaning "needs" on its own. The
               spans go inline again on desktop, where it sets as one line. */}
