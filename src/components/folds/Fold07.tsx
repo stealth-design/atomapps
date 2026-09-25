@@ -175,17 +175,23 @@ export default function Fold07() {
           </div>
 
           {/* ---------- quotes ---------- */}
-          <div className="mt-[24px] min-w-0 flex-1 tablet:mt-[40px] desktop-md:mt-0">
+          <div className="mt-[28px] min-w-0 flex-1 tablet:mt-[40px] desktop-md:mt-0">
             {/* mobile: two rows drifting sideways in opposite directions.
                 Each row bleeds past the page gutter so cards run to both
                 screen edges, with the edges masked so they arrive and leave
-                softly rather than popping at a hard cut. */}
+                softly rather than popping at a hard cut.
+
+                Each row carries 12px above and below its cards: the row clips
+                sideways for the marquee, and without that room it also cut the
+                cards' shadow off flat. With the 8px gap that puts 32px between
+                the two rows' cards, and the 20px foot gives the same breathing
+                room before Fold 08. */}
             <MarqueeMotion>
-              <div className="-mx-5 flex flex-col gap-[10px] tablet:hidden">
+              <div className="-mx-5 mb-[20px] flex flex-col gap-[8px] tablet:hidden">
                 {MOBILE_ROWS.map((row, rowIndex) => (
                   <div
                     key={rowIndex}
-                    className="overflow-hidden"
+                    className="overflow-hidden py-[12px]"
                     style={{ maskImage: ROW_FADE, WebkitMaskImage: ROW_FADE }}
                   >
                     <div
@@ -202,7 +208,7 @@ export default function Fold07() {
                           className="w-[262px] shrink-0 pr-[10px]"
                           aria-hidden={index >= row.length || undefined}
                         >
-                          <TestimonialCard testimonial={testimonial} clone={index >= row.length} />
+                          <TestimonialCard testimonial={testimonial} clone={index >= row.length} uniform />
                         </div>
                       ))}
                     </div>

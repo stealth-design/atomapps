@@ -2,49 +2,43 @@
  * Fold 06 — Our Approach.
  *
  * Figma: desktop 1153:8675 (1440x1009), mobile 1136:1991 (393x906).
- * The three cards are identical between artboards (331x535 with the same inner
- * layout) — desktop lays them in a row, mobile scrolls them horizontally.
+ * Cards rebuilt from 1792:53548 — 364x488, an illustration across the top and
+ * the copy beneath. Desktop lays them in a row, mobile scrolls them.
  */
 
 export interface ApproachStep {
   id: string;
-  /** Icon SVG basename in `public/images/fold06/`. */
-  icon: string;
   title: string;
   body: string;
-  /** Figma's body text width — card 1 is narrower than the other two. */
+  /** Figma's body text width — each card wraps its copy at its own measure. */
   bodyWidth: number;
   /**
-   * Animated illustration and its Figma box, drawn at the foot of the card.
-   * `src` is a full public path; the GIFs are authored at exactly 2x the box
-   * below, so the declared intrinsic size is width/height doubled.
+   * Card illustration in `public/images/fold06/`, exported from Figma at 2x.
+   * Each is the card's top 364x356, already faded to the card's white.
    */
-  illustration: { src: string; width: number; height: number };
+  image: string;
 }
 
 export const APPROACH_STEPS: ApproachStep[] = [
   {
     id: "find-the-need",
-    icon: "ic-heart",
     title: "Find the Need",
     body: "We start by identifying a real problem, frustration, or task that technology can make easier.",
-    bodyWidth: 217,
-    illustration: { src: "/videos/1st-frame.gif", width: 274, height: 280 },
+    bodyWidth: 333,
+    image: "/images/fold06/find-the-need.png",
   },
   {
     id: "design-around-it",
-    icon: "ic-target",
     title: "Design Around It",
     body: "We focus on the features that matter most and build an experience that feels intuitive and easy to use.",
-    bodyWidth: 253,
-    illustration: { src: "/videos/2nd-frame.gif", width: 274, height: 299 },
+    bodyWidth: 293,
+    image: "/images/fold06/design-around-it.png",
   },
   {
     id: "keep-making-it-better",
-    icon: "ic-check",
     title: "Keep Making It Better",
     body: "We learn from how people use our apps and continue refining the experience over time.",
-    bodyWidth: 253,
-    illustration: { src: "/videos/3rd-frame.gif", width: 279, height: 272 },
+    bodyWidth: 345,
+    image: "/images/fold06/keep-making-it-better-lg-phone.png",
   },
 ];

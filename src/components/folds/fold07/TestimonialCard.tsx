@@ -10,6 +10,11 @@ import type { Testimonial } from "./testimonials";
  * three-line quote lands on 189px and a four-line one on 212px, the two card
  * heights in the design.
  *
+ * `uniform` is for the mobile rows, where every card on a row is drawn at the
+ * same height: the card fills its row, the quote is held to four lines and
+ * leads, and the chip is pinned to the foot — so a short quote leaves its
+ * spare height between the two rather than as an empty band at the bottom.
+ *
  * The chip is a link to the app's page. `clone` marks the second copy of a
  * card that a marquee track renders for its loop: that copy is `aria-hidden`
  * already, and this takes its link out of the tab order too, so a keyboard
@@ -19,11 +24,13 @@ export function TestimonialCard({
   testimonial,
   faded,
   clone,
+  uniform,
   ...rest
 }: {
   testimonial: Testimonial;
   faded?: boolean;
   clone?: boolean;
+  uniform?: boolean;
 } & React.HTMLAttributes<HTMLElement>) {
   return (
     <figure
@@ -31,6 +38,7 @@ export function TestimonialCard({
       className={cn(
         "w-full rounded-[14px] bg-white p-[18px] shadow-[0_10px_28px_rgba(0,0,0,0.04)] tablet:rounded-[20px] tablet:p-[24px]",
         faded && "opacity-40",
+        uniform && "flex h-full flex-col",
       )}
     >
       {/*
@@ -40,7 +48,7 @@ export function TestimonialCard({
        * length. The quote is now 14px/21px and the chip 11px, the smallest
        * sizes that stay comfortable; desktop is untouched.
        */}
-      <figcaption>
+      <figcaption className={cn(uniform && "order-last mt-auto pt-[14px]")}>
         {/* A link only while the app pages are linked at all — see
             APP_PAGES_LINKED. Off, the chip is the plain card header it was
             before those pages existed, so nothing here dead-ends. */}
@@ -52,21 +60,31 @@ export function TestimonialCard({
             height={56}
             className="size-[24px] rounded-[22%] tablet:size-[28px]"
           />
-          <span className="text-[11px] leading-[14px] font-bold text-[#111116] tablet:text-[12px] tablet:leading-[16px]">
-            {testimonial.app}
-          </span>
-          <span
-            aria-label="Rated 5 out of 5"
-            className="text-[11px] leading-[14px] tracking-[0.5px] text-[#ffbf00] tablet:text-[12px] tablet:leading-[15px]"
-          >
-            ★★★★★
+          {/* Mobile stacks the stars under the name, so a long name such as
+              "Volume Control Launcher" stays on one line and every chip is the
+              same two rows. Tablet up keeps them side by side. */}
+          <span className="flex flex-col gap-[2px] tablet:flex-row tablet:items-center tablet:gap-[10px]">
+            <span className="text-[11px] leading-[14px] font-bold whitespace-nowrap text-[#111116] tablet:text-[12px] tablet:leading-[16px] tablet:whitespace-normal">
+              {testimonial.app}
+            </span>
+            <span
+              aria-label="Rated 5 out of 5"
+              className="text-[11px] leading-[14px] tracking-[0.5px] text-[#ffbf00] tablet:text-[12px] tablet:leading-[15px]"
+            >
+              ★★★★★
+            </span>
           </span>
         </Chip>
       </figcaption>
 
       {/* The quotation marks are the card's, not the data's, so every review
           gets the same pair — the old hand-written set had them on some. */}
-      <blockquote className="mt-[10px] text-[14px] leading-[21px] text-[#61616a] tablet:mt-[12px] tablet:text-[15px] tablet:leading-[23px]">
+      <blockquote
+        className={cn(
+          "mt-[10px] text-[14px] leading-[21px] text-[#61616a] tablet:mt-[12px] tablet:text-[15px] tablet:leading-[23px]",
+          uniform && "mt-0 line-clamp-4",
+        )}
+      >
         &ldquo;{testimonial.quote}&rdquo;
       </blockquote>
     </figure>

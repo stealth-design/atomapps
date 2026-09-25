@@ -22,6 +22,11 @@
  */
 @custom-variant can-hover (@media (hover: hover) and (pointer: fine));
 
+/* Short tablet/laptop windows (1280x720, 1024x768, 1366x768), where a card sized
+   to the viewport's height has less room than its copy needs. Capped at 1920
+   because past that the Fold 05 card is sized by its aspect ratio instead. */
+@custom-variant short (@media (min-width: 768px) and (max-width: 1920px) and (max-height: 820px));
+
 /* Everything below lives in `base` on purpose: unlayered CSS outranks every
    Tailwind utility, so an unlayered `h1 { font-size }` here would silently
    beat `text-[60px]` in a fold. Keeping it layered lets utilities win. */

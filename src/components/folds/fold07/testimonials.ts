@@ -105,5 +105,20 @@ export const DESKTOP_COLUMNS: Testimonial[][] = [
   TESTIMONIALS.filter((_, index) => index % 2 === 1),
 ];
 
-/** Mobile: the same split, as two rows drifting sideways in opposite directions. */
-export const MOBILE_ROWS: Testimonial[][] = DESKTOP_COLUMNS;
+/**
+ * Longest quote the mobile rows carry. Every card on a row is drawn at one
+ * height, clamped to four lines of quote, and at the 262px card that is about
+ * 105 characters — so the rows take the reviews that fit whole rather than
+ * cutting the longer ones off mid-sentence.
+ */
+const MOBILE_QUOTE_MAX = 105;
+
+/** Mobile: the reviews that fit four lines, split the same way into two rows. */
+const MOBILE_TESTIMONIALS = TESTIMONIALS.filter(
+  (testimonial) => testimonial.quote.length <= MOBILE_QUOTE_MAX,
+);
+
+export const MOBILE_ROWS: Testimonial[][] = [
+  MOBILE_TESTIMONIALS.filter((_, index) => index % 2 === 0),
+  MOBILE_TESTIMONIALS.filter((_, index) => index % 2 === 1),
+];

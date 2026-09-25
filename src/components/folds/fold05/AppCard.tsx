@@ -119,7 +119,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
             * inset above is what brings the third side into line with them. */}
         <div
           data-f05-glass
-          className="pointer-events-auto absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.1175cqh] tablet:bottom-auto tablet:left-[11.1175cqh] tablet:h-[77.765cqh] tablet:max-h-none tablet:w-[32.222%]"
+          className="pointer-events-auto absolute bottom-[4.5%] left-[5.089%] max-h-[66%] w-[89.822%] tablet:top-[11.1175cqh] tablet:bottom-auto tablet:left-[11.1175cqh] tablet:h-[77.765cqh] tablet:max-h-none tablet:w-[46%] desktop-sm:w-[max(32.222%,340px)]"
         >
           {/*
            * Solid white, not frosted.
@@ -151,23 +151,23 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
              * drifted from at every other width. 10.4% is ~48px in the card
              * against the 43 it was, which is the nudge inward.
              */}
-            <div className="relative z-10 flex h-full w-full flex-col p-[6.799%] tablet:p-[10.4%]">
+            <div className="relative z-10 flex h-full w-full flex-col p-[6.799%] tablet:p-[10.4%] short:p-[8%]">
               {/* ---- header ---- */}
               {/* The app name deliberately has no `desktop-xl` size. It shares its
                   row with the icon, so it only gets 268px in the narrowed card,
                   and "Volume Control" — the longest of the four — needs 35.6px or
                   less to hold one line there. 35px is already that ceiling, so
                   growing it only buys a wrap the reference frame does not have. */}
-              <div className="flex items-center gap-[12px] tablet:gap-[20px]">
+              <div className="flex items-center gap-[12px] tablet:gap-[20px] short:gap-[14px]">
                 <Image
                   src={panel.icon}
                   alt=""
                   width={279}
                   height={280}
                   aria-hidden="true"
-                  className="size-[40px] shrink-0 rounded-[20.8%] tablet:size-[65px] desktop-xl:size-[54px]"
+                  className="size-[40px] shrink-0 rounded-[20.8%] tablet:size-[65px] desktop-xl:size-[54px] short:size-[48px]"
                 />
-                <h3 className="text-[20px] leading-[26px] font-normal text-black tablet:text-[35px] tablet:leading-[46px]">
+                <h3 className="text-[20px] leading-[26px] font-normal text-black tablet:text-[35px] tablet:leading-[46px] short:text-[28px] short:leading-[34px]">
                   {panel.title}
                 </h3>
               </div>
@@ -176,12 +176,12 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 // `whitespace-pre-line` so a panel can force its own break —
                 // see Steppy, which puts "Walk with Steppy." on a line of its
                 // own. Everything else still wraps to the card's width.
-                <p className="mt-[20px] whitespace-pre-line text-[16px] leading-[21px] font-medium text-black tablet:mt-[35px] desktop-xl:mt-[26px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
+                <p className="mt-[20px] whitespace-pre-line text-[16px] leading-[21px] font-medium text-black tablet:mt-[35px] desktop-xl:mt-[26px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px] short:mt-[20px] short:text-[17px] short:leading-[23px]">
                   {panel.question}
                 </p>
               )}
 
-              <p className="mt-[14px] text-[12px] leading-[16px] font-light text-black tablet:mt-[30px] desktop-xl:mt-[22px] tablet:text-[14px] tablet:leading-[18px] desktop-xl:text-[15px] desktop-xl:leading-[20px]">
+              <p className="mt-[14px] text-[12px] leading-[16px] font-light text-black tablet:mt-[30px] desktop-xl:mt-[22px] tablet:text-[14px] tablet:leading-[18px] desktop-xl:text-[15px] desktop-xl:leading-[20px] short:mt-[14px]">
                 {panel.description}
               </p>
 
@@ -196,7 +196,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                   send anyone to yet — but the row takes both if one ever
                   needs them. */}
               {(panel.cta || panel.badge) && (
-                <div className="mt-[18px] flex flex-wrap items-center gap-[12px] tablet:mt-[30px] desktop-xl:mt-[22px]">
+                <div className="mt-[18px] flex flex-wrap items-center gap-[12px] tablet:mt-[30px] desktop-xl:mt-[22px] short:mt-[18px]">
                   {panel.cta && (
                     // The app's own site, so a plain anchor opening away from
                     // the page rather than a client-side `Link`.
@@ -285,7 +285,7 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                   takes back just that leading. */}
               <div className="mt-auto pt-[20px] -mb-[6px] desktop-xl:mt-[26px]">
                 {panel.quote && (
-                  <p className="mb-[20px] text-[15px] leading-[21px] font-medium text-black tablet:mb-[40px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px]">
+                  <p className="mb-[20px] text-[15px] leading-[21px] font-medium text-black tablet:mb-[40px] tablet:text-[20px] tablet:leading-[26px] desktop-xl:text-[21px] desktop-xl:leading-[28px] short:mb-[18px] short:text-[16px] short:leading-[22px]">
                     {panel.quote}
                   </p>
                 )}
@@ -296,8 +296,8 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                   // takes a bottom margin only when there is a stats block
                   // under it to be separated from.
                   <ul
-                    className={`flex flex-col gap-[14px] tablet:gap-[20px] ${
-                      panel.stats ? "mb-[20px] tablet:mb-[28px]" : ""
+                    className={`flex flex-col gap-[14px] tablet:gap-[20px] short:gap-[12px] ${
+                      panel.stats ? "mb-[20px] tablet:mb-[28px] short:mb-[16px]" : ""
                     }`}
                   >
                     {panel.features.map((feature) => (
@@ -334,9 +334,14 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                 )}
 
                 {panel.stats && (
-                  <div className="flex gap-[42px] tablet:gap-[111px]">
+                  <div className="flex gap-[42px] tablet:justify-between tablet:gap-[16px]">
+                    {/* Spread to the card's edges rather than a fixed 111px gap.
+                        That gap is the 1440 artboard's, where the two blocks
+                        happen to span the card; on any narrower card it pushed
+                        the rating past the right edge. At 1440 this lands within
+                        10px of the artboard. */}
                     <div>
-                      <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
+                      <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px] short:text-[36px] short:leading-[44px]">
                         {panel.stats.downloads}
                       </p>
                       <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">
@@ -345,12 +350,12 @@ export function AppCard({ panel, index }: { panel: AppPanel; index: number }) {
                     </div>
                     <div>
                       <div className="flex items-center gap-[7px]">
-                        <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px]">
+                        <p className="text-[27px] leading-[36px] font-bold text-black tablet:text-[47px] tablet:leading-[61px] desktop-xl:text-[48px] desktop-xl:leading-[60px] short:text-[36px] short:leading-[44px]">
                           {panel.stats.rating}
                         </p>
                         <StarRating
                           rating={panel.stats.rating}
-                          className="block h-[11px] tablet:h-[18px]"
+                          className="block h-[11px] tablet:h-[18px] short:h-[14px]"
                         />
                       </div>
                       <p className="text-[12px] leading-[16px] text-black tablet:text-[16px] tablet:leading-[20px] desktop-xl:text-[16px] desktop-xl:leading-[21px]">

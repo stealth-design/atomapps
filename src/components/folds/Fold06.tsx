@@ -11,12 +11,12 @@ import { APPROACH_STEPS } from "@/components/folds/fold06/steps";
  *   mobile   1136:1991   393 x 906
  *
  * A centred header over faint concentric arcs, then three process cards. The
- * cards are identical on both artboards (331x535); desktop rows them with a
- * 77px gap, mobile scrolls them horizontally with a 15px gap — Figma parks the
- * second and third off-canvas, the same carousel hint used elsewhere.
+ * cards follow Figma 1792:53548: 364x488, an illustration across the top and
+ * the copy beneath. Desktop rows them with a 21px gap; mobile scrolls them
+ * horizontally at 331px with a 15px gap, the same carousel hint used elsewhere.
  *
- * Card illustrations are dense vector compositions (avatar clusters, a phone
- * UI, an orbit diagram), so each is exported as a PNG rather than rebuilt.
+ * Card illustrations are dense compositions (a photo hex grid, a phone UI, a
+ * world map), so each is exported from Figma as a 2x PNG rather than rebuilt.
  *
  * This is the only fold that carries a ground of its own — `--fold-06-bg`,
  * sitting between Fold 05's white and Fold 07's. Because the cards are white
@@ -89,61 +89,34 @@ export default function Fold06() {
             (`syncTouch` is off), so horizontal swiping is native anyway, and
             Lenis ignores horizontal wheel deltas — the carousel still works. */}
         <div
-          className="mt-[64px] flex snap-x snap-mandatory gap-[15px] overflow-x-auto scroll-pl-[31px] px-[31px] pb-2 [scrollbar-width:none] tablet:mt-[58px] desktop-md:justify-center desktop-md:snap-none desktop-md:gap-[77px] desktop-md:overflow-visible desktop-md:px-10 [&::-webkit-scrollbar]:hidden"
+          className="mt-[64px] flex snap-x snap-mandatory gap-[15px] overflow-x-auto scroll-pl-[31px] px-[31px] pb-2 [scrollbar-width:none] tablet:mt-[58px] desktop-md:justify-center desktop-md:snap-none desktop-md:gap-[21px] desktop-md:overflow-visible desktop-md:px-10 [&::-webkit-scrollbar]:hidden"
         >
           {APPROACH_STEPS.map((step) => (
             <article
               key={step.id}
-              className="relative h-[535px] w-[331px] shrink-0 snap-start overflow-hidden rounded-[13px] border border-[#e5e7eb] bg-white px-[28px] pt-[33px]"
+              className="relative w-[331px] shrink-0 snap-start overflow-hidden rounded-[15px] border border-[#e5e7eb] bg-white pb-[24px] tablet:w-[364px]"
             >
-              {/* The glyph alone, at the artboard's 39px. It used to sit in a
-                  white chip with its own hairline; 1539:625 drops that and
-                  lets the icon stand on the card. Each file is exported at
-                  39x39 with the vector already placed inside it, so the box
-                  here is the icon's own frame rather than a wrapper. */}
+              {/* The top 364x356 of the Figma card, exported as one image — it
+                  already fades to the card's white where the copy begins. */}
               <Image
-                src={`/images/fold06/${step.icon}.svg`}
+                src={step.image}
                 alt=""
-                width={39}
-                height={39}
-                className="size-[39px]"
+                width={728}
+                height={712}
+                sizes="(min-width: 768px) 364px, 331px"
+                className="block h-auto w-full"
               />
 
-              <h3 className="mt-[16px] text-[25px] leading-[33px] font-normal text-[#1e1e1e]">
-                {step.title}
-              </h3>
+              <div className="mt-[5px] pr-[8px] pl-[24px]">
+                <h3 className="text-[25px] leading-[33px] font-normal text-[#1e1e1e]">{step.title}</h3>
 
-              <p
-                className="mt-[16px] text-[14px] leading-[18px] text-[#444444]"
-                style={{ width: step.bodyWidth }}
-              >
-                {step.body}
-              </p>
-
-              {/*
-               * `unoptimized` is required, not a shortcut: the image optimizer
-               * has no animated output, so a GIF routed through it comes back
-               * as a single still frame. It also means the bytes are served
-               * as-authored, which is why these stay lazy — they sit well
-               * below the fold and together weigh far more than the rest of
-               * the page.
-               */}
-              <Image
-                src={step.illustration.src}
-                alt=""
-                width={step.illustration.width * 2}
-                height={step.illustration.height * 2}
-                unoptimized
-                loading="lazy"
-                aria-hidden="true"
-                className="absolute top-[228px] left-[28px] h-auto"
-                // The GIFs are matted on #fcfcfc, three values off the card's
-                // white, which showed as a faint rectangle around each one.
-                // 1.2% of brightness maps 252 to exactly 255 so the matte
-                // disappears; the artwork shifts by the same 1.2%, which is
-                // not perceptible and avoids re-encoding 241 frames.
-                style={{ width: step.illustration.width, filter: "brightness(1.0119)" }}
-              />
+                <p
+                  className="mt-[16px] max-w-full text-[14px] leading-[18px] text-[#444444]"
+                  style={{ width: step.bodyWidth }}
+                >
+                  {step.body}
+                </p>
+              </div>
             </article>
           ))}
         </div>
