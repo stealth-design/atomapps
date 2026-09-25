@@ -104,7 +104,7 @@ export const APP_PANELS: AppPanel[] = [
     mobileFocal: "67%",
     icon: "/images/apps/steppy.png",
     title: "Steppy",
-    question: "Need a push to start walking more?\nWalk with Steppy.",
+    question: "Need a push to start walking more?",
     description:
       "Turn your steps into real rewards, the more you walk, the more you can earn.",
     badge: "Coming soon",
@@ -123,7 +123,7 @@ export const APP_PANELS: AppPanel[] = [
     title: "Volume Control",
     question: "Tired of not knowing how to set ringtone, alarm, or text volumes?",
     description:
-      "Easily control all your volume settings in one place with Volume Control Launcher.",
+      "Boost your phone's volume and control all your volume settings from one easy to use place.",
     cta: { label: "Learn More", href: "https://phonevolumecontrol.com/" },
     quote:
       "“Great app! I can control all my app volumes separately and the boost is incredible!”",
@@ -139,6 +139,10 @@ export const APP_PANELS: AppPanel[] = [
     question: "Your Sound. Your Calm.",
     description:
       "Find your calm with soothing sounds designed to help you sleep, focus, and unwind.",
+    // Not on Google Play yet, but it has a site to read about it on — so this
+    // is the one card carrying a CTA and the badge at once, which is what the
+    // row in AppCard was built for.
+    cta: { label: "Learn More", href: "https://whitenoiseapp.ai/" },
     badge: "Coming soon",
     features: [
       { icon: "ic-headphones", text: "Relax with soothing white noise and calming audio." },
