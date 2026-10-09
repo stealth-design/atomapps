@@ -61,8 +61,8 @@ export function IconScatter() {
       <style>{START_CSS}</style>
 
       {END_ORDER.map((icon) => {
-        // `APP_PAGES_LINKED` is off: every icon renders exactly as it did
-        // before the pages existed — decorative, and out of the a11y tree.
+        // With `APP_PAGES_LINKED` off, every icon renders as it did before the
+        // pages existed — decorative, and out of the a11y tree.
         const link = APP_PAGES_LINKED ? ICON_LINKS[icon] : undefined;
 
         const art = (

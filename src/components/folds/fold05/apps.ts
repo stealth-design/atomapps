@@ -66,8 +66,8 @@ export interface AppPanel {
   /**
    * The panel's "Learn More", pointing at the app's own website.
    *
-   * It used to point at the app's page on this site; those are unreleased (see
-   * APP_PAGES_LINKED) so it goes to the product site instead. Steppy is the
+   * It used to point at the app's page on this site; it goes to the product
+   * site instead, and the on-site pages are reached from Fold 03 and Fold 07. Steppy is the
    * only panel with no site to send anyone to, and carries a "Coming soon"
    * badge in place of a CTA.
    */

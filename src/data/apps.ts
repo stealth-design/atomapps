@@ -120,18 +120,16 @@ export interface AppPage {
 /**
  * Whether anything on the site links into `/apps/*`.
  *
- * The pages are built and reachable by URL — `generateStaticParams` still
- * covers every slug — but while they are unreleased nothing on the public
- * site points at them. One flag rather than commented-out links in four
- * files, so turning them back on is this line and nothing else.
+ * One flag rather than commented-out links in several files, so the pages can
+ * be hidden again with this line and nothing else. Off, the pages stay built
+ * and reachable by URL — `generateStaticParams` still covers every slug.
  *
- * What it gates: the Fold 03 icon grid, Fold 05's "Learn More" pills and the
- * Fold 07 review chips. It deliberately does NOT gate the "more apps" grid at
- * the foot of an app page — that one is inside the section it would be
- * disabling, and a reader who has the URL should still be able to move
- * between them.
+ * What it gates: the Fold 03 icon grid and the Fold 07 review chips. Fold 05's
+ * "Learn More" pills point at each app's own website and are not affected. It
+ * deliberately does NOT gate the "more apps" grid at the foot of an app page,
+ * so a reader who has the URL can always move between them.
  */
-export const APP_PAGES_LINKED = false;
+export const APP_PAGES_LINKED = true;
 
 /** When the stats below were read off the listings. */
 export const APPS_SNAPSHOT = "23 September 2026";
