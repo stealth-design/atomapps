@@ -10,7 +10,9 @@ import { Container } from "@/components/ui/Container";
 import { ComingSoonPage } from "@/components/apps/ComingSoonPage";
 import { MoreApps } from "@/components/apps/MoreApps";
 import { PlayStoreButton } from "@/components/apps/PlayStoreButton";
+import { HeroFan, type FanScreen } from "@/components/apps/HeroFan";
 import { Poster } from "@/components/apps/Poster";
+import { ScrollLine } from "@/components/apps/ScrollLine";
 import { StarRating } from "@/components/apps/StarRating";
 import { ICON_RADIUS } from "@/components/folds/fold03/appIcons";
 import { REVIEWS } from "@/components/folds/fold07/testimonials";
@@ -22,6 +24,7 @@ import {
   getApp,
   getComingSoon,
   type AppFeature,
+  type AppPage,
 } from "@/data/apps";
 import { siteConfig } from "@/data/site";
 
@@ -32,9 +35,10 @@ import { siteConfig } from "@/data/site";
  * page is the same run of bands, and a band an app has nothing for is left
  * out:
  *
- *   hero        headline written from the summary, the store poster beside it
- *   stats       the store's header figures as one strip
- *   lead        the listing's opening paragraph and its tick list
+ *   hero        headline written from the summary over a fan of three screens
+ *   intro       the listing's opening paragraph, its tick list and the
+ *               store's header figures
+ *   one-liner   a line that holds the screen while the scroll spells it out
  *   features    one row per feature that has a poster, text and image
  *               alternating sides; the rest in a compact grid after them
  *   launcher    what the launcher itself adds, with its two posters
@@ -117,6 +121,7 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
   const reviews = REVIEWS.filter((review) => review.slug === app.slug).slice(0, 3);
   const [lead, ...rest] = app.intro;
   const headlineLines = app.headline.split("\n");
+  const fan = fanScreens(app);
 
   return (
     <>
@@ -124,19 +129,19 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
 
       <main style={{ "--accent": app.accent } as CSSProperties}>
         {/* ================= hero ================= */}
-        {/* The tint is the accent at a tenth, fading to the page's white by
-            the foot of the band, so the stats strip under it sits on plain
-            white. `pt` clears the fixed 50px header. */}
+        {/* Centred, with the fan of screens under the pitch. The tint is the
+            accent at a tenth, fading to the page's white by the foot of the
+            band. `pt` clears the fixed 50px header. */}
         <section
           className="relative overflow-hidden"
           style={{
             backgroundImage: [
-              "radial-gradient(60% 70% at 85% 10%, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 70%)",
+              "radial-gradient(70% 55% at 50% 0%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 70%)",
               "linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, #fff) 0%, #fff 100%)",
             ].join(","),
           }}
         >
-          <Container className="pt-[calc(var(--header-height)+32px)] pb-[56px] tablet:pt-[calc(var(--header-height)+56px)] tablet:pb-[80px]">
+          <Container className="pt-[calc(var(--header-height)+32px)] pb-[48px] tablet:pt-[calc(var(--header-height)+48px)] tablet:pb-[72px]">
             <nav aria-label="Breadcrumb" className="text-[14px] leading-[20px] text-[#61616a]">
               <Link href="/" className={LINK}>
                 Home
@@ -149,69 +154,79 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
               </Link>
             </nav>
 
-            <div className="mt-[32px] grid items-center gap-[48px] tablet:mt-[48px] desktop-sm:grid-cols-[minmax(0,1fr)_400px] desktop-sm:gap-[80px] desktop-md:grid-cols-[minmax(0,1fr)_440px]">
-              <div className="min-w-0">
-                {/* The store name is the byline here, not the headline. */}
-                <p className="flex items-center gap-[12px]">
-                  <span className="block size-[40px] shrink-0 overflow-hidden tablet:size-[44px]" style={{ borderRadius: ICON_RADIUS }}>
-                    <Image
-                      src={appIconSrc(app)}
-                      alt=""
-                      width={279}
-                      height={280}
-                      priority
-                      sizes="44px"
-                      className="aspect-square w-full object-cover"
-                    />
+            <div className="mt-[32px] flex flex-col items-center text-center tablet:mt-[40px]">
+              {/* The store name is the byline here, not the headline. */}
+              <p className="flex items-center gap-[12px]">
+                <span className="block size-[40px] shrink-0 overflow-hidden tablet:size-[44px]" style={{ borderRadius: ICON_RADIUS }}>
+                  <Image
+                    src={appIconSrc(app)}
+                    alt=""
+                    width={279}
+                    height={280}
+                    priority
+                    sizes="44px"
+                    className="aspect-square w-full object-cover"
+                  />
+                </span>
+                <span className="text-[15px] leading-[20px] font-semibold text-[var(--foreground)] tablet:text-[16px]">
+                  {app.name}
+                </span>
+              </p>
+
+              <h1 className="mt-[24px] text-[40px] leading-[44px] font-normal tracking-[-0.01em] text-[var(--foreground)] tablet:mt-[28px] tablet:text-[56px] tablet:leading-[60px] desktop-md:text-[68px] desktop-md:leading-[72px]">
+                {headlineLines.map((line, index) => (
+                  <span key={index} className="block">
+                    {line}
                   </span>
-                  <span className="text-[15px] leading-[20px] font-semibold text-[var(--foreground)] tablet:text-[16px]">
-                    {app.name}
-                  </span>
-                </p>
+                ))}
+              </h1>
 
-                <h1 className="mt-[24px] text-[40px] leading-[44px] font-normal tracking-[-0.01em] text-[var(--foreground)] tablet:mt-[28px] tablet:text-[56px] tablet:leading-[60px] desktop-md:text-[68px] desktop-md:leading-[72px]">
-                  {headlineLines.map((line, index) => (
-                    <span key={index} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </h1>
-
-                <p className="mt-[20px] max-w-[52ch] text-[17px] leading-[27px] text-[#3f3f46] tablet:mt-[24px] tablet:text-[19px] tablet:leading-[30px]">
-                  {app.summary}
-                </p>
-
-                <div className="mt-[32px] flex flex-wrap items-center gap-x-[24px] gap-y-[16px] tablet:mt-[40px]">
-                  <PlayStoreButton app={app} />
-                  <a
-                    href={app.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-underline-link
-                    className="text-[15px] leading-[20px] font-medium text-[var(--foreground)]"
-                  >
-                    Visit the app&rsquo;s website
-                  </a>
-                </div>
+              <div className="mt-[28px] flex flex-wrap items-center justify-center gap-x-[24px] gap-y-[16px] tablet:mt-[36px]">
+                <PlayStoreButton app={app} />
+                <a
+                  href={app.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-underline-link
+                  className="text-[15px] leading-[20px] font-medium text-[var(--foreground)]"
+                >
+                  Visit the app&rsquo;s website
+                </a>
               </div>
-
-              {/* The poster leans a touch, the way a phone does in someone's
-                  hand. Straight on a phone, where it fills the width. */}
-              <Poster
-                app={app}
-                shot={app.heroShot}
-                alt={`${app.name} on Android`}
-                priority
-                sizes="(max-width: 767px) 80vw, 440px"
-                className="mx-auto w-full max-w-[360px] desktop-sm:max-w-none desktop-sm:rotate-[-2deg]"
-              />
             </div>
+
+            <HeroFan
+              screens={fan.screens}
+              framed={fan.framed}
+              className="mt-[48px] max-w-[360px] tablet:mt-[64px] tablet:max-w-[600px] desktop-md:max-w-[660px]"
+            />
           </Container>
         </section>
 
-        {/* ================= stats strip ================= */}
-        <Container>
-          <dl className="grid grid-cols-2 gap-y-[24px] border-y border-[var(--border)] py-[24px] tablet:grid-cols-5 tablet:gap-y-0 tablet:py-[28px]">
+        {/* ================= intro ================= */}
+        {/* What the app is, in the listing's own words, and the store's
+            figures under it. */}
+        <Container as="section" aria-label={`About ${app.title}`} className="pt-[32px] tablet:pt-[56px]">
+          <div className="mx-auto flex max-w-[800px] flex-col items-center text-center">
+            <p className={EYEBROW}>{app.category}</p>
+            <p className="mt-[16px] text-[20px] leading-[32px] text-[var(--foreground)] tablet:text-[24px] tablet:leading-[37px]">
+              {lead ?? app.summary}
+            </p>
+            {app.highlights && app.highlights.length > 0 && (
+              <ul className="mt-[28px] flex flex-wrap justify-center gap-[10px]">
+                {app.highlights.map((item) => (
+                  <li
+                    key={item}
+                    className="rounded-full border border-[var(--border)] bg-white px-[14px] py-[7px] text-[14px] leading-[20px] text-[var(--foreground)]"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <dl className="mt-[48px] grid grid-cols-2 gap-y-[24px] border-y border-[var(--border)] py-[24px] tablet:mt-[64px] tablet:grid-cols-5 tablet:gap-y-0 tablet:py-[28px]">
             <Stat label={`${formatCount(app.ratingCount)} reviews`}>
               <span className="flex items-center gap-[8px]">
                 {app.rating.toFixed(1)}
@@ -225,32 +240,12 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
           </dl>
         </Container>
 
-        {/* ================= lead ================= */}
-        {lead && (
-          <Container className="pt-[64px] tablet:pt-[96px]">
-            <div className="max-w-[760px]">
-              <p className="text-[20px] leading-[32px] font-medium text-[var(--foreground)] tablet:text-[24px] tablet:leading-[36px]">
-                {lead}
-              </p>
-              {app.highlights && app.highlights.length > 0 && (
-                <ul className="mt-[28px] flex flex-wrap gap-[10px]">
-                  {app.highlights.map((item) => (
-                    <li
-                      key={item}
-                      className="rounded-full border border-[var(--border)] bg-white px-[14px] py-[7px] text-[14px] leading-[20px] text-[var(--foreground)]"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </Container>
-        )}
+        {/* ================= one-liner ================= */}
+        <ScrollLine text={app.oneLiner} />
 
         {/* ================= features ================= */}
         {featured.length > 0 && (
-          <Container as="section" aria-label="Features" className="pt-[72px] tablet:pt-[112px]">
+          <Container as="section" aria-label="Features">
             <div className="flex flex-col gap-[72px] tablet:gap-[120px]">
               {featured.map((feature, index) => (
                 <FeatureRow key={feature.title} feature={feature} index={index} flip={index % 2 === 1} app={app} />
@@ -466,6 +461,34 @@ export default async function AppDetailPage({ params }: PageProps<"/apps/[slug]"
 
 /* ------------------------------------------------------------------------ */
 
+/**
+ * The three screens for the hero fan, left to right.
+ *
+ * The app's own captures when it has all three. Otherwise its store posters:
+ * the hero poster in the middle, flanked by the first two feature posters,
+ * then any others, never the two launcher posters, which show the launcher
+ * rather than the app and appear further down the page.
+ */
+function fanScreens(app: AppPage): { screens: FanScreen[]; framed: boolean } {
+  if (app.screens && app.screens.length >= 3) {
+    return {
+      framed: true,
+      screens: app.screens.slice(0, 3).map((screen) => ({ ...screen, alt: `${app.name} on Android` })),
+    };
+  }
+
+  const order = [
+    app.heroShot,
+    ...app.features.flatMap((feature) => (feature.shot === undefined ? [] : [feature.shot])),
+    ...app.screenshots.map((_, index) => index + 1),
+  ].filter((shot, index, all) => all.indexOf(shot) === index && !app.launcherShots.includes(shot));
+  const [centre, left, right] = order.map((shot) => ({
+    ...app.screenshots[shot - 1],
+    alt: `${app.name} on Android`,
+  }));
+  return { framed: false, screens: [left, centre, right] };
+}
+
 /** One figure in the stats strip. */
 function Stat({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -506,7 +529,9 @@ function FeatureRow({
         app={app}
         shot={feature.shot ?? 0}
         alt={`${app.name}: ${feature.title}`}
-        className={`mx-auto w-full max-w-[340px] tablet:max-w-[380px] ${flip ? "desktop-sm:order-1" : ""}`}
+        // A slight lean, alternating side to side, the way the hero's fan
+        // holds its cards.
+        className={`mx-auto w-full max-w-[340px] tablet:max-w-[380px] ${flip ? "desktop-sm:order-1 desktop-sm:rotate-[2deg]" : "desktop-sm:rotate-[-2deg]"}`}
       />
     </div>
   );

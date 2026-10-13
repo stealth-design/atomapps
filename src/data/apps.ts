@@ -73,6 +73,11 @@ export interface AppPage {
    */
   headline: string;
   /**
+   * The line the page spells out word by word as it scrolls, under the intro.
+   * A sentence rather than a slogan: it has to hold a screen on its own.
+   */
+  oneLiner: string;
+  /**
    * The app's colour, sampled from its icon and darkened where the icon's own
    * is too bright to hold type. Tints the hero and numbers the features.
    */
@@ -115,6 +120,12 @@ export interface AppPage {
   /** Any other list the listing carries ("How to use the app", "Why choose…"). */
   lists?: AppList[];
   screenshots: AppScreenshot[];
+  /**
+   * Raw screen captures for the hero fan — left, centre, right — kept in
+   * `public/images/apps/<slug>/screen-<n>.webp`. Shown in a drawn phone body.
+   * Until an app has all three, the fan falls back to its store posters.
+   */
+  screens?: AppScreenshot[];
 }
 
 /**
@@ -250,6 +261,7 @@ export const APPS: AppPage[] = [
     name: "Breaking News Launcher",
     summary: "Business, Sports, Entertainment, Technology News. Local Weather Forecast Service",
     headline: "The news,\none swipe away.",
+    oneLiner: "Every headline and every forecast, waiting one swipe from your home screen.",
     accent: "#322553",
     heroShot: 1,
     launcherShots: [5, 6],
@@ -301,6 +313,7 @@ export const APPS: AppPage[] = [
     name: "Volume Control Sound Launcher",
     summary: "Audio Booster: Volume Control, Sound Enhancer, Make Music, Calls, Alarms Louder",
     headline: "Every sound,\nexactly as loud as you want.",
+    oneLiner: "Louder calls, louder music, louder alarms, turned up exactly as far as you want.",
     accent: "#1F5BFF",
     heroShot: 2,
     launcherShots: [4, 5],
@@ -356,6 +369,7 @@ export const APPS: AppPage[] = [
     name: "Step Tracker Launcher",
     summary: "Track steps, set goals, view stats & celebrate milestones — all in one app.",
     headline: "Every step counts.\nCount them.",
+    oneLiner: "Every walk becomes progress you can see, one step at a time.",
     accent: "#4567FD",
     heroShot: 1,
     launcherShots: [7, 8],
@@ -416,6 +430,7 @@ export const APPS: AppPage[] = [
     name: "Find My Phone Launcher",
     summary: "Lost your phone? Use device finder: locate missing phone with a clap or whistle.",
     headline: "Lost your phone?\nClap.",
+    oneLiner: "Clap or whistle, and your phone answers back from wherever it’s hiding.",
     accent: "#3455FD",
     heroShot: 2,
     launcherShots: [5, 6],
@@ -475,6 +490,7 @@ export const APPS: AppPage[] = [
     name: "AI Chat Launcher: AI Assistant",
     summary: "AI Chat & Smart Assistant Chatbot Launcher powered by GPT-5.2, Gemini and Claude",
     headline: "An AI assistant,\none swipe from home.",
+    oneLiner: "Ask anything, write anything, and get an answer without leaving your home screen.",
     accent: "#039471",
     heroShot: 5,
     launcherShots: [6, 7],
@@ -529,6 +545,7 @@ export const APPS: AppPage[] = [
     name: "2026 Calendar Launcher",
     summary: "Daily Calendar Launcher 2026 - Reminder, event planner & appointment scheduler",
     headline: "Your month,\nat a glance.",
+    oneLiner: "Every plan, reminder and appointment, laid out where you’ll actually see it.",
     accent: "#3B5FC4",
     heroShot: 6,
     launcherShots: [7, 8],
@@ -585,6 +602,7 @@ export const APPS: AppPage[] = [
     name: "Daily Horoscope Launcher",
     summary: "Astrology Birth Chart & Zodiac compatibility for all zodiac signs. Check yours!",
     headline: "What the stars have in store,\nevery day.",
+    oneLiner: "Your sign, your chart and the day ahead, read in the stars every morning.",
     accent: "#5B0A4F",
     heroShot: 1,
     launcherShots: [7, 8],
@@ -643,6 +661,7 @@ export const APPS: AppPage[] = [
     name: "Notes, Notepad, To Do Launcher",
     summary: "Notes & Notepad Launcher with Color Note, To Do List Planner, Reminders, Widgets",
     headline: "Jot it down\nbefore it's gone.",
+    oneLiner: "Ideas, lists and reminders, caught the moment they occur to you.",
     accent: "#896040",
     heroShot: 1,
     launcherShots: [6, 7],
@@ -698,6 +717,7 @@ export const APPS: AppPage[] = [
     name: "Live Weather Radar Launcher",
     summary: "All-in-one weather radar launcher with rain, temperature maps & local forecast.",
     headline: "See the weather\nbefore it arrives.",
+    oneLiner: "Rain, wind and temperature on a live map, so the sky never catches you out.",
     accent: "#0591F3",
     heroShot: 5,
     launcherShots: [7, 8],
@@ -751,6 +771,7 @@ export const APPS: AppPage[] = [
     name: "Calculator Launcher",
     summary: "Perform quick calculations & unit conversions with this easy calculator launcher",
     headline: "Every calculator\nyou'll ever need.",
+    oneLiner: "Sums, percentages and conversions, answered as fast as you can type them.",
     accent: "#5E8A14",
     heroShot: 1,
     launcherShots: [7, 8],
@@ -806,6 +827,7 @@ export const APPS: AppPage[] = [
     name: "Brightest Flashlight Launcher",
     summary: "Powerful LED flashlight, alert torch, screen light & magnifying glass launcher",
     headline: "The brightest light\nin your pocket.",
+    oneLiner: "A bright, steady light the moment the room goes dark.",
     accent: "#059C54",
     heroShot: 1,
     launcherShots: [6, 7],
@@ -868,6 +890,7 @@ export const APPS: AppPage[] = [
     name: "QR & Barcode Scanner Launcher",
     summary: "Easy to use QR code scanner and barcode reader. Scan codes quickly and easily.",
     headline: "Point.\nScan. Done.",
+    oneLiner: "Menus, tickets, links and products, every code read in a second.",
     accent: "#2D9E94",
     heroShot: 1,
     launcherShots: [7, 6],
@@ -927,6 +950,7 @@ export const APPS: AppPage[] = [
     name: "Holy Bible Launcher: KJV+Audio",
     summary: "Holy Bible (KJV) launcher with audio. Read verses daily & study the word of God.",
     headline: "God's Word,\none swipe away.",
+    oneLiner: "A verse for every day, to read or to hear, wherever you are.",
     accent: "#733B02",
     heroShot: 1,
     launcherShots: [6, 8],
@@ -983,6 +1007,7 @@ export const APPS: AppPage[] = [
     name: "Alarm Clock Launcher",
     summary: "Wake up & get tasks done! Add alarms & reminders on the Alarm Clock Launcher.",
     headline: "Wake up on time,\nevery time.",
+    oneLiner: "Alarms you can count on, and reminders that keep the day on track.",
     accent: "#107D82",
     heroShot: 1,
     launcherShots: [7, 8],
