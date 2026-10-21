@@ -36,6 +36,15 @@ export function scrollToTop() {
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
+/** Scroll the page to a document offset, through Lenis for the reason above. */
+export function scrollToY(y: number) {
+  if (instance) {
+    instance.scrollTo(y);
+    return;
+  }
+  window.scrollTo({ top: y, behavior: "auto" });
+}
+
 /** Stop or resume page scrolling. No-ops under reduced motion, where there is no Lenis. */
 export function setScrollLocked(locked: boolean) {
   if (instance) {

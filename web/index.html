@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone Viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; color: #eee; font: 14px system-ui, sans-serif; overflow: hidden; }
+  canvas { display: block; }
+  #ui { position: fixed; top: 16px; left: 16px; background: #000a; padding: 12px 14px; border-radius: 10px; display: grid; gap: 8px; max-width: 280px; }
+  #ui b { font-size: 13px; }
+  #ui small { color: #aaa; line-height: 1.4; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="ui">
+  <b>Screen content</b>
+  <label>Image or video <input id="file" type="file" accept="image/*,video/*"></label>
+  <small>Screen size: <b>1260 × 2800 px</b> (aspect ratio 9:20)<br>Other sizes are stretched to fit.</small>
+  <small id="info"></small>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+const camera = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 0.01, 10);
+camera.position.set(0, 0, 0.45);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+const draco = new DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/');
+let screenMat;
+new GLTFLoader().setDRACOLoader(draco).load('phone.glb', ({ scene: phone }) => {
+  phone.position.sub(new THREE.Box3().setFromObject(phone).getCenter(new THREE.Vector3()));
+  scene.add(phone);
+  const screen = phone.getObjectByName('Front_Screen');
+  // Unlit material so the screen shows the image's true colours, like a lit display.
+  screenMat = new THREE.MeshBasicMaterial({ map: screen.material.emissiveMap || screen.material.map });
+  screen.material = screenMat;
+});
+
+let videoEl;
+document.getElementById('file').onchange = e => {
+  const f = e.target.files[0];
+  if (!f || !screenMat) return;
+  const url = URL.createObjectURL(f);
+  videoEl?.pause();
+  if (f.type.startsWith('video/')) {
+    videoEl = Object.assign(document.createElement('video'), { src: url, loop: true, muted: true, playsInline: true });
+    videoEl.onloadedmetadata = () => info(videoEl.videoWidth, videoEl.videoHeight);
+    videoEl.play();
+    setMap(new THREE.VideoTexture(videoEl));
+  } else {
+    new THREE.TextureLoader().load(url, t => { info(t.image.width, t.image.height); setMap(t); });
+  }
+};
+
+function setMap(t) {
+  t.flipY = false;                       // glTF UV convention
+  t.colorSpace = THREE.SRGBColorSpace;
+  screenMat.map?.dispose();
+  screenMat.map = t;
+  screenMat.needsUpdate = true;
+}
+
+function info(w, h) {
+  const ok = Math.abs(w / h - 1260 / 2800) < 0.01;
+  document.getElementById('info').textContent = `Loaded ${w} × ${h} px ${ok ? '✓ fits' : '⚠ different aspect ratio, will stretch'}`;
+}
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+</script>
+</body>
+</html>
