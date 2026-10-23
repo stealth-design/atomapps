@@ -4,8 +4,9 @@ import { useState, type ReactNode } from "react";
 
 /**
  * An endless horizontal strip (the `tt-marquee` keyframes, defined by
- * AppTemplate) with a pause button under it — moving content that runs past
- * five seconds needs a way to stop it (WCAG 2.2.2). It also pauses on hover.
+ * AppTemplate) that pauses on hover. Moving content that runs past five
+ * seconds needs a way to stop it (WCAG 2.2.2), so there is a pause button —
+ * kept out of sight and only shown when the keyboard reaches it.
  * `children` are the <li>s, already doubled so -50% loops seamlessly.
  */
 export function Marquee({
@@ -32,13 +33,13 @@ export function Marquee({
           {children}
         </ul>
       </div>
-      <div className="mx-auto mt-4 flex max-w-[var(--content-max-width)] justify-end px-[var(--content-padding)] motion-reduce:hidden">
+      <div className="mx-auto flex max-w-[var(--content-max-width)] justify-end px-[var(--content-padding)] motion-reduce:hidden">
         <button
           type="button"
           aria-pressed={paused}
           aria-label={`${paused ? "Play" : "Pause"} ${label}`}
           onClick={() => setPaused((p) => !p)}
-          className="grid size-9 place-items-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground)] transition-colors can-hover:hover:bg-black/5"
+          className="sr-only grid size-9 place-items-center focus-visible:not-sr-only focus-visible:mt-4 rounded-full border border-[var(--border)] bg-white text-[var(--foreground)] transition-colors can-hover:hover:bg-black/5"
         >
           <svg viewBox="0 0 12 12" className="size-3" fill="currentColor" aria-hidden>
             {paused ? <path d="M2.5 1.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L3.4.7a.6.6 0 0 0-.9.5Z" /> : <path d="M2 1h3v10H2zM7 1h3v10H7z" />}

@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Dev only: lets a Cloudflare quick tunnel load the dev server's assets.
+  allowedDevOrigins: ["*.trycloudflare.com"],
   /**
    * Long-lived caching for the scene art in `public/images/`.
    *

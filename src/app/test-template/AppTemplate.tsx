@@ -1,14 +1,32 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import { ShaderBackground } from "./ShaderBackground";
 import { HeroPhone } from "./HeroPhone";
+import { HeroCalculator } from "./HeroCalculator";
+import { HeroVolume } from "./HeroVolume";
+import { HeroSteps } from "./HeroSteps";
+import { HeroStrip } from "./HeroStrip";
+import { HeroFlashlight } from "./HeroFlashlight";
+import { HeroAlarm } from "./HeroAlarm";
+import { HeroQR } from "./HeroQR";
+import { HeroCalendar } from "./HeroCalendar";
+import { HeroNotes } from "./HeroNotes";
+import { HeroNews } from "./HeroNews";
+import { HeroHoroscope } from "./HeroHoroscope";
+import { HeroBible } from "./HeroBible";
+import { NIGHT_FRAG } from "./NightSky";
+import { HeroWeather, WeatherMap, MAP_CREDIT, RADAR_FRAG } from "./WeatherScene";
+import { HeroAI, AI_FRAG } from "./HeroAI";
 import { HeroParallax } from "./HeroParallax";
+import { RingCta } from "./RingCta";
 import { StepSlider } from "./StepSlider";
 import { Marquee } from "./Marquee";
+import { LauncherExplorer } from "./LauncherExplorer";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FooterParallax } from "@/components/layout/FooterParallax";
 import { Container } from "@/components/ui/Container";
+import { Reveal } from "@/components/ui/Reveal";
 import { MoreApps } from "@/components/apps/MoreApps";
 import { PlayStoreButton } from "@/components/apps/PlayStoreButton";
 import { Poster } from "@/components/apps/Poster";
@@ -25,31 +43,16 @@ import { getTemplate } from "@/data/appTemplates";
  * leaves out falls back to a default drawn from the listing, and a band with
  * nothing to show (no steps, no reviews, no widget) is left out.
  *
- * Screenshots are chosen by rule rather than by number: the strips, collage
- * and closing row cycle through the app's portrait posters (a few listings
+ * Screenshots are chosen by rule rather than by number: the strip and the
+ * closing row cycle through the app's portrait posters (a few listings
  * open with a landscape banner), so an app with fewer posters repeats them
  * instead of reaching for one it doesn't have.
+ *
+ * `hero` swaps out the template's own hero — /apps/[slug] keeps its fan of
+ * screens and takes every band below it from here.
  */
 
-/**
- * The review collage, left to right: per column a top offset and its tiles as
- * [k, height, crop], k being an index into the app's portrait posters (wrapped).
- * Mirror-symmetric, eight tiles. The outer pairs run 434px deep and the middle
- * four stop by 381, so the heading lifts 24px into the gap between the outer
- * pairs. Heights are in a 130px-column unit and scale with --w; outer columns
- * hide below 1024.
- */
-const M = 198, L = 306;
-const COLLAGE: { top: number; outer?: boolean; tiles: [k: number, h: number, pos: string][] }[] = [
-  { top: 24, outer: true, tiles: [[1, M, "50% 20%"], [3, M, "50% 70%"]] },
-  { top: 75, tiles: [[0, L, "50% 40%"]] },
-  { top: 0, tiles: [[2, L, "50% 60%"]] },
-  { top: 0, tiles: [[1, L, "50% 45%"]] },
-  { top: 75, tiles: [[4, L, "50% 40%"]] },
-  { top: 24, outer: true, tiles: [[4, M, "50% 15%"], [1, M, "50% 75%"]] },
-];
-
-const CARD_BGS = [
+export const CARD_BGS = [
   "linear-gradient(180deg,#eef0f8 40%,#f8dce2)",
   "linear-gradient(180deg,#eef0f8 40%,#c9d3ff)",
   "linear-gradient(180deg,#eef0f8 40%,#cdeccf)",
@@ -57,18 +60,23 @@ const CARD_BGS = [
 // Static strings so Tailwind sees them; picked by how many cards there are.
 const CARD_COLS = ["", "", "desktop-sm:grid-cols-2", "desktop-sm:grid-cols-3"];
 
-const H2 = "text-[36px] leading-[1.05] font-semibold tracking-tight tablet:text-[52px]";
-const SUB = "text-[16px] leading-[1.5] text-black/55 tablet:text-[18px]";
-const CARD_H3 = "text-[26px] leading-[1.1] font-semibold tracking-tight tablet:text-[32px]";
+export const H2 = "text-[36px] leading-[1.05] font-semibold tracking-tight tablet:text-[52px]";
+export const SUB = "text-[16px] leading-[1.5] text-black/55 tablet:text-[18px]";
+export const CARD_H3 = "text-[26px] leading-[1.1] font-semibold tracking-tight tablet:text-[32px]";
+const CARD_TEXT = "text-[15px] leading-[1.45] text-black/55";
 const LINK = "underline underline-offset-2 can-hover:hover:no-underline";
-/** The hero CTA's ring and glow colours, the shader's palette. */
-const RING = "bg-[conic-gradient(from_0deg,#f6a5c0,#8ec5ff,#7de0c4,#ffd27a,#c3a6ff,#f6a5c0)]";
+const PHONE = "mx-auto -mt-2 h-[60vh] min-h-[420px] w-[min(100vw,60vh)] [mask-image:linear-gradient(180deg,#000_60%,transparent_95%)]";
 
-export function AppTemplate({ app }: { app: AppPage }) {
+export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
   const t = getTemplate(app.slug);
+  const demo = t.hero?.demo;
+  // A night-sky hero: no foot fade into the page's white, rounded at the foot instead.
+  const dark = demo === "horoscope" || demo === "ai";
+  // The flat widgets grow the hero to fit and scroll with the page.
+  const flat = demo === "calculator" || demo === "qr" || demo === "calendar" || demo === "bible" || demo === "ai";
   const f = app.features;
   const reviews = REVIEWS.filter((r) => r.slug === app.slug);
-  const count = `${Math.round(app.ratingCount / 1000)}K`;
+  const count = app.ratingCount < 1000 ? String(app.ratingCount) : `${Math.round(app.ratingCount / 1000)}K`;
 
   // Portrait posters, 1-based; `pick(k)` wraps so short lists repeat.
   const portraits = app.screenshots.flatMap((s, i) => (s.height > s.width ? [i + 1] : []));
@@ -108,98 +116,138 @@ export function AppTemplate({ app }: { app: AppPage }) {
 
         {/* ================= hero ================= */}
         {/* Parallax depths: sky lags (0.35), phone lags a little (0.15), copy runs ahead. */}
-        <HeroParallax className="relative mx-2 mt-[calc(var(--header-height)+8px)] h-[calc(100svh-var(--header-height)-8px)] min-h-[720px] overflow-hidden rounded-t-[24px]">
+        {hero ?? (
+        // A screen tall — except the calculator's, QR scanner's, calendar's and Bible's, which
+        // grow to fit, so the widget never sits under the strip on a short window.
+        <HeroParallax
+          className={`group/hero relative mx-2 mt-[calc(var(--header-height)+8px)] overflow-hidden ${dark ? "rounded-[24px]" : "rounded-t-[24px]"} ${
+            flat
+              ? "min-h-[max(720px,calc(100svh-var(--header-height)-8px))]"
+              : "h-[calc(100svh-var(--header-height)-8px)] min-h-[720px]"
+          }`}
+        >
           {/* Fades the sky, the shader and the phone's foot into the page's white,
-              so the hero has no bottom edge. Above the phone (z-10), under the copy (z-20). */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[35%] bg-[linear-gradient(180deg,transparent_0%,rgba(255,255,255,0.6)_45%,#fff_100%)]" />
+              so the hero has no bottom edge. Above the phone (z-10), under the copy (z-20).
+              The weather map's is shorter, so the map fills the hero, but still ends
+              on solid white: its own cloud banks scroll away with the parallax. The
+              dark skies (horoscope, AI) have none: they end in a rounded edge instead. */}
+          {!dark && (
+          <div
+            className={`pointer-events-none absolute inset-x-0 bottom-0 z-[15] ${
+              demo === "weather"
+                ? "h-[24%] bg-[linear-gradient(180deg,transparent_0%,rgba(255,255,255,0.7)_55%,#fff_100%)]"
+                : "h-[35%] bg-[linear-gradient(180deg,transparent_0%,rgba(255,255,255,0.6)_45%,#fff_100%)]"
+            }`}
+          />
+          )}
           <div data-depth="0.35" className="absolute inset-0">
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,#dfeaf7_0%,#eef2f7_35%,#f5f4f1_70%,#faf6ec_100%)]" />
-            <ShaderBackground className="absolute inset-0 h-full w-full" />
+            {/* The weather hero's sky is a map with rain clouds over it. */}
+            {demo === "weather" ? (
+              <>
+                <WeatherMap className="absolute inset-0" />
+                <ShaderBackground frag={RADAR_FRAG} className="absolute inset-0 h-full w-full" />
+              </>
+            ) : demo === "horoscope" ? (
+              <ShaderBackground frag={NIGHT_FRAG} className="absolute inset-0 h-full w-full bg-[#07061a]" />
+            ) : demo === "ai" ? (
+              <ShaderBackground frag={AI_FRAG} className="absolute inset-0 h-full w-full bg-[#03060a]" />
+            ) : (
+              <>
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,#dfeaf7_0%,#eef2f7_35%,#f5f4f1_70%,#faf6ec_100%)]" />
+                {/* The volume demo sends its own rings, from behind the phone. */}
+                <ShaderBackground clicks={demo !== "volume"} className="absolute inset-0 h-full w-full" />
+              </>
+            )}
           </div>
+          {/* The flashlight hero's dark: over the sky and the foot fade, under
+              the copy and the phone, shown while HeroFlashlight sets data-dark. */}
+          {demo === "flashlight" && (
+            <div className="pointer-events-none absolute inset-0 z-[16] bg-[#050608] opacity-0 transition-opacity duration-[600ms] group-data-[dark=true]/hero:opacity-100 motion-reduce:transition-none" />
+          )}
 
-          <div data-depth="-0.2" className="relative z-20 mx-auto max-w-[900px] px-4 pt-10 text-center">
+          {/* Tighter on phones and short windows (short:), so the demo below starts higher. */}
+          <div data-depth="-0.2" className="relative z-20 mx-auto max-w-[900px] px-4 pt-6 text-center desktop-sm:max-w-[1240px] tablet:pt-10 short:pt-5">
             {/* Each authored line is its own block and may wrap inside itself,
                 so a long line (some headlines run to ~30 characters) can't
                 push past the screen. */}
-            <h1 className="text-[40px] leading-[1.02] font-semibold tracking-tight text-balance tablet:text-[76px]">
+            <h1 className="text-[clamp(30px,9vw,40px)] leading-[1.02] font-semibold tracking-tight text-balance transition-colors duration-[600ms] group-data-[dark=true]/hero:text-white tablet:text-[64px] desktop-sm:text-[min(76px,6vw)] short:text-[52px]">
               {app.headline.split("\n").map((line) => (
-                <span key={line} className="block">{line}</span>
+                <span key={line} className="block desktop-sm:whitespace-nowrap">{line}</span>
               ))}
             </h1>
-            <p className={`mx-auto mt-4 max-w-[480px] ${SUB}`}>{app.summary}</p>
-            {/* The hero's store button: a frosted pill inside a 3px ring of
-                conic gradient (the shader's colours) turning behind it, and a
-                soft blur of the same colours under it that brightens and
-                spreads on hover or keyboard focus. Its own markup rather than
-                PlayStoreButton, whose black fill the live pages keep. Still
-                under reduced motion. */}
-            <div className="mt-6 flex justify-center">
-              <span className="group relative inline-flex">
-                <span
-                  aria-hidden
-                  className={`pointer-events-none absolute -inset-1 rounded-full opacity-40 blur-md transition-[opacity,filter,inset] duration-500 can-hover:group-hover:-inset-2.5 can-hover:group-hover:opacity-90 can-hover:group-hover:blur-xl group-focus-within:-inset-2.5 group-focus-within:opacity-90 group-focus-within:blur-xl ${RING}`}
-                />
-                <a
-                  href={playStoreUrl(app)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="relative inline-flex overflow-hidden rounded-full p-[3px] focus-visible:outline-none"
-                >
-                  <span aria-hidden className={`absolute top-1/2 left-1/2 aspect-square w-[160%] -translate-1/2 animate-[tt-spin_4s_linear_infinite] motion-reduce:animate-none ${RING}`} />
-                  <span className="relative flex h-[44px] items-center gap-3 rounded-full bg-white/90 pr-5 pl-[10px] text-[var(--foreground)] backdrop-blur-sm">
-                    <span className="grid size-[26px] place-items-center rounded-full bg-[var(--foreground)] text-white">
-                      <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden fill="currentColor">
-                        <path d="M0 0.8v10.4c0 .6.66.98 1.18.68l8.34-5.2a.8.8 0 0 0 0-1.36L1.18.12A.8.8 0 0 0 0 .8Z" />
-                      </svg>
-                    </span>
-                    <span className="flex flex-col text-left leading-none">
-                      <span className="text-[10px] leading-[12px] tracking-[0.02em] uppercase opacity-70">Get it on</span>
-                      <span className="text-[15px] leading-[18px] font-semibold">Google Play</span>
-                    </span>
-                  </span>
-                </a>
-              </span>
+            <p className={`mx-auto mt-3 max-w-[480px] ${SUB} transition-colors tablet:mt-4 short:mt-2 short:text-[16px] duration-[600ms] group-data-[dark=true]/hero:text-white/70`}>{app.summary}</p>
+            {/* The hero's store button as a RingCta rather than
+                PlayStoreButton, whose black fill the live pages keep. */}
+            <div className="mt-5 flex justify-center short:mt-4">
+              <RingCta
+                href={playStoreUrl(app)}
+                external
+                eyebrow="Get it on"
+                label="Google Play"
+                icon={
+                  <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden fill="currentColor">
+                    <path d="M0 0.8v10.4c0 .6.66.98 1.18.68l8.34-5.2a.8.8 0 0 0 0-1.36L1.18.12A.8.8 0 0 0 0 .8Z" />
+                  </svg>
+                }
+              />
             </div>
-            <p className="mt-3 flex items-center justify-center gap-2 text-xs text-black/50">
-              <StarRating rating={app.rating} className="block h-[12px]" />
+            <p className="mt-3 flex items-center justify-center gap-2 text-xs text-black/50 transition-colors duration-[600ms] group-data-[dark=true]/hero:text-white/60">
+              <StarRating rating={app.rating} className="block h-[12px] transition-colors duration-[600ms] group-data-[dark=true]/hero:text-white" />
               {app.rating} / {count} ratings
             </p>
           </div>
 
-          {/* Centred under the rating, fading out toward the hero's foot, with
-              the app's demo buttons either side — see HeroPhone. */}
-          <div data-depth="0.15" className="relative z-10">
-            <HeroPhone
-              screen={t.hero?.screen}
-              actions={t.hero?.actions}
-              className="mx-auto -mt-2 h-[60vh] min-h-[420px] w-[min(100vw,60vh)] [mask-image:linear-gradient(180deg,#000_60%,transparent_95%)]"
-            />
-          </div>
-
-          {t.hero?.strip && (
-            <div className="absolute bottom-8 left-1/2 z-20 flex w-max -translate-x-1/2 flex-col items-center gap-3 tablet:bottom-12">
-              <p className="text-[14px] leading-[18px] text-[#61616a] tablet:text-[15px]">{t.hero.strip.label}</p>
-              <ul className="flex items-center text-[var(--foreground)]">
-                {t.hero.strip.items.map(({ label, icon }, i) => (
-                  <li key={label} className="flex items-center">
-                    {i > 0 && <span aria-hidden className="mx-4 h-5 w-px bg-black/15 tablet:mx-6" />}
-                    <span className="flex items-center gap-2">
-                      <svg viewBox="0 0 24 24" className="size-[20px] tablet:size-[22px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                        <path d={icon} />
-                      </svg>
-                      <span className="text-[17px] leading-none font-semibold tracking-[-0.01em] tablet:text-[20px]">{label}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
+          {/* Centred under the rating: the phone, fading out toward the hero's
+              foot with the app's demo buttons either side (see HeroPhone), or
+              the app's demo in its place. The step widget is fixed to the
+              viewport, so it sits outside the parallax layers. */}
+          {demo === "steps" ? (
+            <HeroSteps />
+          ) : (
+            <div
+              // The flat widgets (calculator, weather, QR, calendar, Bible) scroll with the page:
+              // lagging like the phone, they'd slide down over the strip.
+              data-depth={flat || demo === "weather" ? "0" : "0.15"} className={`relative ${demo ? "z-20" : "z-10"}`}>
+              {demo === "calculator" ? (
+                <HeroCalculator />
+              ) : demo === "ai" ? (
+                <HeroAI />
+              ) : demo === "weather" ? (
+                <HeroWeather />
+              ) : demo === "volume" ? (
+                <HeroVolume accent={app.accent} className={PHONE} />
+              ) : demo === "flashlight" ? (
+                <HeroFlashlight accent={app.accent} className={PHONE} />
+              ) : demo === "alarm" ? (
+                <HeroAlarm accent={app.accent} className={PHONE} />
+              ) : demo === "qr" ? (
+                <HeroQR />
+              ) : demo === "calendar" ? (
+                <HeroCalendar />
+              ) : demo === "notes" ? (
+                <HeroNotes />
+              ) : demo === "news" ? (
+                <HeroNews />
+              ) : demo === "horoscope" ? (
+                <HeroHoroscope className={PHONE} />
+              ) : demo === "bible" ? (
+                <HeroBible />
+              ) : (
+                <HeroPhone screen={t.hero?.screen} face={t.hero?.face && { ...t.hero.face, name: app.title, icon: appIconSrc(app), accent: app.accent }} actions={t.hero?.actions} className={PHONE} />
+              )}
             </div>
           )}
+
+          {/* Bottom centre, above the foot fade (z-15). */}
+          {t.hero?.strip && <HeroStrip strip={t.hero.strip} className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 tablet:bottom-12" />}
+
+          {demo === "weather" && <p className="absolute bottom-3 left-3 z-20 text-[11px] text-black/55">{MAP_CREDIT}</p>}
 
           <a
             href={playStoreUrl(app)}
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute right-3 bottom-3 z-20 hidden items-center gap-3 rounded-xl bg-[#1d1d1f] p-2 pr-4 text-white tablet:flex"
+            className="absolute right-3 bottom-3 z-20 hidden items-center gap-3 rounded-xl bg-[#1d1d1f] p-2 pr-4 text-white desktop-sm:flex"
           >
             <Image src={appIconSrc(app)} alt="" width={48} height={48} className="size-12" style={{ borderRadius: ICON_RADIUS }} />
             <span className="text-sm leading-tight font-semibold">
@@ -208,6 +256,7 @@ export function AppTemplate({ app }: { app: AppPage }) {
             </span>
           </a>
         </HeroParallax>
+        )}
 
         {/* ================= badges + poster strip ================= */}
         <section className="pt-16 pb-24 text-center tablet:pt-24">
@@ -229,7 +278,9 @@ export function AppTemplate({ app }: { app: AppPage }) {
           <Marquee
             label="App screenshots"
             duration={45}
-            className="mx-auto mt-14 max-w-[1440px] overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_18%,#000_82%,transparent)] tablet:mt-20"
+            // The edges fade over a quarter of the width each, eased (slow out
+            // of transparent, slow into solid) so there's no visible line.
+            className="mx-auto mt-14 max-w-[1440px] overflow-hidden [mask-image:linear-gradient(90deg,transparent,rgba(0,0,0,0.06)_5%,rgba(0,0,0,0.25)_11%,rgba(0,0,0,0.6)_18%,rgba(0,0,0,0.9)_24%,#000_28%,#000_72%,rgba(0,0,0,0.9)_76%,rgba(0,0,0,0.6)_82%,rgba(0,0,0,0.25)_89%,rgba(0,0,0,0.06)_95%,transparent)] tablet:mt-20"
           >
             {[...strip, ...strip].map((n, i) => {
               const img = shotOf(n);
@@ -247,17 +298,18 @@ export function AppTemplate({ app }: { app: AppPage }) {
           <Container as="section" className="pt-28 text-center">
             <h2 className={`mx-auto max-w-[16ch] ${H2}`}>{t.features?.heading ?? `Inside ${app.title}`}</h2>
             <p className={`mx-auto mt-4 max-w-[52ch] ${SUB}`}>{t.features?.sub ?? app.oneLiner}</p>
-            <div className={`mx-auto mt-12 grid max-w-[1100px] gap-4 text-left ${CARD_COLS[cards.length]}`}>
+            <Reveal variant="stagger" className={`mx-auto mt-12 grid max-w-[1100px] gap-4 text-left ${CARD_COLS[cards.length]}`}>
               {cards.map(([i, shot], c) => (
                 <FeatureCard key={i} app={app} feature={f[i]} shot={shot} bg={CARD_BGS[c % CARD_BGS.length]} />
               ))}
-            </div>
+            </Reveal>
           </Container>
         )}
 
         {/* ================= wide widget card ================= */}
         {t.widget && f[t.widget.feature] && (
           <Container as="section" className="pt-4">
+            <Reveal>
             <div className="mx-auto grid max-w-[1100px] items-center gap-10 overflow-hidden rounded-[28px] bg-[linear-gradient(160deg,#eef0f8,#d9d6fb)] p-8 tablet:p-12 desktop-sm:grid-cols-2">
               <div>
                 <h3 className={`${CARD_H3} tablet:text-[44px]`}>{f[t.widget.feature].title}</h3>
@@ -281,11 +333,13 @@ export function AppTemplate({ app }: { app: AppPage }) {
                 </ul>
               </div>
             </div>
+            </Reveal>
           </Container>
         )}
 
         {/* ================= launcher card ================= */}
         <Container as="section" className="pt-4">
+          <Reveal>
           <div className="relative mx-auto grid max-w-[1100px] items-center gap-10 overflow-hidden rounded-[28px] bg-[linear-gradient(180deg,#eef0f8,#cdeef0)] p-8 tablet:p-12 desktop-sm:grid-cols-[1fr_1fr]">
             {/* orbit rings */}
             <div className="pointer-events-none absolute top-1/2 left-[38%] size-[900px] -translate-1/2 rounded-full border border-white/70" />
@@ -295,7 +349,7 @@ export function AppTemplate({ app }: { app: AppPage }) {
               {app.launcherBenefits.slice(0, 5).map((b, i) => (
                 <span
                   key={b.title}
-                  className="absolute grid size-14 place-items-center rounded-2xl bg-white text-2xl shadow-lg"
+                  className="absolute grid size-14 place-items-center rounded-2xl bg-white text-2xl shadow-[0_6px_16px_-10px_rgba(0,0,0,0.2)]"
                   style={{ left: `${[2, 72, 84, 66, 8][i]}%`, top: `${[10, 6, 44, 80, 70][i]}%`, rotate: `${[-8, 6, -4, 10, 8][i]}deg` }}
                 >
                   {b.emoji}
@@ -307,11 +361,12 @@ export function AppTemplate({ app }: { app: AppPage }) {
               <p className={`mt-3 max-w-[40ch] ${SUB}`}>{app.launcherBenefits[0]?.text}</p>
             </div>
           </div>
+          </Reveal>
         </Container>
 
         {/* ================= how it works band ================= */}
-        {/* The whole band pins while the scroll walks the steps, one image at
-            a time — see StepSlider. Only for apps with steps written. */}
+        {/* Stacked step cards wiping one still image to the next — see
+            StepSlider. Only for apps with steps written. */}
         {t.steps && (
           <StepSlider
             steps={t.steps.items}
@@ -363,41 +418,39 @@ export function AppTemplate({ app }: { app: AppPage }) {
         )}
 
         {/* ================= and more ================= */}
+        {/* An explorer of the launcher's extras beside a phone acting each
+            one out — see LauncherExplorer. */}
         <Container as="section" className="py-28">
-          <div className="mx-auto grid max-w-[1000px] items-center gap-16 desktop-sm:grid-cols-2">
-            <div>
-              <h2 className={H2}>It&rsquo;s a launcher, too</h2>
-              <p className={`mt-3 ${SUB}`}>{app.title} also has the following features:</p>
-              <ul className="mt-10 flex flex-col gap-3">
-                {app.launcherBenefits.map((b) => (
-                  <li key={b.title} className="rounded-2xl bg-[#eef0f8] px-5 py-4">
-                    <p className="font-semibold">{b.emoji} {b.title}</p>
-                    <p className="mt-1 text-sm text-black/50">{b.text}</p>
-                  </li>
-                ))}
-              </ul>
-              {/* The launcher disclosure every app page carries. */}
-              <p className="mt-8 text-[14px] leading-[22px] text-[#61616a]">
-                <strong className="font-semibold text-[var(--foreground)]">Please note: </strong>
-                {LAUNCHER_NOTE}
-                {app.links.faq && (
-                  <>
-                    {" "}
-                    <a href={app.links.faq} target="_blank" rel="noopener noreferrer" className={LINK}>
-                      Read the FAQ
-                    </a>
-                    .
-                  </>
-                )}
-              </p>
-            </div>
-            <Poster app={app} shot={app.launcherShots[1]} alt="" sizes="340px" className="mx-auto w-[280px] tablet:w-[340px]" />
+          <div className="text-center">
+            <h2 className={H2}>It&rsquo;s a launcher, too</h2>
+            <p className={`mx-auto mt-4 max-w-[52ch] ${SUB}`}>{app.title} also has the following features:</p>
           </div>
+          <Reveal>
+          <LauncherExplorer
+            items={app.launcherBenefits}
+            app={{ name: app.title, icon: appIconSrc(app), features: f.map(({ title }) => ({ title })) }}
+          />
+          </Reveal>
+          {/* The launcher disclosure every app page carries. */}
+          <p className="mx-auto mt-8 max-w-[70ch] text-center text-[13px] leading-[20px] text-[#61616a]">
+            <strong className="font-semibold text-[var(--foreground)]">Please note: </strong>
+            {LAUNCHER_NOTE}
+            {app.links.faq && (
+              <>
+                {" "}
+                <a href={app.links.faq} target="_blank" rel="noopener noreferrer" className={LINK}>
+                  Read the FAQ
+                </a>
+                .
+              </>
+            )}
+          </p>
         </Container>
 
         {/* ================= spotlight card ================= */}
         {spotlight && (
           <Container as="section">
+            <Reveal>
             <div className="relative mx-auto flex h-[440px] max-w-[1100px] items-start justify-center overflow-hidden rounded-[28px] bg-[radial-gradient(80%_100%_at_0%_100%,#2f8a63_0%,transparent_50%),radial-gradient(80%_100%_at_100%_100%,#2f8a63_0%,transparent_50%),linear-gradient(90deg,#1f3b33,#1f2026_40%,#1f2026_60%,#1f3b33)] pt-16 text-center text-white">
               <Image
                 src={appIconSrc(app)}
@@ -412,40 +465,16 @@ export function AppTemplate({ app }: { app: AppPage }) {
                 <p className="mt-3 text-white/60">{spotlight.text}</p>
               </div>
             </div>
+            </Reveal>
           </Container>
         )}
 
         {/* ================= reviews ================= */}
-        {/* A symmetric collage of tiles with the heading set into the gap its
-            shorter middle columns leave, then a marquee of review cards.
-            Only for apps with reviews. */}
+        {/* The heading, then a marquee of review cards. Only for apps with reviews. */}
         {reviews.length > 0 && (
           <section className="pt-32 text-center">
-            {/* The site's content width and side padding (as Container); the
-                wrapper is a size container, and --w is one column's share of its
-                width (4 columns below 1024, 6 above). Every height and offset
-                is a multiple of --w, so the collage keeps its shape at any
-                width; the design unit is a 130px column. */}
-            <div className="mx-auto max-w-[var(--content-max-width)] px-[var(--content-padding)] [--g:8px] [--w:calc((100cqw-3*var(--g))/4)] [container-type:inline-size] desktop-sm:[--g:14px] desktop-sm:[--w:calc((100cqw-5*var(--g))/6)]">
-              <div className="flex items-start justify-between gap-[var(--g)]">
-                {COLLAGE.map((col, c) => (
-                  <div
-                    key={c}
-                    className={`flex w-[var(--w)] shrink-0 flex-col gap-[var(--g)] ${col.outer ? "hidden desktop-sm:flex" : ""}`}
-                    style={{ marginTop: `calc(var(--w) * ${col.top / 130})` }}
-                  >
-                    {col.tiles.map(([k, h, pos], i) => {
-                      const img = shotOf(pick(k));
-                      return (
-                        <div key={i} className="overflow-hidden rounded-[18px] tablet:rounded-[24px]" style={{ height: `calc(var(--w) * ${h / 130})` }}>
-                          <Image src={img.src} alt="" width={img.width} height={img.height} sizes="(max-width: 1023px) 25vw, 17vw" className="h-full w-full object-cover" style={{ objectPosition: pos }} />
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-              <h2 className="relative mx-auto mt-10 max-w-[560px] px-4 text-[34px] leading-[1.05] font-semibold tracking-[-0.02em] tablet:mt-12 tablet:text-[48px] desktop-sm:mt-[calc(var(--w)*-24/130)] desktop-sm:text-[52px]">
+            <div className="mx-auto max-w-[var(--content-max-width)] px-[var(--content-padding)]">
+              <h2 className="relative mx-auto max-w-[560px] px-4 text-[34px] leading-[1.05] font-semibold tracking-[-0.02em] tablet:text-[48px] desktop-sm:text-[52px]">
                 {t.reviewsHeading ?? "Loved on Google Play"}
               </h2>
               <p className={`mx-auto mt-5 max-w-[46ch] px-4 ${SUB}`}>
@@ -513,12 +542,19 @@ export function AppTemplate({ app }: { app: AppPage }) {
   );
 }
 
+/**
+ * Every card holds the same text block — a title of up to two lines over up
+ * to three of text, the space reserved even when shorter — and the poster is
+ * pinned at one offset, so a row of cards lines up whatever the copy.
+ */
 function FeatureCard({ app, feature, shot, bg }: { app: AppPage; feature: AppFeature; shot: number; bg: string }) {
   return (
     <div className="relative h-[560px] overflow-hidden rounded-[28px] p-7" style={{ background: bg }}>
-      <h3 className={CARD_H3}>{feature.title}</h3>
-      <p className="mt-2 line-clamp-4 text-[15px] leading-[1.45] text-black/55">{feature.text}</p>
-      <Poster app={app} shot={shot} alt={feature.title} sizes="280px" className="mx-auto mt-8 w-[75%]" />
+      <h3 className={`${CARD_H3} line-clamp-2 min-h-[2.2em]`}>{feature.title}</h3>
+      <p className={`mt-2 line-clamp-3 min-h-[4.35em] ${CARD_TEXT}`}>{feature.text}</p>
+      <div className="absolute inset-x-0 top-[220px] flex justify-center">
+        <Poster app={app} shot={shot} alt={feature.title} sizes="280px" className="w-[64%]" />
+      </div>
     </div>
   );
 }

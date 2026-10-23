@@ -35,7 +35,7 @@ export function Poster({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-[22px] bg-[var(--surface)] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.28)] tablet:rounded-[28px]",
+        "overflow-hidden rounded-[22px] bg-[var(--surface)] shadow-[0_16px_36px_-20px_rgba(0,0,0,0.18)] tablet:rounded-[28px]",
         className,
       )}
       style={{ aspectRatio: `${image.width} / ${image.height}` }}

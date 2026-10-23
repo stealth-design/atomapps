@@ -9,6 +9,9 @@ import { useId } from "react";
  * One `clipPath` per instance: the id has to be unique because a page shows
  * this twice (the hero and the details card), and two clip paths sharing an
  * id would both resolve to whichever came first.
+ *
+ * The stars are drawn in the text colour, near-black unless `className` sets
+ * another (the dark heroes turn them white).
  */
 
 const STAR =
@@ -26,7 +29,7 @@ export function StarRating({ rating, className }: { rating: number; className?: 
   const filledWidth = whole * STEP + (fill - whole) * 20;
 
   return (
-    <span className={className} role="img" aria-label={`Rated ${rating} out of 5`}>
+    <span className={`text-[#1c1b1f] ${className ?? ""}`} role="img" aria-label={`Rated ${rating} out of 5`}>
       <svg viewBox={`0 0 ${WIDTH} 20`} aria-hidden="true" className="h-full w-auto">
         <defs>
           <clipPath id={clipId}>
@@ -34,11 +37,11 @@ export function StarRating({ rating, className }: { rating: number; className?: 
           </clipPath>
         </defs>
         {[0, 1, 2, 3, 4].map((index) => (
-          <path key={index} d={STAR} transform={`translate(${index * STEP} 0)`} fill="#1c1b1f" opacity="0.2" />
+          <path key={index} d={STAR} transform={`translate(${index * STEP} 0)`} fill="currentColor" opacity="0.2" />
         ))}
         <g clipPath={`url(#${clipId})`}>
           {[0, 1, 2, 3, 4].map((index) => (
-            <path key={index} d={STAR} transform={`translate(${index * STEP} 0)`} fill="#1c1b1f" />
+            <path key={index} d={STAR} transform={`translate(${index * STEP} 0)`} fill="currentColor" />
           ))}
         </g>
       </svg>

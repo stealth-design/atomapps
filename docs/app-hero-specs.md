@@ -22,9 +22,9 @@ The order is the same for every app. Items marked **per app** are set in `appTem
 | 4 | Summary | `apps.ts` → `summary` | |
 | 5 | Google Play button | shared | 3px animated gradient ring around it. |
 | 6 | Rating line | `apps.ts` → `rating`, `ratingCount` | |
-| 7 | 3D phone | shared model, **per app** screen | Slow 360° spin every 4s, leans toward the cursor. `hero.screen` sets what its display shows at rest. |
+| 7 | 3D phone | shared model, **per app** screen | Rests facing front and leans toward the cursor; it turns only when an action plays. `hero.screen` sets what its display shows at rest. |
 | 8 | Action buttons (0–2) | **per app** `hero.actions` | Frosted pills left and right of the phone. Pressing one plays its action for 2.4s. |
-| 9 | Status note | **per app** `actions[].note` | Dark pill above the phone while an action plays, e.g. "Clap detected · Ringing". |
+| 9 | Status note | **per app** `actions[].note` | Dark pill over the middle of the phone while an action plays, e.g. "Clap detected · Ringing". |
 | 10 | Bottom strip | **per app** `hero.strip` | A grey label over three icon + word items, pinned to the hero's foot. Optional. |
 | 11 | Store card | shared | App icon + name, bottom right, desktop only. |
 

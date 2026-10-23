@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -40,29 +40,8 @@ import { siteConfig } from "@/data/site";
  * The mark is `final-atom-logo-dark.png` / `-white.png` — see the note at the
  * element for why derived files rather than a CSS filter.
  *
- * The bar retracts on the way down the page and comes back the moment the
- * scroll reverses. Direction comes from a ScrollTrigger rather than a `scroll`
- * listener: Lenis owns the scroll position here and already drives
- * ScrollTrigger from the same ticker (see SmoothScroll), so reading direction
- * from it means one source of truth and no second listener firing on a
- * position Lenis has not finished settling.
- *
- * It also comes back, and stays, once the footer is on screen. Arriving at the
- * foot of the page is the one place a reader has run out of page and is most
- * likely to want the nav again, and it is exactly where the retract would
- * otherwise have hidden it — the last movement before the page bottoms out is
- * always downward. While any part of the footer is in view the direction rule
- * is suspended, so the bar cannot flicker away on the small downward drifts a
- * settling scroll makes there.
+ * The bar is permanent: it stays in place at every scroll position.
  */
-
-/**
- * Movement to ignore before the bar reacts, in pixels.
- *
- * Without it a trackpad's own jitter around a standstill flips direction on
- * its own and the bar flickers in and out while nobody is really scrolling.
- */
-const DIRECTION_THRESHOLD = 8;
 
 /**
  * How far the page may scroll and still count as "at the top", in pixels.
@@ -81,7 +60,7 @@ const TOP_THRESHOLD = 24;
  */
 const HERO_SCRIM = "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%)";
 
-/** The state swap. Matches the retract, so the two read as one movement. */
+/** The state swap. */
 const SWAP = "transition-colors duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none";
 const SWAP_FADE = "transition-opacity duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none";
 
@@ -98,80 +77,21 @@ interface HeaderProps {
 export function Header({ transparentOverHero = false }: HeaderProps) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isRetracted, setIsRetracted] = useState(false);
   const [isOverHero, setIsOverHero] = useState(transparentOverHero);
 
-  // Mirrors of the two values the ScrollTrigger needs to read on every frame.
-  // Kept in refs so `onUpdate` can compare against them without the effect
-  // depending on state and rebuilding the trigger on every toggle.
-  const lastScroll = useRef(0);
-  const retracted = useRef(false);
-  /** True while the footer is on screen — see the footer trigger below. */
-  const overFooter = useRef(false);
-
-  const setRetracted = useCallback((next: boolean) => {
-    if (retracted.current === next) return;
-    retracted.current = next;
-    setIsRetracted(next);
-  }, []);
-
   useGSAP(() => {
+    if (!transparentOverHero) return;
     const trigger = ScrollTrigger.create({
       start: 0,
       end: "max",
-      onUpdate: (self) => {
-        const y = self.scroll();
-
-        // The scrim is for the top of the page only. Read before the direction
-        // threshold below, which would otherwise hold the swap back until the
-        // page had moved a further 8px.
-        if (transparentOverHero) setIsOverHero(y <= TOP_THRESHOLD);
-
-        const delta = y - lastScroll.current;
-        if (Math.abs(delta) < DIRECTION_THRESHOLD) return;
-        lastScroll.current = y;
-
-        // Never retracted over the top of the page: the first 50px is the bar's
-        // own height, and hiding it there would take it away as the hero
-        // arrives rather than once the reader is into the page. Nor over the
-        // footer, where the bar is held out on purpose.
-        setRetracted(y > 50 && delta > 0 && !overFooter.current);
-      },
+      onUpdate: (self) => setIsOverHero(self.scroll() <= TOP_THRESHOLD),
     });
-
-    // The footer is wrapped by FooterParallax, whose root is where the footer
-    // sits in the layout — the parallax only moves the footer *inside* that
-    // box, so the box is the right thing to measure against. `top bottom` is
-    // the moment its first pixel enters the viewport.
-    const footer = document.querySelector<HTMLElement>("[data-footer-parallax]");
-    const footerTrigger = footer
-      ? ScrollTrigger.create({
-          trigger: footer,
-          start: "top bottom",
-          end: "max",
-          onToggle: (self) => {
-            overFooter.current = self.isActive;
-            if (self.isActive) setRetracted(false);
-          },
-        })
-      : null;
-    // As with the hero trigger: `onToggle` only fires on a crossing, so a load
-    // that lands already at the foot of the page has to read the state off.
-    if (footerTrigger?.isActive) {
-      overFooter.current = true;
-      setRetracted(false);
-    }
-
     // `onUpdate` only fires on movement, so the initial state is read off the
     // scroll position directly — otherwise a load already down the page (a
     // hash link, or a restored position) would come up inverted.
-    if (transparentOverHero) setIsOverHero(trigger.scroll() <= TOP_THRESHOLD);
-
-    return () => {
-      trigger.kill();
-      footerTrigger?.kill();
-    };
-  }, [setRetracted, transparentOverHero]);
+    setIsOverHero(trigger.scroll() <= TOP_THRESHOLD);
+    return () => trigger.kill();
+  }, [transparentOverHero]);
 
   return (
     <>
@@ -185,18 +105,7 @@ export function Header({ transparentOverHero = false }: HeaderProps) {
           Safe here because `MobileMenu` is a sibling of this element, not a
           descendant — a transform would otherwise become the containing block
           for its `fixed inset-0` panel. */}
-      <header
-        // Focus brings it back before anything can be tabbed to behind it:
-        // a retracted bar is off screen but its links are still in the tab
-        // order, and focus landing on something invisible is a dead end.
-        onFocusCapture={() => setRetracted(false)}
-        // Tailwind v4 puts `-translate-y-full` on the `translate` property,
-        // which is separate from the `transform` that `transform-gpu` sets, so
-        // the two compose rather than one dropping the other.
-        className={`fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] transform-gpu transition-transform duration-[450ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none ${
-          isRetracted && !isMenuOpen ? "-translate-y-full" : "translate-y-0"
-        }`}
-      >
+      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)] h-[50px] transform-gpu">
         {/* Two grounds rather than one that changes colour: a gradient and a
             solid cannot be transitioned into each other, so they are stacked
             and their opacity is cross-faded instead. The scrim is second, so
@@ -230,9 +139,6 @@ export function Header({ transparentOverHero = false }: HeaderProps) {
               if (pathname !== "/" || event.metaKey || event.ctrlKey || event.shiftKey) return;
               event.preventDefault();
               scrollToTop();
-              // The bar hides itself on the way down; coming back to the top
-              // should always leave it showing.
-              setRetracted(false);
             }}
             className="flex h-full items-center"
           >

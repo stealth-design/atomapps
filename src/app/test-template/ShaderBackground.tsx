@@ -10,23 +10,27 @@ const VERT = `attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}`;
  * seen through a fisheye. Streaks inside the band flow outward (log(|x|) - t),
  * which reads as warp speed. uMouse shifts the vanishing point.
  *
- * Clicks: each of the last four (uClicks: pixel x, y, time) sends a ring out
- * from the click that pushes the band outward and leaves a faint shimmer,
- * and uFlow (the streaks' scroll, integrated in JS) surges then eases back.
+ * Clicks: each of the last four (uClicks: pixel x, y, time, strength) sends a
+ * ring out from the click that pushes the band outward and leaves a faint
+ * shimmer, and uFlow (the streaks' scroll, integrated in JS) surges then eases
+ * back — all scaled by the strength.
  */
 const FRAG = `precision highp float;
-uniform vec2 uRes;uniform float uTime;uniform vec2 uMouse;uniform vec3 uClicks[4];uniform float uFlow;
+uniform vec2 uRes;uniform float uTime;uniform vec2 uMouse;uniform vec4 uClicks[4];uniform float uFlow;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+1.),f.x),f.y);}
 float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p*=2.03;a*=.5;}return v;}
+// The AtomApps logo's rings: orange, teal and blue, a fifth lifted toward white so the band stays soft.
 vec3 ramp(float t){
-  vec3 pink=vec3(.98,.78,.86),blue=vec3(.52,.80,.95),teal=vec3(.55,.90,.80),gold=vec3(.98,.90,.66);
+  vec3 orange=vec3(.95,.42,.11),amber=vec3(.97,.58,.12),teal=vec3(.12,.77,.75),blue=vec3(.17,.44,.77),deep=vec3(.04,.24,.57);
   t=clamp(t*.5+.5,0.,1.);
-  if(t>.75)return mix(blue,pink,(t-.75)*4.);
-  if(t>.5)return mix(teal,blue,(t-.5)*4.);
-  if(t>.25)return mix(gold,teal,(t-.25)*4.);
-  return mix(pink,gold,t*4.);
+  vec3 c;
+  if(t>.75)c=mix(blue,deep,(t-.75)*4.);
+  else if(t>.5)c=mix(teal,blue,(t-.5)*4.);
+  else if(t>.25)c=mix(amber,teal,(t-.25)*4.);
+  else c=mix(orange,amber,t*4.);
+  return mix(c,vec3(1.),.2);
 }
 void main(){
   vec2 uv=gl_FragCoord.xy/uRes;
@@ -39,7 +43,7 @@ void main(){
     if(age<0.||age>3.)continue;
     vec2 d=q-(uClicks[i].xy-.5*uRes)/uRes.y;
     float r=length(d);
-    float ring=exp(-pow((r-age*.6)*9.,2.))*exp(-age*1.3);
+    float ring=exp(-pow((r-age*.6)*9.,2.))*exp(-age*1.3)*uClicks[i].w;
     p+=d/(r+1e-4)*ring*.05;
     glow+=ring;
   }
@@ -61,7 +65,17 @@ void main(){
   gl_FragColor=vec4(col,1.);
 }`;
 
-export function ShaderBackground({ className = "" }: { className?: string }) {
+/** Dispatch on `window` to send a ring from client point x, y; strength 1 is a click's. */
+export const PULSE_EVENT = "hero-pulse";
+export type Pulse = { x: number; y: number; strength: number };
+
+/**
+ * `clicks={false}` leaves the rings to PULSE_EVENT alone. `frag` swaps the
+ * sky for another fragment shader with the same uniforms (uRes, uTime,
+ * uMouse — eased, 0–1 across the canvas, y up — uClicks and uFlow); its
+ * output is drawn over the page, premultiplied, so it can be see-through.
+ */
+export function ShaderBackground({ className = "", clicks: onClick = true, frag = FRAG }: { className?: string; clicks?: boolean; frag?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -77,7 +91,7 @@ export function ShaderBackground({ className = "" }: { className?: string }) {
     };
     const prog = gl.createProgram()!;
     gl.attachShader(prog, shader(gl.VERTEX_SHADER, VERT));
-    gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FRAG));
+    gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, frag));
     gl.linkProgram(prog);
     gl.useProgram(prog);
 
@@ -95,8 +109,9 @@ export function ShaderBackground({ className = "" }: { className?: string }) {
     const target = { x: 0.5, y: 0.5 };
     const mouse = { x: 0.5, y: 0.5 };
     const onMove = (e: PointerEvent) => {
-      target.x = e.clientX / innerWidth;
-      target.y = 1 - e.clientY / innerHeight;
+      const r = canvas.getBoundingClientRect();
+      target.x = (e.clientX - r.left) / r.width;
+      target.y = 1 - (e.clientY - r.top) / r.height;
     };
     addEventListener("pointermove", onMove);
 
@@ -116,25 +131,25 @@ export function ShaderBackground({ className = "" }: { className?: string }) {
 
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Ring buffer of the last four clicks as [x, y, seconds], in canvas pixels
-    // with y up. The canvas sits under the hero's copy and phone, so clicks
-    // are caught on the window and kept when they land inside its box.
-    const clicks = new Float32Array(12).fill(-100);
+    // Ring buffer of the last four clicks as [x, y, seconds, strength], in
+    // canvas pixels with y up. The canvas sits under the hero's copy and phone,
+    // so clicks are caught on the window and kept when they land inside its box.
+    const clicks = new Float32Array(16).fill(-100);
     let next = 0;
     let now = 0;
     let flow = 0;
     let boost = 0;
-    const onDown = (e: PointerEvent) => {
+    const pulse = ({ x, y, strength }: Pulse) => {
       const r = canvas.getBoundingClientRect();
-      if (still || e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
-      clicks.set(
-        [((e.clientX - r.left) / r.width) * canvas.width, (1 - (e.clientY - r.top) / r.height) * canvas.height, now],
-        next * 3,
-      );
+      if (still || !strength || x < r.left || x > r.right || y < r.top || y > r.bottom) return;
+      clicks.set([((x - r.left) / r.width) * canvas.width, (1 - (y - r.top) / r.height) * canvas.height, now, strength], next * 4);
       next = (next + 1) % 4;
-      boost = 2.5;
+      boost = 2.5 * strength;
     };
+    const onDown = (e: PointerEvent) => onClick && pulse({ x: e.clientX, y: e.clientY, strength: 1 });
+    const onPulse = (e: Event) => pulse((e as CustomEvent<Pulse>).detail);
     addEventListener("pointerdown", onDown);
+    addEventListener(PULSE_EVENT, onPulse);
 
     let raf = 0;
     let last = 0;
@@ -144,7 +159,7 @@ export function ShaderBackground({ className = "" }: { className?: string }) {
       now = ms / 1000;
       flow += still ? 0 : dt * (0.25 + boost);
       boost *= 0.95;
-      gl.uniform3fv(uClicks, clicks);
+      gl.uniform4fv(uClicks, clicks);
       gl.uniform1f(uFlow, flow);
       mouse.x += (target.x - mouse.x) * 0.05;
       mouse.y += (target.y - mouse.y) * 0.05;
@@ -161,9 +176,10 @@ export function ShaderBackground({ className = "" }: { className?: string }) {
       io.disconnect();
       removeEventListener("pointermove", onMove);
       removeEventListener("pointerdown", onDown);
+      removeEventListener(PULSE_EVENT, onPulse);
       removeEventListener("resize", resize);
     };
-  }, []);
+  }, [onClick, frag]);
 
   return <canvas ref={ref} aria-hidden className={className} />;
 }
