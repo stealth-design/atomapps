@@ -55,16 +55,18 @@ export interface AppTemplate {
     /**
      * Swaps the 3D phone for an interactive demo: a working calculator, the
      * phone with a volume knob that sets how hard clicks pulse the background,
-     * a step widget that docks bottom-left and counts the scroll, a map with
+     * a footprint cursor whose trail the phone counts as steps, a map with
      * rain clouds the cursor blows about, or screen-colour swatches and a
      * torch that darkens the hero, or the phone's alarms list with Ring alarm
      * and Timer buttons, an illustrated QR / barcode scan with stage buttons,
      * a desk calendar that breaks into blocks, a flat phone's to-do list
      * filled by voice, a flat phone's news feed, a night sky of zodiac
      * constellations, a Bible whose pages turn, or a working AI prompt bar
-     * over a dark shader sky it ripples. See docs/app-hero-specs.md.
+     * over a dark shader sky it ripples, or a 3D living room where a clap
+     * makes the phone on the table ring and the camera flies in to it.
+     * See docs/app-hero-specs.md.
      */
-    demo?: "calculator" | "volume" | "steps" | "weather" | "flashlight" | "alarm" | "qr" | "calendar" | "notes" | "news" | "horoscope" | "bible" | "ai";
+    demo?: "calculator" | "volume" | "steps" | "weather" | "flashlight" | "alarm" | "qr" | "calendar" | "notes" | "news" | "horoscope" | "bible" | "ai" | "find";
   };
   /** Ends "Join {downloads} people …". Default: "using {title}". */
   socialLine?: string;
@@ -228,7 +230,7 @@ export const APP_TEMPLATES: Record<string, AppTemplate> = {
     hero: {
       demo: "steps",
       strip: {
-        label: "Counts every walk in",
+        label: "Tracks as you go",
         items: [
           { label: "Steps", icon: "M8 3c1.7 0 2.5 1.8 2.5 4S9.5 12 8 12 5.5 10.2 5.5 8 6.3 3 8 3ZM6 15h4v1.5a2 2 0 0 1-4 0ZM16 7c1.7 0 2.5 1.8 2.5 4s-1 5-2.5 5-2.5-1.8-2.5-4 .8-5 2.5-5ZM14 19h4v.5a2 2 0 0 1-4 0Z" },
           { label: "Distance", icon: "M6 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM8 19h8.5a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7H16" },
@@ -265,11 +267,8 @@ export const APP_TEMPLATES: Record<string, AppTemplate> = {
   },
   "find-my-phone": {
     hero: {
+      demo: "find",
       face: { button: "Clap to find", status: "Detection on" },
-      actions: [
-        { label: "Clap", emoji: "👏", does: "ring", note: "Clap detected · Ringing" },
-        { label: "Whistle", emoji: "😗", does: "ring", note: "Whistle detected · Ringing" },
-      ],
       strip: {
         label: "Works whether your phone is on",
         items: [

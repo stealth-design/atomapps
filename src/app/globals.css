@@ -199,3 +199,11 @@
     color: var(--foreground);
   }
 }
+
+/* Phones: a hero's animated layers (.under-copy) fade out above the end of its copy, so
+   nothing moves behind the headline (--copy-h is set by HeroParallax). */
+@media (width < 768px) {
+  .under-copy {
+    mask-image: linear-gradient(180deg, transparent calc(var(--copy-h, 0px) - 16px), #000 calc(var(--copy-h, 0px) + 48px));
+  }
+}

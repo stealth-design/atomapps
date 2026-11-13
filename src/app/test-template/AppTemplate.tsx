@@ -14,11 +14,15 @@ import { HeroNotes } from "./HeroNotes";
 import { HeroNews } from "./HeroNews";
 import { HeroHoroscope } from "./HeroHoroscope";
 import { HeroBible } from "./HeroBible";
+import { HeroFindPhone } from "./HeroFindPhone";
 import { NIGHT_FRAG } from "./NightSky";
-import { HeroWeather, WeatherMap, MAP_CREDIT, RADAR_FRAG } from "./WeatherScene";
+import { SKIES } from "./HeroSkies";
+import { WeatherMap, MAP_CREDIT, RADAR_FRAG } from "./WeatherScene";
+import { HeroWeather } from "./HeroWeather";
 import { HeroAI, AI_FRAG } from "./HeroAI";
 import { HeroParallax } from "./HeroParallax";
 import { RingCta } from "./RingCta";
+import { SpotlightCarousel } from "./SpotlightCarousel";
 import { StepSlider } from "./StepSlider";
 import { Marquee } from "./Marquee";
 import { LauncherExplorer } from "./LauncherExplorer";
@@ -28,12 +32,11 @@ import { FooterParallax } from "@/components/layout/FooterParallax";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { MoreApps } from "@/components/apps/MoreApps";
-import { PlayStoreButton } from "@/components/apps/PlayStoreButton";
 import { Poster } from "@/components/apps/Poster";
 import { StarRating } from "@/components/apps/StarRating";
 import { ICON_RADIUS } from "@/components/folds/fold03/appIcons";
 import { REVIEWS } from "@/components/folds/fold07/testimonials";
-import { LAUNCHER_NOTE, appIconSrc, playStoreUrl, type AppFeature, type AppPage } from "@/data/apps";
+import { LAUNCHER_NOTE, appIconSrc, type AppFeature, type AppPage } from "@/data/apps";
 import { getTemplate } from "@/data/appTemplates";
 
 /**
@@ -65,15 +68,17 @@ export const SUB = "text-[16px] leading-[1.5] text-black/55 tablet:text-[18px]";
 export const CARD_H3 = "text-[26px] leading-[1.1] font-semibold tracking-tight tablet:text-[32px]";
 const CARD_TEXT = "text-[15px] leading-[1.45] text-black/55";
 const LINK = "underline underline-offset-2 can-hover:hover:no-underline";
-const PHONE = "mx-auto -mt-2 h-[60vh] min-h-[420px] w-[min(100vw,60vh)] [mask-image:linear-gradient(180deg,#000_60%,transparent_95%)]";
+const PHONE_SOLID = "mx-auto -mt-2 h-[60vh] min-h-[420px] w-[min(100vw,60vh)]";
+// Most phones fade out at the foot; the alarm's and the flashlight's stay solid (a photo; a screen showing the page behind).
+const PHONE = `${PHONE_SOLID} [mask-image:linear-gradient(180deg,#000_60%,transparent_95%)]`;
 
 export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
   const t = getTemplate(app.slug);
   const demo = t.hero?.demo;
-  // A night-sky hero: no foot fade into the page's white, rounded at the foot instead.
-  const dark = demo === "horoscope" || demo === "ai";
+  // A full-bleed hero (night skies, the alarm's photo): no foot fade into the page's white, rounded at the foot instead.
+  const dark = demo === "horoscope" || demo === "ai" || demo === "alarm" || demo === "find";
   // The flat widgets grow the hero to fit and scroll with the page.
-  const flat = demo === "calculator" || demo === "qr" || demo === "calendar" || demo === "bible" || demo === "ai";
+  const flat = demo === "calculator" || demo === "notes" || demo === "qr" || demo === "calendar" || demo === "bible" || demo === "ai" || demo === "flashlight";
   const f = app.features;
   const reviews = REVIEWS.filter((r) => r.slug === app.slug);
   const count = app.ratingCount < 1000 ? String(app.ratingCount) : `${Math.round(app.ratingCount / 1000)}K`;
@@ -89,17 +94,13 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
     t.features?.cards ?? f.flatMap((x, i): [number, number][] => (x.shot ? [[i, x.shot]] : [])).slice(0, 3);
   const used = new Set([...cards.map(([i]) => i), ...(t.widget ? [t.widget.feature] : [])]);
   const spotlightIndex = t.spotlight ?? f.findIndex((_, i) => !used.has(i));
-  const spotlight: AppFeature | undefined = f[spotlightIndex];
-
-  const others = portraits.filter((n) => n !== app.heroShot);
-  const closingRow = [...others.slice(0, 2), app.heroShot, ...others.slice(2, 4)];
-
-  const links = [
-    ["FAQ", app.links.faq],
-    ["Contact", app.links.contact],
-    ["Terms", app.links.terms],
-    ["Privacy", app.links.privacy],
-  ].filter((l): l is [string, string] => !!l[1]);
+  // The spotlight carousel's USPs: the spotlight feature, then the ones the
+  // page doesn't show yet, then the rest, six at most.
+  const first = Math.max(0, spotlightIndex);
+  const rest = f.map((_, i) => i).filter((i) => i !== first);
+  const usps: Pick<AppFeature, "title" | "text">[] = [first, ...rest.filter((i) => !used.has(i)), ...rest.filter((i) => used.has(i))]
+    .slice(0, 6)
+    .flatMap((i) => (f[i] ? [{ title: f[i].title, text: f[i].text }] : []));
 
   return (
     <>
@@ -117,7 +118,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
         {/* ================= hero ================= */}
         {/* Parallax depths: sky lags (0.35), phone lags a little (0.15), copy runs ahead. */}
         {hero ?? (
-        // A screen tall — except the calculator's, QR scanner's, calendar's and Bible's, which
+        // A screen tall — except the calculator's, notes', QR scanner's, calendar's and Bible's, which
         // grow to fit, so the widget never sits under the strip on a short window.
         <HeroParallax
           className={`group/hero relative mx-2 mt-[calc(var(--header-height)+8px)] overflow-hidden ${dark ? "rounded-[24px]" : "rounded-t-[24px]"} ${
@@ -130,7 +131,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               so the hero has no bottom edge. Above the phone (z-10), under the copy (z-20).
               The weather map's is shorter, so the map fills the hero, but still ends
               on solid white: its own cloud banks scroll away with the parallax. The
-              dark skies (horoscope, AI) have none: they end in a rounded edge instead. */}
+              full-bleed ones (horoscope, AI, alarm) have none: they end in a rounded edge instead. */}
           {!dark && (
           <div
             className={`pointer-events-none absolute inset-x-0 bottom-0 z-[15] ${
@@ -149,13 +150,16 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               </>
             ) : demo === "horoscope" ? (
               <ShaderBackground frag={NIGHT_FRAG} className="absolute inset-0 h-full w-full bg-[#07061a]" />
+            ) : demo === "find" && t.hero?.face ? (
+              // The room is the whole hero; the phone is in it, so there's no phone slot below.
+              <HeroFindPhone face={{ ...t.hero.face, name: app.title, icon: appIconSrc(app), accent: app.accent }} className="absolute inset-0" />
             ) : demo === "ai" ? (
-              <ShaderBackground frag={AI_FRAG} className="absolute inset-0 h-full w-full bg-[#03060a]" />
+              <ShaderBackground frag={AI_FRAG} clicks={false} className="absolute inset-0 h-full w-full bg-[#03060a]" />
             ) : (
               <>
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,#dfeaf7_0%,#eef2f7_35%,#f5f4f1_70%,#faf6ec_100%)]" />
-                {/* The volume demo sends its own rings, from behind the phone. */}
-                <ShaderBackground clicks={demo !== "volume"} className="absolute inset-0 h-full w-full" />
+                {/* Each app's own sky (HeroSkies). The volume demo sends its own pulses, from behind the phone; the notes page has no click effect. */}
+                <ShaderBackground frag={SKIES[app.slug]} clicks={demo !== "volume" && demo !== "notes"} className="under-copy absolute inset-0 h-full w-full" />
               </>
             )}
           </div>
@@ -166,7 +170,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
           )}
 
           {/* Tighter on phones and short windows (short:), so the demo below starts higher. */}
-          <div data-depth="-0.2" className="relative z-20 mx-auto max-w-[900px] px-4 pt-6 text-center desktop-sm:max-w-[1240px] tablet:pt-10 short:pt-5">
+          <div data-depth="-0.2" data-copy className="relative z-20 mx-auto max-w-[900px] px-4 pt-6 text-center desktop-sm:max-w-[1240px] tablet:pt-10 short:pt-5">
             {/* Each authored line is its own block and may wrap inside itself,
                 so a long line (some headlines run to ~30 characters) can't
                 push past the screen. */}
@@ -176,17 +180,16 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               ))}
             </h1>
             <p className={`mx-auto mt-3 max-w-[480px] ${SUB} transition-colors tablet:mt-4 short:mt-2 short:text-[16px] duration-[600ms] group-data-[dark=true]/hero:text-white/70`}>{app.summary}</p>
-            {/* The hero's store button as a RingCta rather than
-                PlayStoreButton, whose black fill the live pages keep. */}
+            {/* The hero's call to action: the app's own website. */}
             <div className="mt-5 flex justify-center short:mt-4">
               <RingCta
-                href={playStoreUrl(app)}
+                href={app.website}
                 external
-                eyebrow="Get it on"
-                label="Google Play"
+                eyebrow="Visit the"
+                label="Website"
                 icon={
-                  <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden fill="currentColor">
-                    <path d="M0 0.8v10.4c0 .6.66.98 1.18.68l8.34-5.2a.8.8 0 0 0 0-1.36L1.18.12A.8.8 0 0 0 0 .8Z" />
+                  <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9 9 3M4 3h5v5" />
                   </svg>
                 }
               />
@@ -202,8 +205,8 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               the app's demo in its place. The step widget is fixed to the
               viewport, so it sits outside the parallax layers. */}
           {demo === "steps" ? (
-            <HeroSteps />
-          ) : (
+            <HeroSteps accent={app.accent} />
+          ) : demo === "find" ? null : (
             <div
               // The flat widgets (calculator, weather, QR, calendar, Bible) scroll with the page:
               // lagging like the phone, they'd slide down over the strip.
@@ -217,9 +220,9 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               ) : demo === "volume" ? (
                 <HeroVolume accent={app.accent} className={PHONE} />
               ) : demo === "flashlight" ? (
-                <HeroFlashlight accent={app.accent} className={PHONE} />
+                <HeroFlashlight accent={app.accent} className={`${PHONE_SOLID} mb-[150px]`} />
               ) : demo === "alarm" ? (
-                <HeroAlarm accent={app.accent} className={PHONE} />
+                <HeroAlarm accent={app.accent} className={PHONE_SOLID} />
               ) : demo === "qr" ? (
                 <HeroQR />
               ) : demo === "calendar" ? (
@@ -239,22 +242,10 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
           )}
 
           {/* Bottom centre, above the foot fade (z-15). */}
-          {t.hero?.strip && <HeroStrip strip={t.hero.strip} className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 tablet:bottom-12" />}
+          {t.hero?.strip && <HeroStrip strip={t.hero.strip} onPhoto={demo === "alarm" || demo === "find"} className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 tablet:bottom-12" />}
 
           {demo === "weather" && <p className="absolute bottom-3 left-3 z-20 text-[11px] text-black/55">{MAP_CREDIT}</p>}
 
-          <a
-            href={playStoreUrl(app)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute right-3 bottom-3 z-20 hidden items-center gap-3 rounded-xl bg-[#1d1d1f] p-2 pr-4 text-white desktop-sm:flex"
-          >
-            <Image src={appIconSrc(app)} alt="" width={48} height={48} className="size-12" style={{ borderRadius: ICON_RADIUS }} />
-            <span className="text-sm leading-tight font-semibold">
-              {app.title}
-              <span className="block text-[11px] font-normal text-white/60">Free on Google Play</span>
-            </span>
-          </a>
         </HeroParallax>
         )}
 
@@ -448,23 +439,23 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
         </Container>
 
         {/* ================= spotlight card ================= */}
-        {spotlight && (
+        {usps.length > 0 && (
           <Container as="section">
             <Reveal>
-            <div className="relative mx-auto flex h-[440px] max-w-[1100px] items-start justify-center overflow-hidden rounded-[28px] bg-[radial-gradient(80%_100%_at_0%_100%,#2f8a63_0%,transparent_50%),radial-gradient(80%_100%_at_100%_100%,#2f8a63_0%,transparent_50%),linear-gradient(90deg,#1f3b33,#1f2026_40%,#1f2026_60%,#1f3b33)] pt-16 text-center text-white">
-              <Image
-                src={appIconSrc(app)}
-                alt=""
-                width={279}
-                height={280}
-                className="absolute top-1/2 left-1/2 w-[340px] -translate-1/2 opacity-15 grayscale"
-                style={{ borderRadius: ICON_RADIUS }}
+              <SpotlightCarousel
+                items={usps}
+                h2={H2}
+                backdrop={
+                  <Image
+                    src={appIconSrc(app)}
+                    alt=""
+                    width={279}
+                    height={280}
+                    className="absolute top-1/2 left-1/2 w-[340px] -translate-1/2 opacity-15 grayscale"
+                    style={{ borderRadius: ICON_RADIUS }}
+                  />
+                }
               />
-              <div className="relative max-w-[46ch] px-6">
-                <h2 className={H2}>{spotlight.title}</h2>
-                <p className="mt-3 text-white/60">{spotlight.text}</p>
-              </div>
-            </div>
             </Reveal>
           </Container>
         )}
@@ -501,31 +492,19 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
             <h2 className={H2}>{t.closing ?? `Get ${app.title}`}</h2>
             {app.highlights && <p className={`mx-auto mt-4 max-w-[50ch] ${SUB}`}>{app.highlights.join(" · ")}</p>}
             <div className="mt-6 flex justify-center">
-              <PlayStoreButton app={app} />
-            </div>
-            <p className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[14px] text-[#61616a]">
-              <a href={app.website} target="_blank" rel="noopener noreferrer" className={LINK}>
-                Website
-              </a>
-              {links.map(([label, href]) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer" className={LINK}>
-                  {label}
-                </a>
-              ))}
-            </p>
-          </Container>
-          <div className="mt-16 flex items-center justify-center gap-4 tablet:gap-8">
-            {closingRow.map((shot) => (
-              <Poster
-                key={shot}
-                app={app}
-                shot={shot}
-                alt=""
-                sizes="260px"
-                className={shot === app.heroShot ? "w-[200px] shrink-0 tablet:w-[260px]" : "w-[140px] shrink-0 opacity-90 tablet:w-[190px]"}
+              <RingCta
+                href={app.website}
+                external
+                eyebrow="Visit the"
+                label="Website"
+                icon={
+                  <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9 9 3M4 3h5v5" />
+                  </svg>
+                }
               />
-            ))}
-          </div>
+            </div>
+          </Container>
         </section>
 
         {/* ================= the rest of the family ================= */}

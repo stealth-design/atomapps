@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Hint } from "./Hint";
+import { HeroCalcCards } from "./HeroCalcCards";
+import { useReducedMotion } from "./useReducedMotion";
+
+// What the calculator types on its own, a key at a time ("(" and ")" are the
+// one brackets key), each answer held a moment before the next.
+const SCRIPT = ["14552−25%=", "(48+12)×3.5=", "1250÷8+75=", "99×99=", "3.14×12×12=", "86.40+18%="];
+const IDLE = 8000; // ms after the reader's last key before it types again
 
 /*
  * The app's own calculator, as on its store screenshot: you type a whole
@@ -142,6 +149,49 @@ export function HeroCalculator() {
   const [{ expr }, setS] = useState({ expr: "", done: false });
   const [lit, setLit] = useState("");
   const tap = (k: string) => setS((s) => ({ expr: press(s.expr, k, s.done), done: k === "=" }));
+  const reduce = useReducedMotion();
+  const root = useRef<HTMLDivElement>(null);
+
+  // Left alone, it works through SCRIPT; a key or a press from the reader
+  // hands it over to them until they've been idle for IDLE ms.
+  useEffect(() => {
+    if (reduce) return;
+    let line = 0;
+    let at = 0;
+    let idleUntil = 0;
+    let timer = 0;
+    const takeOver = () => {
+      idleUntil = performance.now() + IDLE;
+      at = 0;
+    };
+    const el = root.current!;
+    addEventListener("keydown", takeOver);
+    el.addEventListener("pointerdown", takeOver);
+    const tick = () => {
+      if (performance.now() < idleUntil || document.hidden) {
+        timer = window.setTimeout(tick, 500);
+        return;
+      }
+      if (at === 0) setS({ expr: "", done: false });
+      const ch = SCRIPT[line][at];
+      const key = ch === "(" || ch === ")" ? "()" : ch;
+      setS((s) => ({ expr: press(s.expr, key, s.done), done: key === "=" }));
+      setLit(key);
+      at++;
+      if (at < SCRIPT[line].length) timer = window.setTimeout(tick, 230 + Math.random() * 150);
+      else {
+        at = 0;
+        line = (line + 1) % SCRIPT.length;
+        timer = window.setTimeout(tick, 2200);
+      }
+    };
+    timer = window.setTimeout(tick, 900);
+    return () => {
+      clearTimeout(timer);
+      removeEventListener("keydown", takeOver);
+      el.removeEventListener("pointerdown", takeOver);
+    };
+  }, [reduce]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -169,6 +219,7 @@ export function HeroCalculator() {
 
   return (
     <div
+      ref={root}
       data-calc
       // The bottom margin clears the hero's strip.
       className="relative mx-auto mt-12 mb-[150px] w-[min(340px,calc(100vw-32px))] roomy:w-[390px] rounded-[28px] bg-white px-4 pt-3 pb-4 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.35)] ring-1 ring-black/5 short:mt-8"
@@ -218,6 +269,7 @@ export function HeroCalculator() {
         ))}
       </div>
       <Hint className="absolute top-full left-1/2 mt-3 -translate-x-1/2" />
+      <HeroCalcCards />
     </div>
   );
 }

@@ -1,139 +1,271 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Mic } from "lucide-react";
-import { FlatPhone } from "./FlatPhone";
+import { useEffect, useRef, useState } from "react";
+import { Check, Mic } from "lucide-react";
 import { useReducedMotion } from "./useReducedMotion";
-import { Hint } from "./Hint";
+import { NOTE_PITCH } from "./HeroSkies";
 
-const AT_REST = ["Plan the weekend", "Reply to Sam"];
-const SPOKEN = ["Buy milk", "Call mom at 6", "Gym tomorrow 7am"];
-const TICK = 40; // ms a typed letter takes
-const PAUSE = 15; // ticks between one task landing and the next starting
-// The tick each spoken task starts typing on, after a short wait for the waves.
-const STARTS = SPOKEN.reduce<number[]>((acc, task, i) => [...acc, i ? acc[i - 1] + SPOKEN[i - 1].length + PAUSE : 12], []);
-const DONE = STARTS.at(-1)! + SPOKEN.at(-1)!.length + PAUSE;
-const NOTE_FOR = 60; // ticks "3 tasks added" stays up
-
-/**
- * The notes hero: a flat phone with a to-do list and a Voice command button
- * beside it. Pressing it puts up "Listening…", sends audio waves from the
- * button to the phone, and the three spoken tasks type themselves in one by
- * one, each then dropping into the list with a soft bounce. Then the waves
- * stop, the last task gets a colour tag and the note reads "3 tasks added".
- * Pressing again starts over. No microphone, no sound; under reduced motion
- * there are no waves and the tasks simply appear.
+/*
+ * The notes hero, written on the sky's ruled paper rather than in a phone:
+ * a big mic in the middle that hears a command, types out what it heard and
+ * says what it did; the day's to-do list on the left, where spoken tasks
+ * land and finished ones are struck through; and "Try saying" on the right,
+ * the commands it knows, the one playing lit — press any to hear it.
+ *
+ * It plays on its own: each command in turn, then the list starts over.
+ * Everything is derived from where it is in the loop (`cmd`, and `t` ticks
+ * into it), so the list is always INITIAL with the commands so far applied.
+ * Under reduced motion it rests with every command applied, and pressing a
+ * command shows its result at once. No microphone, no sound.
  */
+
+type Item = { text: string; meta?: string; done?: boolean };
+type Cmd = { say: string; result: string; add?: Item; done?: string };
+
+const INITIAL: Item[] = [{ text: "Plan the weekend" }, { text: "Reply to Sam" }, { text: "Water the plants" }];
+const COMMANDS: Cmd[] = [
+  { say: "Add buy milk to my list", result: "Added · Shopping", add: { text: "Buy milk", meta: "Shopping" } },
+  { say: "Remind me to call Mom at 6 pm", result: "Added · Today, 6:00 PM", add: { text: "Call Mom", meta: "6:00 PM" } },
+  { say: "Mark reply to Sam as done", result: "Done · Reply to Sam", done: "Reply to Sam" },
+  { say: "Gym tomorrow at 7 am", result: "Added · Tomorrow, 7:00 AM", add: { text: "Gym", meta: "Tomorrow 7 AM" } },
+  { say: "Add pay rent on Friday", result: "Added · Friday", add: { text: "Pay rent", meta: "Fri" } },
+  { say: "Tick off water the plants", result: "Done · Water the plants", done: "Water the plants" },
+];
+
+const TICK = 50; // ms
+const LISTEN = 14; // ticks of listening before the words come
+const GAP = 8; // ticks between the last word and the result
+const HOLD = 44; // ticks the result shows
+const REST = 40; // ticks with the full list before it starts over
+const applyAt = (c: number) => LISTEN + COMMANDS[c].say.length + GAP;
+const endOf = (c: number) => applyAt(c) + HOLD;
+
+const apply = (list: Item[], c: Cmd) =>
+  c.add ? [...list, c.add] : list.map((it) => (it.text === c.done ? { ...it, done: true } : it));
+
+const INK = "#23305a"; // pen blue, on the paper
+
 export function HeroNotes() {
   const still = useReducedMotion();
-  const [run, setRun] = useState(0);
-  const [tick, setTick] = useState(0);
-  const end = DONE + NOTE_FOR;
+  const last = COMMANDS.length - 1;
+  const [{ cmd, t }, setRun] = useState({ cmd: 0, t: 0 });
+  const at = still ? { cmd: last, t: endOf(last) } : { cmd, t };
 
   useEffect(() => {
-    if (!run || tick >= end) return;
-    const t = setTimeout(() => setTick(tick + 1), TICK);
-    return () => clearTimeout(t);
-  }, [run, tick, end]);
+    if (still) return;
+    const id = setTimeout(() => {
+      const end = endOf(cmd) + (cmd === last ? REST : 0);
+      setRun(t + 1 < end ? { cmd, t: t + 1 } : { cmd: (cmd + 1) % COMMANDS.length, t: 0 });
+    }, TICK);
+    return () => clearTimeout(id);
+  }, [cmd, t, still, last]);
 
-  const start = () => {
-    setTick(still ? DONE : 0);
-    setRun((r) => r + 1);
-  };
+  const c = COMMANDS[at.cmd];
+  const applied = at.t >= applyAt(at.cmd);
+  const listening = !applied;
+  const heard = c.say.slice(0, Math.max(0, at.t - LISTEN));
+  const showResult = applied && at.t < endOf(at.cmd) + (still ? 1 : 0);
+  const list = COMMANDS.slice(0, at.cmd + (applied ? 1 : 0)).reduce(apply, INITIAL);
+  const fresh = applied ? (c.add?.text ?? c.done) : undefined;
 
-  const listening = run > 0 && tick < DONE;
-  const typed = SPOKEN.map((task, i) => task.slice(0, Math.max(0, tick - STARTS[i])));
-  const landed = run ? SPOKEN.filter((task, i) => typed[i] === task) : [];
-  const typing = typed.find((text, i) => text && text !== SPOKEN[i]);
-  const done = run > 0 && tick >= DONE;
+  const play = (k: number) => setRun({ cmd: k, t: still ? endOf(k) : 0 });
+
+  // Writes the hero's copy and both lists on the sky's ruled lines: every row is one line tall
+  // (`--pitch`), and each list is padded down so its rows' feet sit on lines.
+  // The lines are NOTE_PITCH apart from half a pitch below the sky's top;
+  // measured against the sky's layer, which the parallax moves on its own,
+  // and refitted on resize.
+  const list$ = useRef<HTMLDivElement>(null);
+  const hints$ = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const hero = list$.current!.closest("section")!;
+    const sky = hero.querySelector<HTMLElement>("[data-depth='0.35']") ?? hero;
+    const fit = () => {
+      const pitch = NOTE_PITCH;
+      const line = sky.getBoundingClientRect().top + pitch / 2; // any line, in viewport px
+      const down = (y: number) => (((line - y) % pitch) + pitch) % pitch; // to the next line at or below y
+
+      // The hero's copy, top down (each shift moves what follows): text gets a
+      // line height of whole pitches and is nudged so its baselines sit just
+      // on lines; the store button and the rating row rest their feet on one.
+      const copy = hero.querySelector<HTMLElement>("[data-depth='-0.2']");
+      const [h1, sub, cta, rating] = copy ? (Array.from(copy.children) as HTMLElement[]) : [];
+      for (const el of [h1, sub, cta, rating]) if (el) el.style.cssText = el.style.cssText.replace(/(margin-top|line-height|height|align-items|padding-bottom):[^;]*;?/g, "");
+      for (const el of [h1, sub]) {
+        if (!el) continue;
+        const fs = parseFloat(getComputedStyle(el).fontSize);
+        let k = Math.max(1, Math.round((fs * 1.15) / pitch));
+        if (k * pitch < fs * 0.95) k++;
+        el.style.lineHeight = `${k * pitch}px`;
+        const probe = Object.assign(document.createElement("span"), { style: "display:inline-block;width:0;height:0;vertical-align:baseline" });
+        (el.firstElementChild ?? el).prepend(probe);
+        const baseline = probe.getBoundingClientRect().top;
+        probe.remove();
+        el.style.marginTop = `${parseFloat(getComputedStyle(el).marginTop) + down(baseline + 4)}px`;
+      }
+      if (rating) Object.assign(rating.style, { height: `${pitch}px`, alignItems: "flex-end", paddingBottom: "4px" });
+      for (const el of [cta, rating]) if (el) el.style.marginTop = `${parseFloat(getComputedStyle(el).marginTop) + down(el.getBoundingClientRect().bottom)}px`;
+
+      for (const el of [list$.current, hints$.current]) {
+        if (!el) continue;
+        el.style.setProperty("--pitch", `${pitch}px`);
+        const top = el.getBoundingClientRect().top;
+        // Padding, not a transform, so what follows the list moves down with it.
+        el.style.paddingTop = `${(((line - top) % pitch) + pitch) % pitch}px`;
+      }
+    };
+    fit();
+    // Refit on width changes only: the padding itself changes the hero's height
+    // (it grows to fit), and refitting on that would chase its own tail.
+    let width = hero.clientWidth;
+    const ro = new ResizeObserver(() => {
+      if (hero.clientWidth === width) return;
+      width = hero.clientWidth;
+      fit();
+    });
+    ro.observe(hero);
+    return () => ro.disconnect();
+  }, []);
 
   return (
-    <div className="relative mt-6 short:mt-3">
-      <style>{`@keyframes tt-land{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}@keyframes tt-wave{to{stroke-dashoffset:-48}}`}</style>
+    <div className="relative mx-auto mt-5 mb-[150px] w-full max-w-[1200px] px-4 tablet:mt-8 desktop-sm:min-h-[350px] short:mt-4" style={{ color: INK }}>
+      <style>{`@keyframes nt-land{0%{opacity:0;transform:translateY(-10px) scale(.95)}60%{opacity:1;transform:translateY(2px) scale(1.02)}100%{transform:none}}
+@keyframes nt-mark{from{background-size:0% 100%}}
+@keyframes nt-bar{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@keyframes nt-ring{from{transform:scale(1);opacity:.5}to{transform:scale(1.9);opacity:0}}`}</style>
 
-      {run > 0 && tick < end && (
-        <p role="status" className="absolute -top-4 left-1/2 z-20 flex w-max -translate-x-1/2 items-center gap-2 rounded-full bg-[var(--foreground)] px-4 py-2 text-[13px] font-medium text-white shadow-lg">
-          <span className={`size-2 rounded-full ${done ? "bg-[#3ddc84]" : "animate-pulse bg-[#ff5a5a]"}`} />
-          {done ? "3 tasks added" : "Listening…"}
-        </p>
-      )}
-
-      <FlatPhone>
-        <div className="px-5 pt-6">
-          <p className="text-[24px] leading-none font-bold">To do</p>
-          <p className="mt-1 text-[12px] text-black/45">{AT_REST.length + landed.length} tasks</p>
-
-          <div className={`mt-4 flex h-9 items-center gap-2 rounded-full px-3 text-[13px] transition-colors duration-300 ${listening ? "bg-[var(--accent)]/12 text-[#1d1d1f]" : "bg-[#f3f4f8] text-black/35"}`}>
-            <Mic aria-hidden className={`size-4 shrink-0 ${listening ? "text-[var(--accent)]" : ""}`} strokeWidth={2} />
-            {typing ? (
-              <span className="truncate">
-                {typing}
-                <span className="ml-px inline-block h-3.5 w-px translate-y-0.5 animate-pulse bg-[#1d1d1f]" />
-              </span>
-            ) : listening ? (
-              "Listening…"
-            ) : (
-              "Add a task"
-            )}
-          </div>
-
-          <ul className="mt-4 flex flex-col gap-2">
-            {[...AT_REST, ...landed].map((task, i) => {
-              const fresh = i >= AT_REST.length;
-              const tagged = done && task === SPOKEN.at(-1);
-              return (
-                <li
-                  key={`${run}-${task}`}
-                  className="flex items-center gap-3 rounded-2xl bg-[#f6f6f8] px-3 py-2.5 text-[13px] font-medium"
-                  style={fresh && !still ? { animation: "tt-land .5s cubic-bezier(0.34,1.56,0.64,1) both" } : undefined}
-                >
-                  <span className="size-4 shrink-0 rounded-[5px] border-[1.5px] border-black/25" />
-                  <span className="min-w-0 flex-1 truncate">{task}</span>
-                  {tagged && <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-[10px] font-semibold text-white">Fitness</span>}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </FlatPhone>
-
-      {/* Audio waves from the button into the phone's screen. */}
-      {listening && !still && (
-        <svg
-          aria-hidden
-          viewBox="0 0 160 60"
-          preserveAspectRatio="none"
-          className="pointer-events-none absolute top-[calc(30%-6px)] right-1/2 z-10 h-[72px] w-[min(160px,calc(50vw-64px))] [mask-image:linear-gradient(90deg,#000_40%,transparent)]"
+      {/* The voice command, centre. */}
+      <div className="flex flex-col items-center">
+        <button
+          type="button"
+          onClick={() => !listening && play((at.cmd + 1) % COMMANDS.length)}
+          aria-label={`Voice command. Try: ${COMMANDS[(at.cmd + 1) % COMMANDS.length].say}`}
+          className="relative grid size-[68px] place-items-center tablet:size-[88px] rounded-full text-white shadow-[0_18px_40px_-14px_rgba(0,0,0,0.45)] transition-transform duration-300 can-hover:hover:scale-105 active:scale-95"
+          style={{ background: listening ? "var(--accent)" : "#1d1d1f" }}
         >
-          {/* Three nested ripples, in phase, the inner ones smaller and fainter. */}
-          {[22, 13, 6].map((a, i) => (
-            <path
-              key={a}
-              d={`M0 30 Q20 ${30 - a} 40 30 T80 30 T120 30 T160 30`}
-              fill="none"
-              className="stroke-[var(--accent)]"
-              strokeWidth={2.5 - i * 0.5}
-              strokeLinecap="round"
-              strokeDasharray="18 10"
-              opacity={0.9 - i * 0.25}
-              style={{ animation: `tt-wave ${0.7 + i * 0.15}s linear infinite` }}
-            />
-          ))}
-        </svg>
-      )}
+          {listening && !still && (
+            <>
+              <span className="absolute inset-0 rounded-full bg-[var(--accent)] animate-[nt-ring_1.6s_ease-out_infinite]" />
+              <span className="absolute inset-0 rounded-full bg-[var(--accent)] animate-[nt-ring_1.6s_ease-out_.8s_infinite]" />
+            </>
+          )}
+          {listening && !still && at.t > LISTEN / 2 ? (
+            // Sound bars while it hears.
+            <span aria-hidden className="relative flex h-8 items-center gap-[3px]">
+              {[0.1, 0.35, 0, 0.25, 0.5].map((d, i) => (
+                <span key={i} className="h-full w-[4px] origin-center rounded-full bg-white animate-[nt-bar_.7s_ease-in-out_infinite]" style={{ animationDelay: `${d}s` }} />
+              ))}
+            </span>
+          ) : (
+            <Mic aria-hidden className="relative size-7 tablet:size-9" strokeWidth={1.8} />
+          )}
+        </button>
+        <p className="mt-3 text-[13px] font-semibold tracking-wide uppercase opacity-60">{listening ? "Listening…" : "Tap and speak"}</p>
 
-      <button
-        type="button"
-        onClick={start}
-        aria-label="Voice command"
-        className={`absolute top-[30%] left-3 z-20 flex items-center gap-2 rounded-full p-3 text-[15px] font-semibold shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)] ring-1 backdrop-blur-md transition-[transform,background-color,color] duration-300 can-hover:hover:scale-105 active:scale-95 tablet:right-[calc(50%+min(160px,40vw))] tablet:left-auto tablet:px-5 ${
-          listening ? "bg-[var(--accent)] text-white ring-[var(--accent)]" : "bg-white/75 text-[var(--foreground)] ring-black/5"
-        }`}
-      >
-        <Mic aria-hidden className="size-[22px]" strokeWidth={1.8} />
-        <span className="hidden tablet:inline">Voice command</span>
-        <Hint />
-      </button>
+        {/* What it heard, as it hears it. */}
+        <p className="mt-3 min-h-[2.4em] max-w-[min(400px,100%)] text-center text-[clamp(20px,2.2vw,26px)] text-balance leading-tight font-semibold">
+          {heard ? (
+            <>
+              &ldquo;{heard}
+              {listening && <span className="ml-0.5 inline-block h-[0.9em] w-[2px] translate-y-[0.1em] animate-pulse bg-current" />}
+              {!listening && "”"}
+            </>
+          ) : (
+            <span className="opacity-30">&ldquo;Say a task…&rdquo;</span>
+          )}
+        </p>
+
+        {/* What it did. */}
+        <p
+          role="status"
+          className={`mt-3 flex items-center gap-2 rounded-full bg-[#1d1d1f] px-4 py-2 text-[13px] font-medium text-white shadow-lg transition-[opacity,transform] duration-300 ${showResult ? "opacity-100" : "translate-y-1 opacity-0"}`}
+        >
+          <span className="grid size-4 place-items-center rounded-full bg-[#3ddc84]">
+            <Check aria-hidden className="size-3 text-[#1d1d1f]" strokeWidth={3} />
+          </span>
+          {c.result}
+        </p>
+      </div>
+
+      {/* Today's list, written on the paper: left from desktop up, under the mic below that (latest three). */}
+      <div ref={list$} className="mx-auto mt-6 w-[min(320px,100%)] desktop-sm:absolute desktop-sm:top-2 desktop-sm:right-[calc(50%+230px)] desktop-sm:mt-0 desktop-sm:w-[300px]">
+        <p className="flex h-[var(--pitch,40px)] items-end gap-1.5 pb-[4px] text-[22px] leading-none font-bold">
+          Today <span className="text-[14px] font-medium opacity-50">· {list.filter((i) => !i.done).length} to do</span>
+        </p>
+        <ul>
+          {list.map((it, i) => (
+            <li
+              key={it.text}
+              className={`h-[var(--pitch,40px)] items-end gap-3 pb-[4px] text-[17px] leading-none ${i < list.length - 3 ? "hidden desktop-sm:flex" : "flex"}`}
+              style={it.text === fresh && c.add && !still ? { animation: "nt-land .55s cubic-bezier(0.34,1.56,0.64,1) both" } : undefined}
+            >
+              <span
+                className={`grid size-[18px] shrink-0 place-items-center rounded-[5px] border-2 transition-colors duration-300 ${it.done ? "border-[var(--accent)] bg-[var(--accent)] text-white" : "border-current opacity-60"}`}
+              >
+                {it.done && <Check aria-hidden className="size-3" strokeWidth={3.5} />}
+              </span>
+              <span className={`relative min-w-0 truncate transition-opacity duration-500 ${it.done ? "opacity-45" : ""}`}>
+                <span
+                  // A highlighter swipe on what was just added.
+                  className="bg-[linear-gradient(transparent_55%,rgba(255,214,90,.65)_55%)] bg-no-repeat"
+                  style={{
+                    backgroundSize: it.text === fresh && c.add ? "100% 100%" : "0% 100%",
+                    animation: it.text === fresh && c.add && !still ? "nt-mark .6s .35s ease-out both" : undefined,
+                  }}
+                >
+                  {it.text}
+                </span>
+                {/* The strike-through, drawn across when it's done. */}
+                <span
+                  aria-hidden
+                  className="absolute top-1/2 left-0 h-[2px] w-full origin-left bg-current transition-transform duration-500"
+                  style={{ transform: `scaleX(${it.done ? 1 : 0})` }}
+                />
+              </span>
+              {it.meta && <span className="ml-auto shrink-0 rounded-full bg-[var(--accent)]/12 px-2 py-0.5 text-[11px] font-semibold text-[var(--accent)]">{it.meta}</span>}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* On phones and tablets: the commands as chips to tap, scrolling sideways. */}
+      <p className="mt-6 text-center text-[12px] font-semibold tracking-wide uppercase opacity-60 desktop-sm:hidden">Try saying</p>
+      <div className="-mx-4 mt-2 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] tablet:flex-wrap tablet:justify-center desktop-sm:hidden">
+        {COMMANDS.map((k, i) => (
+          <button
+            key={k.say}
+            type="button"
+            onClick={() => play(i)}
+            aria-label={`Play the command: ${k.say}`}
+            className={`flex shrink-0 snap-start items-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-medium ring-1 transition-colors duration-300 ${
+              i === at.cmd ? "bg-[#23305a] text-white ring-[#23305a]" : "bg-white/70 ring-black/10"
+            }`}
+          >
+            <Mic aria-hidden className="size-3.5" strokeWidth={2.2} />
+            &ldquo;{k.say}&rdquo;
+          </button>
+        ))}
+      </div>
+
+      {/* The commands it knows, the one playing lit; each plays when pressed. Desktop up. */}
+      <div ref={hints$} className="absolute top-2 left-[calc(50%+230px)] hidden w-[300px] desktop-sm:block">
+        <p className="flex h-[var(--pitch,40px)] items-end pb-[4px] text-[22px] leading-none font-bold">Try saying</p>
+        <ul>
+          {COMMANDS.map((k, i) => (
+            <li key={k.say}>
+              <button
+                type="button"
+                onClick={() => play(i)}
+                aria-label={`Play the command: ${k.say}`}
+                className={`flex h-[var(--pitch,40px)] w-full items-end gap-2.5 pb-[4px] text-left text-[16px] leading-none transition-[opacity,transform] duration-300 can-hover:hover:opacity-100 ${i === at.cmd ? "translate-x-1 font-semibold opacity-100" : "opacity-50"}`}
+              >
+                <Mic aria-hidden className={`size-4 shrink-0 ${i === at.cmd ? "text-[var(--accent)]" : ""}`} strokeWidth={2.2} />
+                &ldquo;{k.say}&rdquo;
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

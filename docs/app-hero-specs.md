@@ -26,7 +26,6 @@ The order is the same for every app. Items marked **per app** are set in `appTem
 | 8 | Action buttons (0–2) | **per app** `hero.actions` | Frosted pills left and right of the phone. Pressing one plays its action for 2.4s. |
 | 9 | Status note | **per app** `actions[].note` | Dark pill over the middle of the phone while an action plays, e.g. "Clap detected · Ringing". |
 | 10 | Bottom strip | **per app** `hero.strip` | A grey label over three icon + word items, pinned to the hero's foot. Optional. |
-| 11 | Store card | shared | App icon + name, bottom right, desktop only. |
 
 The hero is fully usable with none of the per-app fields: the phone spins, there are no buttons and no strip.
 
@@ -52,7 +51,7 @@ The specs below use these where the four above can't show what the app does. Eac
 
 ### Custom scenes
 
-A scene is a per-app hero component that can replace the background (layer 2), the 3D phone (layer 7), the action buttons (layer 8) and the cursor. It keeps the headline, store button, rating, strip and store card. Field: `hero.scene: "flashlight" | "volume" | "steps" | "calendar" | "horoscope" | "notes" | "weather" | "qr" | "bible"`. The scenes need these additions to `PhoneModel`:
+A scene is a per-app hero component that can replace the background (layer 2), the 3D phone (layer 7), the action buttons (layer 8) and the cursor. It keeps the headline, store button, rating and strip. Field: `hero.scene: "flashlight" | "volume" | "steps" | "calendar" | "horoscope" | "notes" | "weather" | "qr" | "bible"`. The scenes need these additions to `PhoneModel`:
 
 | Addition | What it does | Used by |
 |---|---|---|
@@ -142,27 +141,19 @@ Each app has:
   - no screen images (the screen is drawn live)
   - icons: phone handset, music note, alarm bell
 
-### Step Tracker Launcher · `step-tracker`
+### Step Tracker Launcher · `step-tracker` · **live in the template**
 
-- **MVP:** every step counted as you take it.
+- **MVP:** a walk turning into a step count, with no input from the reader.
 - **Scene:** `steps`
 - **Flow:**
-  1. The shader sky is replaced by a top-down view of land: soft grass, earth paths and a few trees, seen from above in pale, map-like colours so the headline stays readable.
-  2. Over the hero, the cursor becomes a human footprint.
-  3. As the cursor moves, it leaves a trail of footprints, one about every 40px of travel. They alternate left and right, a little either side of the path, and each turns to face the way it is heading. Each print fades out after a few seconds, and at most about 40 are on screen.
-  4. In the centre, the phone holds facing front with a step counter on its display. It counts up by one for every footprint, with a ring filling toward a goal of 100. Distance and calories tick up under the count.
-  5. Reaching the goal fills the ring and the note reads "Goal reached 🎉". The count then carries on.
-  6. The strip shows the three numbers it tracks.
-- **Components:**
-  - land background: a shader or a static illustration
-  - footprint cursor (CSS `cursor`), plus a footprint trail on a canvas over the land
-  - counter: a live screen on the phone
-  - strip "Tracks as you go": Steps · Distance · Calories
-- **Rules:** on touch screens, the footprints follow a finger dragged across the hero. With no pointer, the count rises a little on its own so the hero isn't empty. Under reduced motion the prints still appear but don't fade.
-- **To make:**
-  - the land art, or a shader
-  - the footprint cursor (left and right foot, SVG)
-  - icons: footprints, route, flame
+  1. The shader sky is replaced by a park seen from above: pale grass, round trees and a winding sand path across the hero, with a dashed blue route marching along it and three checkpoints.
+  2. Someone walks the path on their own, left to right and round again: a footprint every 380ms, alternating feet, each turned along the path. A "+1" rises off each print, and each print fades after 4s.
+  3. In place of the phone, a step widget sits centred low in the hero: a ring filling toward a goal of 100, the count, and distance, calories and active time under "Today". It scrolls away with the hero, like the cards round it.
+  4. Around it, cards from the app's other screens, from desktop up: a Day / Week / Month switch that flips on its own, a week's bar chart whose last bar is the live count, a Time · Cal · Meters row, and a Step Goal picker reading "N to go". They rise in and bob gently.
+  5. Reaching the goal fills the ring and the goal card turns green: "Goal reached 🎉". The count then carries on.
+  6. The strip reads "Tracks as you go": Steps · Distance · Calories.
+- **Components:** the park sky (`HeroSkies` → `STEPS`; its path function matches `PATH` in `HeroSteps`), the footprint canvas over it, the step widget and the side cards.
+- **Rules:** no cursor or touch input. The walk pauses while the hero is off screen or the tab is hidden. Under reduced motion it's a still: 14 prints along the path and the count they make.
 
 ### AI Chat Launcher · `ai-chat`
 

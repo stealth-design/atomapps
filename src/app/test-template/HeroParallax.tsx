@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 
@@ -13,6 +13,19 @@ import { gsap } from "@/lib/gsap";
  */
 export function HeroParallax({ className, children }: { className?: string; children: ReactNode }) {
   const ref = useRef<HTMLElement>(null);
+
+  // --copy-h: where the copy ([data-copy]) ends, from the hero's top. On phones the
+  // animated layers marked .under-copy fade out above it (globals.css).
+  useEffect(() => {
+    const hero = ref.current!;
+    const copy = hero.querySelector<HTMLElement>("[data-copy]");
+    if (!copy) return;
+    const set = () => hero.style.setProperty("--copy-h", `${copy.offsetTop + copy.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(copy);
+    return () => ro.disconnect();
+  }, []);
 
   useGSAP(
     () => {

@@ -105,6 +105,7 @@ export function ShaderBackground({ className = "", clicks: onClick = true, frag 
     const uMouse = gl.getUniformLocation(prog, "uMouse");
     const uClicks = gl.getUniformLocation(prog, "uClicks");
     const uFlow = gl.getUniformLocation(prog, "uFlow");
+    const uDpr = gl.getUniformLocation(prog, "uDpr"); // buffer px per CSS px; only skies that declare it use it
 
     const target = { x: 0.5, y: 0.5 };
     const mouse = { x: 0.5, y: 0.5 };
@@ -115,14 +116,18 @@ export function ShaderBackground({ className = "", clicks: onClick = true, frag 
     };
     addEventListener("pointermove", onMove);
 
+    let dpr = 1;
     const resize = () => {
-      const dpr = Math.min(devicePixelRatio, 1.5); // ponytail: capped for fill-rate; it's a soft blur anyway
+      dpr = Math.min(devicePixelRatio, 1.5); // ponytail: capped for fill-rate; it's a soft blur anyway
       canvas.width = canvas.clientWidth * dpr;
       canvas.height = canvas.clientHeight * dpr;
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     resize();
     addEventListener("resize", resize);
+    // The hero can grow without the window resizing (demos that fit their content).
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
 
     // Skip drawing while scrolled out of view.
     let visible = true;
@@ -164,6 +169,7 @@ export function ShaderBackground({ className = "", clicks: onClick = true, frag 
       mouse.x += (target.x - mouse.x) * 0.05;
       mouse.y += (target.y - mouse.y) * 0.05;
       gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uDpr, dpr);
       gl.uniform1f(uTime, still ? 0 : ms / 1000);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
       if (visible) gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -178,6 +184,7 @@ export function ShaderBackground({ className = "", clicks: onClick = true, frag 
       removeEventListener("pointerdown", onDown);
       removeEventListener(PULSE_EVENT, onPulse);
       removeEventListener("resize", resize);
+      ro.disconnect();
     };
   }, [onClick, frag]);
 

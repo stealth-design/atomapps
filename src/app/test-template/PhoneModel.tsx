@@ -36,12 +36,14 @@ export function PhoneModel({
   action,
   live,
   liveKey,
+  stream,
 }: {
   className?: string;
   screen?: string;
   action?: PhoneAction;
   live?: HTMLCanvasElement;
   liveKey?: unknown;
+  stream?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   // Read by the render loop, which is set up once; a ref keeps it current.
@@ -53,6 +55,17 @@ export function PhoneModel({
   useEffect(() => {
     liveDirty.current = true;
   }, [liveKey]);
+  // `stream`: the live canvas changes every frame, so re-upload it every frame.
+  useEffect(() => {
+    if (!stream) return;
+    let raf = 0;
+    const tick = () => {
+      liveDirty.current = true;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [stream]);
 
   useEffect(() => {
     let stop: (() => void) | undefined;

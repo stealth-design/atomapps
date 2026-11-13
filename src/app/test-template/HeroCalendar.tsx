@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import { Bell, MapPin } from "lucide-react";
 import { gsap } from "@/lib/gsap";
 import { useReducedMotion } from "./useReducedMotion";
+import { CalendarWeek } from "./CalendarWeek";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -65,19 +66,37 @@ function MonthGrid({ year, month, today }: { year: number; month: number; today:
   );
 }
 
+// The centre cards' loop: every STEP_MS the selection moves `add` days on from
+// today, and the event card and reminder show that day's plans.
+const STEP_MS = 3000;
+const PLAN = [
+  { add: 0, title: "Team lunch", time: "1:00 PM", reminder: "10:00 · Dentist", done: 0.66 },
+  { add: 1, title: "Design review", time: "10:30 AM", reminder: "9:00 · Standup", done: 0.3 },
+  { add: 3, title: "Gym session", time: "6:00 PM", reminder: "5:30 · Pack gym bag", done: 0.8 },
+  { add: 5, title: "Brunch with family", time: "11:00 AM", reminder: "10:15 · Buy flowers", done: 0.5 },
+  { add: 8, title: "Client call", time: "3:00 PM", reminder: "2:45 · Join the call", done: 0.15 },
+  { add: 12, title: "Movie night", time: "7:30 PM", reminder: "7:00 · Book tickets", done: 0.9 },
+];
+// Keyed on the step, so each change fades in afresh.
+const SWAP = "motion-safe:animate-[cal-in_0.45s_ease-out_both]";
+
 const CARD = "rounded-[24px] bg-white/90 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.4)] ring-1 ring-black/5 backdrop-blur-md";
 
 /**
  * The calendar hero: four blocks that fly in from four sides on load — the
  * month grid from the left, today's date from the top, an event card from
  * the right and a reminder chip from below — then drift with the cursor at
- * different depths. Under reduced motion the blocks are simply there.
+ * different depths. Then they play on their own: every few seconds the
+ * selected day moves on through the month (the date tile, the grid's
+ * highlight) and the event card and reminder change to that day's plans.
+ * Under reduced motion the blocks are simply there, on today.
  */
 export function HeroCalendar() {
   const todayString = useToday();
   const still = useReducedMotion();
   const scope = useRef<HTMLDivElement>(null);
   const [fit, setFit] = useState({ layout: LAYOUTS.wide, scale: 1 });
+  const [step, setStep] = useState(0);
   const { layout: L, scale } = fit;
 
   // The composition is laid out at its own size and scaled to the width it's given.
@@ -110,6 +129,13 @@ export function HeroCalendar() {
     { scope, dependencies: [todayString, still] },
   );
 
+  // The cards step through the plan on their own.
+  useEffect(() => {
+    if (still || !todayString) return;
+    const id = setInterval(() => setStep((n) => (n + 1) % PLAN.length), STEP_MS);
+    return () => clearInterval(id);
+  }, [still, todayString]);
+
   // The blocks drift toward the cursor, each at its own depth.
   const drift = (e: PointerEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -118,12 +144,16 @@ export function HeroCalendar() {
   };
   const depth = (px: number) => ({ transform: `translate(calc(var(--mx, 0) * ${px}px), calc(var(--my, 0) * ${px}px))` });
 
+  const plan = PLAN[still ? 0 : step];
   const today = todayString ? new Date(todayString) : null;
+  today?.setDate(today.getDate() + plan.add); // the selected day, from here on
   const year = today?.getFullYear() ?? 2026;
   const month = today?.getMonth() ?? 0;
 
   return (
     <div className="mx-auto mt-8 mb-[150px] w-[min(640px,calc(100vw-32px))] short:mt-4 roomy:w-[740px]" style={{ height: L.h * scale }}>
+      <CalendarWeek />
+      <style>{`@keyframes cal-in{from{opacity:0;transform:translateY(6px)}}`}</style>
       <div
         ref={scope}
         onPointerMove={drift}
@@ -135,7 +165,7 @@ export function HeroCalendar() {
           <>
             <div className="absolute" style={{ ...L.month, ...depth(6) }}>
               <div className={`piece month invisible p-5 ${CARD}`}>
-                <p className="mb-3 text-[17px] font-bold">
+                <p key={month} className={`mb-3 text-[17px] font-bold ${SWAP}`}>
                   {MONTHS[month]} <span className="font-normal text-black/40">{year}</span>
                 </p>
                 <MonthGrid year={year} month={month} today={today.getDate()} />
@@ -143,7 +173,7 @@ export function HeroCalendar() {
             </div>
             <div className="absolute" style={{ ...L.today, ...depth(14) }}>
               <div className={`piece today invisible grid size-[136px] place-items-center text-center ${CARD}`}>
-                <div>
+                <div key={step} className={SWAP}>
                   <p className="text-[12px] font-semibold tracking-wide text-[var(--accent)] uppercase">{today.toLocaleDateString("en-US", { weekday: "long" })}</p>
                   <p className="text-[64px] leading-none font-bold tabular-nums">{today.getDate()}</p>
                   <p className="text-[12px] text-black/45">{MONTHS[month]}</p>
@@ -152,20 +182,26 @@ export function HeroCalendar() {
             </div>
             <div className="absolute" style={{ ...L.event, ...depth(18) }}>
               <div className={`piece event invisible p-4 ${CARD}`}>
-                <p className="flex items-center gap-2 text-[15px] font-semibold">
-                  <MapPin aria-hidden className="size-4 text-[var(--accent)]" strokeWidth={2.2} />
-                  Team lunch
-                </p>
-                <p className="mt-1 pl-6 text-[13px] text-black/50">Fri · 1:00 PM</p>
+                <div key={step} className={SWAP}>
+                  <p className="flex items-center gap-2 text-[15px] font-semibold">
+                    <MapPin aria-hidden className="size-4 shrink-0 text-[var(--accent)]" strokeWidth={2.2} />
+                    {plan.title}
+                  </p>
+                  <p className="mt-1 pl-6 text-[13px] text-black/50">
+                    {today.toLocaleDateString("en-US", { weekday: "short" })} · {plan.time}
+                  </p>
+                </div>
                 <div className="mt-3 h-1.5 rounded-full bg-[var(--accent)]/20">
-                  <div className="h-full w-2/3 rounded-full bg-[var(--accent)]" />
+                  <div className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-700 ease-out" style={{ width: `${plan.done * 100}%` }} />
                 </div>
               </div>
             </div>
             <div className="absolute" style={{ ...L.reminder, ...depth(10) }}>
               <div className={`piece reminder invisible flex items-center gap-2 rounded-full bg-[#1d1d1f] py-2.5 pr-5 pl-3 text-[14px] font-semibold text-white shadow-[0_20px_40px_-20px_rgba(0,0,0,0.6)]`}>
                 <Bell aria-hidden className="size-4 text-[#ffd27a]" strokeWidth={2.2} />
-                10:00 · Dentist
+                <span key={step} className={SWAP}>
+                  {plan.reminder}
+                </span>
               </div>
             </div>
           </>

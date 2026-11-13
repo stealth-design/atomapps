@@ -5,13 +5,13 @@ import { PhoneModel, ACTION_MS, type PhoneAction } from "./PhoneModel";
 import type { HeroAction } from "@/data/appTemplates";
 import { Hint } from "./Hint";
 
-const W = 630; // the screen canvas, 9:20 like the phone's display
-const H = 1400;
+export const W = 630; // the screen canvas, 9:20 like the phone's display
+export const H = 1400;
 
-type Face = { name: string; icon: string; accent: string; button: string; status: string };
+export type Face = { name: string; icon: string; accent: string; button: string; status: string };
 
 /** The app's main screen: icon and name, a big round button ringed in its accent, and a status line. */
-function drawFace(ctx: CanvasRenderingContext2D, { name, accent, button, status }: Face, icon?: HTMLImageElement) {
+export function drawFace(ctx: CanvasRenderingContext2D, { name, accent, button, status }: Face, icon?: HTMLImageElement) {
   const bg = ctx.createLinearGradient(0, 0, 0, H);
   bg.addColorStop(0, "#ffffff");
   bg.addColorStop(1, "#eef1fb");
