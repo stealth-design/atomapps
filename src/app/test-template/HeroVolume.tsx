@@ -5,11 +5,13 @@ import { PhoneModel } from "./PhoneModel";
 import { PULSE_EVENT, type Pulse } from "./ShaderBackground";
 import { Hint } from "./Hint";
 import { useReducedMotion } from "./useReducedMotion";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const W = 630; // the screen canvas, 9:20 like the phone's display
 const H = 1400;
 const BEAT = 1100; // ms between the background's rings
 const TICKS = 41; // dial marks round the 270° sweep
+const SWEEP = 6000; // ms for one turn up and back on phones
 
 /** A mark's colour by its place on the sweep (0–1): green, then yellow, orange, red. */
 const tickColor = (t: number) => (t < 0.5 ? "#34d058" : t < 0.7 ? "#e8d44d" : t < 0.85 ? "#f59e0b" : "#ef4444");
@@ -151,6 +153,8 @@ export function HeroVolume({ className }: { className?: string; accent?: string 
   const lastPulse = useRef(0);
   const dragging = useRef(false);
   const reduce = useReducedMotion();
+  const desktop = useMediaQuery("(min-width: 768px)");
+  const touched = useRef(false); // the knob stops sweeping on its own once someone turns it
 
   const pulse = (strength = levelRef.current) => {
     const r = phone.current!.getBoundingClientRect();
@@ -160,6 +164,7 @@ export function HeroVolume({ className }: { className?: string; accent?: string 
 
   // Turning the knob redraws the screen and pulses, at most every 250ms.
   const set = (v: number) => {
+    touched.current = true;
     const next = Math.min(1, Math.max(0, v));
     levelRef.current = next;
     setLevel(next);
@@ -179,6 +184,22 @@ export function HeroVolume({ className }: { className?: string; accent?: string 
     const id = setInterval(() => levelRef.current > 0 && pulse(), BEAT);
     return () => clearInterval(id);
   }, [reduce]);
+
+  // On phones the knob turns itself, up and back, until someone takes it.
+  useEffect(() => {
+    if (desktop || reduce) return;
+    let id = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      if (touched.current) return;
+      const v = 0.5 - 0.45 * Math.cos((((now - t0) % SWEEP) / SWEEP) * Math.PI * 2);
+      levelRef.current = v;
+      setLevel(v);
+      id = requestAnimationFrame(tick);
+    };
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [desktop, reduce]);
 
   const onKey = (e: KeyboardEvent) => {
     const step = { ArrowUp: 0.05, ArrowRight: 0.05, ArrowDown: -0.05, ArrowLeft: -0.05, PageUp: 0.2, PageDown: -0.2 }[e.key];
@@ -209,13 +230,14 @@ export function HeroVolume({ className }: { className?: string; accent?: string 
 
   return (
     <div className="relative">
-      <div ref={phone}>
+      {/* On phones, nudged left to make room for the widget at the bottom right. */}
+      <div ref={phone} className="-translate-x-[14%] tablet:translate-x-0">
         <PhoneModel live={live} liveKey={`${level}`} className={className} />
       </div>
 
-      {/* Bottom centre, over the phone's faded foot, on phones; beside the phone from tablet up. */}
-      <div className="absolute bottom-[14%] left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 tablet:top-[30%] tablet:bottom-auto tablet:left-[calc(50%+min(26vw,16vh))] tablet:translate-x-0">
-        <div className="flex flex-col items-center gap-1 rounded-2xl bg-[linear-gradient(#2a2b31,#1a1b20)] p-2 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] tablet:rounded-3xl tablet:p-3">
+      {/* Bottom right, over the phone's faded foot, on phones; beside the phone from tablet up. */}
+      <div className="absolute right-4 bottom-[18%] z-10 flex flex-col items-center gap-2 tablet:top-[30%] tablet:right-auto tablet:bottom-auto tablet:left-[calc(50%+min(26vw,16vh))]">
+        <div className="flex flex-col items-center gap-1 rounded-3xl bg-[linear-gradient(#2a2b31,#1a1b20)] p-3 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] ">
         <div
           role="slider"
           tabIndex={0}
@@ -229,7 +251,7 @@ export function HeroVolume({ className }: { className?: string; accent?: string 
           onPointerMove={(e) => turn(e)}
           onPointerUp={() => (dragging.current = false)}
           onPointerCancel={() => (dragging.current = false)}
-          className="relative size-[72px] cursor-grab touch-none active:cursor-grabbing rounded-full outline-offset-4 select-none tablet:size-[100px] desktop-sm:size-[120px]"
+          className="relative size-[104px] cursor-grab touch-none active:cursor-grabbing rounded-full outline-offset-4 select-none tablet:size-[100px] desktop-sm:size-[120px]"
         >
           {/* The dial: marks lit up to the level, dim past it. */}
           <svg viewBox="0 0 100 100" className="absolute inset-0 size-full" aria-hidden>
@@ -261,10 +283,10 @@ export function HeroVolume({ className }: { className?: string; accent?: string 
             </div>
           </div>
         </div>
-        <p className="text-[18px] leading-none font-bold tabular-nums tablet:text-[24px]" style={{ color: level > 0 ? tickColor(level) : "rgba(255,255,255,0.4)" }}>
+        <p className="text-[22px] leading-none font-bold tabular-nums tablet:text-[24px]" style={{ color: level > 0 ? tickColor(level) : "rgba(255,255,255,0.4)" }}>
           {pct}%
         </p>
-        <p className="text-[9px] text-white/50 tablet:text-[11px]">{pct === 0 ? "Muted" : pct > 85 ? "Boosted Volume" : "Volume"}</p>
+        <p className="text-[11px] text-white/50">{pct === 0 ? "Muted" : pct > 85 ? "Boosted Volume" : "Volume"}</p>
         </div>
         <Hint />
       </div>

@@ -192,7 +192,7 @@ export function HeroSteps({ accent }: { accent: string }) {
   const week = [...WEEK, steps];
 
   return (
-    <div ref={cluster} className="relative mx-auto mt-10 w-[300px] short:mt-6">
+    <div ref={cluster} className="relative mx-auto mt-10 mb-36 w-[300px] tablet:mb-0 short:mt-6">
       <style>{`@keyframes st-in{from{opacity:0;transform:translateY(16px) scale(.96)}}@keyframes st-bob{50%{translate:0 -6px}}`}</style>
 
       {/* The day's card: the ring, then the day. */}

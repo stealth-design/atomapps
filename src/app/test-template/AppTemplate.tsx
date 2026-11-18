@@ -67,8 +67,8 @@ export const H2 = "text-[36px] leading-[1.05] font-semibold tracking-tight table
 export const SUB = "text-[16px] leading-[1.5] text-black/55 tablet:text-[18px]";
 export const CARD_H3 = "text-[26px] leading-[1.1] font-semibold tracking-tight tablet:text-[32px]";
 const CARD_TEXT = "text-[15px] leading-[1.45] text-black/55";
-const LINK = "underline underline-offset-2 can-hover:hover:no-underline";
-const PHONE_SOLID = "mx-auto -mt-2 h-[60vh] min-h-[420px] w-[min(100vw,60vh)]";
+// On phones it takes the screen less the header and copy (~380px), so the hero fits in one screen.
+const PHONE_SOLID = "mx-auto -mt-2 h-[calc(100svh-380px)] min-h-[260px] w-[min(100vw,60vh)] tablet:h-[60vh] tablet:min-h-[420px]";
 // Most phones fade out at the foot; the alarm's and the flashlight's stay solid (a photo; a screen showing the page behind).
 const PHONE = `${PHONE_SOLID} [mask-image:linear-gradient(180deg,#000_60%,transparent_95%)]`;
 
@@ -124,7 +124,10 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
           className={`group/hero relative mx-2 mt-[calc(var(--header-height)+8px)] overflow-hidden ${dark ? "rounded-[24px]" : "rounded-t-[24px]"} ${
             flat
               ? "min-h-[max(720px,calc(100svh-var(--header-height)-8px))]"
-              : "h-[calc(100svh-var(--header-height)-8px)] min-h-[720px]"
+              : demo === "steps"
+              ? // A screen tall, growing on short phones so the strip stays clear of the step cards.
+                "min-h-[calc(100svh-var(--header-height)-8px)] tablet:min-h-[720px]"
+              : "h-[calc(100svh-var(--header-height)-8px)] min-h-[560px] tablet:min-h-[720px]"
           }`}
         >
           {/* Fades the sky, the shader and the phone's foot into the page's white,
@@ -157,9 +160,10 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               <ShaderBackground frag={AI_FRAG} clicks={false} className="absolute inset-0 h-full w-full bg-[#03060a]" />
             ) : (
               <>
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,#dfeaf7_0%,#eef2f7_35%,#f5f4f1_70%,#faf6ec_100%)]" />
-                {/* Each app's own sky (HeroSkies). The volume demo sends its own pulses, from behind the phone; the notes page has no click effect. */}
-                <ShaderBackground frag={SKIES[app.slug]} clicks={demo !== "volume" && demo !== "notes"} className="under-copy absolute inset-0 h-full w-full" />
+                {/* Shows above the copy on phones, where the sky fades out; the notes page keeps its paper's colour there. */}
+                <div className={`absolute inset-0 ${demo === "notes" ? "bg-[#faf5e6]" : "bg-[linear-gradient(180deg,#dfeaf7_0%,#eef2f7_35%,#f5f4f1_70%,#faf6ec_100%)]"}`} />
+                {/* Each app's own sky (HeroSkies); the notes and Bible skies stay behind the copy on phones too. The volume demo sends its own pulses, from behind the phone; the notes page has no click effect. */}
+                <ShaderBackground frag={SKIES[app.slug]} clicks={demo !== "volume" && demo !== "notes"} className={`${demo === "notes" || demo === "bible" ? "" : "under-copy "}absolute inset-0 h-full w-full`} />
               </>
             )}
           </div>
@@ -426,15 +430,6 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
           <p className="mx-auto mt-8 max-w-[70ch] text-center text-[13px] leading-[20px] text-[#61616a]">
             <strong className="font-semibold text-[var(--foreground)]">Please note: </strong>
             {LAUNCHER_NOTE}
-            {app.links.faq && (
-              <>
-                {" "}
-                <a href={app.links.faq} target="_blank" rel="noopener noreferrer" className={LINK}>
-                  Read the FAQ
-                </a>
-                .
-              </>
-            )}
           </p>
         </Container>
 

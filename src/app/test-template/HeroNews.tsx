@@ -458,7 +458,7 @@ export function HeroNews() {
           aria-label={label}
           aria-pressed={screen === id}
           onClick={() => setScreen(screen === id ? "feed" : id)}
-          className={`absolute top-[30%] z-10 flex items-center gap-2 rounded-full bg-white/75 p-3 text-[15px] font-semibold text-[var(--foreground)] shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)] ring-1 backdrop-blur-md transition-transform duration-300 can-hover:hover:scale-105 active:scale-95 tablet:px-5 ${
+          className={`absolute top-[30%] z-10 hidden items-center tablet:flex gap-2 rounded-full bg-white/75 p-3 text-[15px] font-semibold text-[var(--foreground)] shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)] ring-1 backdrop-blur-md transition-transform duration-300 can-hover:hover:scale-105 active:scale-95 tablet:px-5 ${
             i
               ? "right-3 tablet:right-auto tablet:left-[calc(50%+min(160px,40vw))]"
               : "left-3 tablet:right-[calc(50%+min(160px,40vw))] tablet:left-auto"
