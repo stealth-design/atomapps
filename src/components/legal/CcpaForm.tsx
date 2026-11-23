@@ -45,7 +45,7 @@ export function CcpaForm() {
           className="flex min-h-[420px] flex-col items-center justify-center text-center"
         >
           <p className="text-[24px] leading-[32px] font-bold text-[var(--foreground)]">
-            Thanks — we have your request.
+            Thanks, we have your request.
           </p>
           <p className="mt-[12px] max-w-[360px] text-[15px] leading-[23px] text-[#61616a]">
             We will verify your identity and respond within 45 days. You can

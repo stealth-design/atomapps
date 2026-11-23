@@ -269,13 +269,13 @@ export function CommentMode() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) {
-          setSaveError(`Could not save (${res.status}). Your note is still here — try again.`);
+          setSaveError(`Could not save (${res.status}). Your note is still here. Try again.`);
           setBusy(false);
           return;
         }
         await load();
       } catch {
-        setSaveError("Could not reach the server. Your note is still here — try again.");
+        setSaveError("Could not reach the server. Your note is still here. Try again.");
         setBusy(false);
         return;
       }
@@ -589,7 +589,7 @@ export function CommentMode() {
               fontSize: 11,
             }}
           >
-            No shared store configured — these comments are saved in this browser
+            No shared store configured. These comments are saved in this browser
             only and nobody else can see them.
           </div>
         )}

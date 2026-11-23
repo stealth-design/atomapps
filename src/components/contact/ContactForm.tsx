@@ -36,7 +36,7 @@ export function ContactForm() {
           className="flex min-h-[420px] flex-col items-center justify-center text-center"
         >
           <p className="text-[24px] leading-[32px] font-bold text-[var(--foreground)]">
-            Thanks — that&apos;s booked.
+            Thanks, that&apos;s booked.
           </p>
           <p className="mt-[12px] max-w-[320px] text-[15px] leading-[23px] text-[#61616a]">
             One of the team will be in touch to arrange a time that suits you.

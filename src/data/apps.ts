@@ -150,7 +150,7 @@ export const APPS_SNAPSHOT = "23 September 2026";
  * differs per app — see `links.faq`.
  */
 export const LAUNCHER_NOTE =
-  "As a launcher app, the layout of your home screen may change after install. Don't worry, all your apps are still on your phone — they may just be in a different location.";
+  "As a launcher app, the layout of your home screen may change after install. Don't worry, all your apps are still on your phone. They may just be in a different location.";
 
 export function playStoreUrl(app: Pick<AppPage, "packageId">): string {
   return `https://play.google.com/store/apps/details?id=${app.packageId}`;
@@ -215,11 +215,10 @@ export const COMING_SOON: ComingSoonApp[] = [
     name: "Steppy Rewards Launcher",
     headline: "Walk more.\nEarn more.",
     summary:
-      "Turn your steps into real rewards — the more you walk, the more you can earn.",
+      "Turn your steps into real rewards: the more you walk, the more you can earn.",
     accent: "#3E63C6",
     intro: [
       "Steppy counts the steps you were taking anyway and pays you for them. Hit an achievable daily milestone, collect coins, and trade them in for gift cards from brands you already shop with.",
-      "It is in development now. The home screen, the step count and the rewards are being built together, so the walking and the earning are one thing rather than an app with a loyalty scheme bolted on.",
     ],
     features: [
       { icon: "ic-footprints", text: "Track your daily steps" },
@@ -238,7 +237,6 @@ export const COMING_SOON: ComingSoonApp[] = [
     accent: "#574A9D",
     intro: [
       "White Noise is a library of sounds for the parts of the day that need quiet: rain and static to sleep through, steady tones to work against, and slow ambient beds to come down to.",
-      "It is in development now. Everything is built to be started in a second and then left alone — you should not have to look at your phone again once the sound is playing.",
     ],
     features: [
       { icon: "ic-headphones", text: "Relax with soothing white noise and calming audio." },
@@ -345,7 +343,7 @@ export const APPS: AppPage[] = [
       "Convenient access to all your volume settings in one place",
     ],
     features: [
-      { emoji: "🔊", title: "Adjust volume", text: "Easily adjust volume for music, videos, calls, alarms, and notifications — and boost your phone's media volume past its usual ceiling.", shot: 2 },
+      { emoji: "🔊", title: "Adjust volume", text: "Easily adjust volume for music, videos, calls, alarms, and notifications, and boost your phone's media volume past its usual ceiling.", shot: 2 },
       { emoji: "🎛️", title: "All-in-one sound control", text: "Manage all system sounds quickly from one convenient location: ringtone, alarm, media, notifications and system, each on its own slider.", shot: 3 },
     ],
     launcherBenefits: [
@@ -367,7 +365,7 @@ export const APPS: AppPage[] = [
     icon: "icon-03",
     title: "Step Tracker Launcher",
     name: "Step Tracker Launcher",
-    summary: "Track steps, set goals, view stats & celebrate milestones — all in one app.",
+    summary: "Track steps, set goals, view stats & celebrate milestones, all in one app.",
     headline: "Every step counts.\nCount them.",
     oneLiner: "Every walk becomes progress you can see, one step at a time.",
     accent: "#4567FD",
@@ -622,7 +620,7 @@ export const APPS: AppPage[] = [
     },
     intro: [
       "Horoscope Launcher offers daily horoscope readings, love compatibility, birth charts & information on lucky number and color for every zodiac sign. With one-swipe access from your home screen, get astrology insights for Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, and Pisces every day. Get insights on love, health, emotions, and career with our popular astrology and horoscope app!",
-      "Get the Daily Horoscope Launcher to access daily horoscopes, horoscope predictions by category, birth charts, lucky signs, and compatibility insights—all from your home screen!",
+      "Get the Daily Horoscope Launcher to access daily horoscopes, horoscope predictions by category, birth charts, lucky signs, and compatibility insights, all from your home screen!",
     ],
     highlights: [
       "Lucky number, letter & color: Find out which signs are lucky for you  to attract positivity and good fortune.",
@@ -632,7 +630,7 @@ export const APPS: AppPage[] = [
     ],
     features: [
       { emoji: "🌟", title: "Daily Horoscope & Astrology Guidance", text: "Horoscope Launcher provides daily insights on love, career, health, emotions, and fortune. Get yesterday's, today’s, and tomorrow’s predictions for each zodiac sign and let the stars guide your life’s path. Find out your lucky number, color, and letter and bring extra clarity to life’s important decisions. Share your astrological readings with friends and family!", shot: 5 },
-      { emoji: "🔮", title: "Personalized birth chart", text: "Get deep astrology insights based on your birth details — your sun, moon and ascendant signs, and what each says about you.", shot: 2 },
+      { emoji: "🔮", title: "Personalized birth chart", text: "Get deep astrology insights based on your birth details: your sun, moon and ascendant signs, and what each says about you.", shot: 2 },
       { emoji: "🍀", title: "Lucky number, letter & color", text: "Find out which signs are lucky for you to attract positivity and good fortune, refreshed every day.", shot: 6 },
       { emoji: "🔥", title: "Love Compatibility", text: "Find out what the stars have in store for your love life. Simply enter your zodiac sign and your partner’s to discover if your relationship is astrologically aligned. Find out if your zodiac signs are a perfect match or need extra work with the unique wisdom of astrology.", shot: 3 },
     ],
@@ -797,7 +795,7 @@ export const APPS: AppPage[] = [
       { emoji: "💲", title: "Tip Calculator", text: "Make dining out easier with our tip calculator. Enter the bill amount, choose a tip percentage, and instantly split bills with friends. Calculate tips in seconds for stress-free meals.", shot: 5 },
       { emoji: "🔄", title: "Unit Converter", text: "Switch between units easily with the unit converter calculator. Convert length (mile ↔ kilometer), temperature (Fahrenheit ↔ Celsius), weight, volume, speed, and more. Great for cooking, travel, and everyday tasks.", shot: 4 },
       { emoji: "💱", title: "Currency Converter", text: "Convert currencies in a simple and convenient way with our currency converter calculator. Check conversions for USD, EUR, GBP, INR, CAD, AUD, JPY and more. Ideal for travel, online shopping, and general budgeting needs.", shot: 2 },
-      { emoji: "❤️", title: "BMI Calculator", text: "Get a quick view of your body mass index using the BMI calculator. Enter your height and weight to understand your general BMI range. Designed for simple tracking—not medical guidance.", shot: 3 },
+      { emoji: "❤️", title: "BMI Calculator", text: "Get a quick view of your body mass index using the BMI calculator. Enter your height and weight to understand your general BMI range. Designed for simple tracking, not medical guidance.", shot: 3 },
       { emoji: "🏡", title: "Mortgage Calculator", text: "Estimate monthly payments and long-term costs with the mortgage calculator. Get a clearer picture when planning home purchases or comparing mortgage options." },
       { emoji: "💼", title: "Loan Calculator", text: "Use the loan calculator to view EMIs, interest estimates, and total payable amounts. Helpful for car loans, personal loans, education expenses, and more." },
       { emoji: "📈", title: "Compound Interest Calculator", text: "Explore how your savings may grow over time with the compound interest calculator. View projected growth using customizable inputs for long-term planning." },

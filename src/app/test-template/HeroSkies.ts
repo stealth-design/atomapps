@@ -130,7 +130,7 @@ void main(){
 }`;
 
 // A park seen from above: pale grass, round trees and a winding sand path
-// with a route line marching along it and three checkpoints, the walk the
+// with three checkpoints on it, the walk the
 // step counter counts. The route matches HeroSteps' PATH, where the hero's
 // own walker lays its prints. It doesn't lean with the cursor, so the prints
 // stay on the path; a click sends a soft ring across it.
@@ -145,8 +145,6 @@ void main(){
   col=mix(col,vec3(.84,.81,.7),1.-smoothstep(.038,.044,d));
   col=mix(col,vec3(.96,.93,.85),1.-smoothstep(.032,.038,d));
   vec3 blue=vec3(.33,.45,.98);
-  float dash=step(.5,fract(q.x*28.-uTime*.6-uFlow*.5));
-  col=mix(col,blue,(1.-smoothstep(.004,.007,d))*dash*.75);
   for(int k=0;k<3;k++){float cx=(float(k)-1.)*.62;vec2 c=vec2(cx,P(cx));float r=length(q-c);
     col=mix(col,vec3(.4,.45,.4),(1.-smoothstep(.022,.034,length(q-c+vec2(-.006,.008))))*.2);
     col=mix(col,blue,1.-smoothstep(.019,.022,r));

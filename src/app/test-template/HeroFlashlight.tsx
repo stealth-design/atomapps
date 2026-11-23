@@ -7,7 +7,8 @@ import { useReducedMotion } from "./useReducedMotion";
 const W = 630; // the screen canvas, 9:20 like the phone's display
 const H = 1400;
 const ZOOM = 3; // the magnifier's power, against the page as it shows round the phone
-const ZOOM_PHONE = 2; // on phone-width screens, where 3× fills the lens with a few huge letters
+const ZOOM_PHONE = 4; // the chip's label on phone-width screens
+const SPAN_PHONE = 75; // page px across the lens there; scaling off the small phone model filled it with a few huge letters
 const LENS = { x: 50, y: 600, w: 530, h: 600, r: 48 }; // where the magnified view sits on the screen
 const SPREAD = 1800; // ms the light takes to spread once the torch comes on
 
@@ -25,6 +26,7 @@ const PRINT = [
   "Search apps and the web from anywhere",
 ];
 const CELL = { w: 320, h: 54 }; // each line's share of the page
+const CELL_PHONE = { w: 320, h: 24 }; // phone-width screens: smaller, tighter lines
 
 /**
  * The flashlight hero, playing on its own. The hero is a dark room with a
@@ -81,13 +83,15 @@ export function HeroFlashlight({ className }: { className?: string; accent?: str
     // row offset half a cell like brickwork, and the lines cycling so no two
     // neighbours match.
     const printGrid = (g: CanvasRenderingContext2D) => {
-      g.font = `500 13px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
+      const phoneW = w < 768;
+      const cell = phoneW ? CELL_PHONE : CELL;
+      g.font = `500 ${phoneW ? 9 : 13}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
       g.textAlign = "center";
       g.textBaseline = "middle";
       g.fillStyle = "rgba(240,230,210,0.9)";
-      const cols = Math.max(2, Math.round(w / CELL.w));
+      const cols = Math.max(2, Math.round(w / cell.w));
       const cw = w / cols;
-      const rows = Math.ceil(h / CELL.h);
+      const rows = Math.ceil(h / cell.h);
       const ch = h / rows;
       for (let row = 0; row < rows; row++) {
         const shift = row % 2 ? cw / 2 : 0;
@@ -255,8 +259,9 @@ export function HeroFlashlight({ className }: { className?: string; accent?: str
       // text stays sharp), ZOOM times bigger than it shows round the phone,
       // and dimming toward the edge of the light as it does on the page.
       c.save();
-      const zoom = innerWidth < 768 ? ZOOM_PHONE : ZOOM;
-      const k = (W * zoom) / onPage;
+      const phoneW = innerWidth < 768;
+      const zoom = phoneW ? ZOOM_PHONE : ZOOM;
+      const k = phoneW ? LENS.w / SPAN_PHONE : (W * zoom) / onPage;
       c.translate(W / 2, LENS.y + LENS.h / 2);
       c.scale(k, k);
       c.translate(-px, -py);

@@ -6,6 +6,8 @@ import { PhoneModel, type PhoneAction } from "./PhoneModel";
 
 const W = 630; // the screen canvas, 9:20 like the phone's display
 const H = 1400;
+const LOOP = 8; // s for one constellation's trace in and out
+const SPIN = 24; // s for one constellation's full turn; neighbours turn opposite ways
 
 type Sign = {
   name: string;
@@ -157,7 +159,12 @@ export function HeroHoroscope({ className }: { className?: string }) {
 
   return (
     <div ref={ref} className="relative">
-      <style>{`@keyframes tt-flare{0%{transform:scale(1);filter:brightness(1)}35%{transform:scale(1.3);filter:brightness(2.2)}to{transform:scale(1);filter:brightness(1.2)}}`}</style>
+      {/* Each idle constellation traces itself in and out on a loop, the signs a beat apart; hover, focus or a pick holds it drawn. */}
+      <style>{`@keyframes tt-flare{0%{transform:scale(1);filter:brightness(1)}35%{transform:scale(1.3);filter:brightness(2.2)}to{transform:scale(1);filter:brightness(1.2)}}
+@keyframes tt-trace{0%,8%{stroke-dashoffset:1;opacity:.5}38%,68%{stroke-dashoffset:0;opacity:1}92%,100%{stroke-dashoffset:1;opacity:.5}}
+@keyframes tt-glow{0%,8%,92%,100%{opacity:.4}38%,68%{opacity:1}}
+@keyframes tt-sway{to{rotate:1turn}}
+@media (prefers-reduced-motion:no-preference){.tt-trace{animation:tt-trace ${LOOP}s ease-in-out infinite}.tt-glow{animation:tt-glow ${LOOP}s ease-in-out infinite}.tt-sway{animation:tt-sway ${SPIN}s linear infinite}.group:hover :is(.tt-trace,.tt-glow),.group:focus-visible :is(.tt-trace,.tt-glow){animation:none}}`}</style>
 
       {/* The constellations, round the phone. */}
       <div className="pointer-events-none absolute top-0 left-1/2 h-[min(62vh,560px)] w-[min(1200px,100vw)] -translate-x-1/2" style={depth(10)}>
@@ -175,13 +182,13 @@ export function HeroHoroscope({ className }: { className?: string }) {
             >
               <svg
                 viewBox="-6 -6 112 112"
-                className="block size-[clamp(48px,7vw,92px)] overflow-visible"
-                style={on ? { animation: "tt-flare .9s ease-out" } : undefined}
+                className={`block size-[clamp(48px,7vw,92px)] overflow-visible ${on ? "" : "tt-sway"}`}
+                style={on ? { animation: "tt-flare .9s ease-out" } : { animationDelay: `${(-i * SPIN) / SIGNS.length}s`, animationDirection: i % 2 ? "reverse" : "normal" }}
                 aria-hidden
               >
                 {/* The figure, always faintly there, so the signs read as constellations at rest. */}
                 {s.lines.map(([a, b]) => (
-                  <line key={`faint-${a}-${b}`} x1={s.stars[a][0]} y1={s.stars[a][1]} x2={s.stars[b][0]} y2={s.stars[b][1]} className="stroke-[#cdb8ff]" strokeWidth="1" opacity="0.22" />
+                  <line key={`faint-${a}-${b}`} x1={s.stars[a][0]} y1={s.stars[a][1]} x2={s.stars[b][0]} y2={s.stars[b][1]} className="stroke-[#cdb8ff]" strokeWidth="1" opacity="0.1" />
                 ))}
                 {s.lines.map(([a, b]) => (
                   <line
@@ -192,12 +199,13 @@ export function HeroHoroscope({ className }: { className?: string }) {
                     y2={s.stars[b][1]}
                     pathLength={1}
                     strokeDasharray="1"
-                    className={`stroke-[#cdb8ff] transition-[stroke-dashoffset,opacity] duration-700 ease-out group-hover:[stroke-dashoffset:0] group-focus-visible:[stroke-dashoffset:0] ${on ? "[stroke-dashoffset:0] opacity-90" : "[stroke-dashoffset:1] opacity-70"}`}
+                    className={`stroke-[#cdb8ff] transition-[stroke-dashoffset,opacity] duration-700 ease-out group-hover:[stroke-dashoffset:0] group-focus-visible:[stroke-dashoffset:0] ${on ? "[stroke-dashoffset:0] opacity-90" : "tt-trace [stroke-dashoffset:1] opacity-70"}`}
+                    style={{ animationDelay: `${(i * LOOP) / SIGNS.length - LOOP}s` }}
                     strokeWidth="1.4"
                   />
                 ))}
                 {s.stars.map(([x, y], k) => (
-                  <circle key={k} cx={x} cy={y} r={k % 3 ? 3 : 4} className={`fill-white transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 ${on ? "opacity-100" : "opacity-65"}`} />
+                  <circle key={k} cx={x} cy={y} r={k % 3 ? 3 : 4} className={`fill-white transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 ${on ? "opacity-100" : "tt-glow opacity-65"}`} style={{ animationDelay: `${(i * LOOP) / SIGNS.length - LOOP}s` }} />
                 ))}
               </svg>
               <span
@@ -210,22 +218,22 @@ export function HeroHoroscope({ className }: { className?: string }) {
         })}
       </div>
 
-      {sign && (
-        <p role="status" className="absolute top-1/2 left-1/2 z-20 flex w-max -translate-x-1/2 items-center gap-2 rounded-full bg-white px-4 py-2 text-[13px] font-medium text-[#1d1d1f] shadow-lg">
-          <span className="size-2 rounded-full bg-[#e9c46a]" />
-          {sign.name} · Your day ahead
-        </p>
-      )}
-
       <div ref={phone}>
         <PhoneModel live={live} liveKey={picked} action={action} className={className} />
       </div>
 
+      {/* The two pills stacked at the phone's foot, clear of its reading, the small lucky one on top (reversed, so the status still reads first); higher from tablet up, where the phone runs past the hero and the strip sits lower on it. */}
       {sign && (
-        <p className="absolute top-[40%] left-[calc(50%+min(20vw,13vh))] z-10 flex items-center gap-2 rounded-full bg-white/90 px-3.5 py-2 text-[13px] font-semibold text-[#1d1d1f] shadow-lg backdrop-blur-md">
-          <Clover aria-hidden className="size-4 text-[#3a9d5d]" strokeWidth={2.2} />
-          {sign.lucky[0]} · {sign.lucky[1]}
-        </p>
+        <div className="absolute inset-x-0 bottom-[10%] z-20 flex flex-col-reverse items-center gap-2 tablet:bottom-[20%]">
+          <p role="status" className="flex w-max items-center gap-2 rounded-full bg-white px-4 py-2 text-[13px] font-medium text-[#1d1d1f] shadow-lg">
+            <span className="size-2 rounded-full bg-[#e9c46a]" />
+            {sign.name} · Your day ahead
+          </p>
+          <p className="flex w-max items-center gap-2 rounded-full bg-white/90 px-3.5 py-2 text-[13px] font-semibold text-[#1d1d1f] shadow-lg backdrop-blur-md">
+            <Clover aria-hidden className="size-4 text-[#3a9d5d]" strokeWidth={2.2} />
+            {sign.lucky[0]} · {sign.lucky[1]}
+          </p>
+        </div>
       )}
     </div>
   );

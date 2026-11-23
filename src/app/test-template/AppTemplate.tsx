@@ -246,7 +246,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
           )}
 
           {/* Bottom centre, above the foot fade (z-15). */}
-          {t.hero?.strip && <HeroStrip strip={t.hero.strip} onPhoto={demo === "alarm" || demo === "find"} className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 tablet:bottom-12" />}
+          {t.hero?.strip && <HeroStrip strip={t.hero.strip} onPhoto={demo === "alarm" || demo === "find"} className={`absolute left-1/2 z-20 -translate-x-1/2 tablet:bottom-12 ${demo === "horoscope" ? "bottom-3" : "bottom-8"}`} />}
 
           {demo === "weather" && <p className="absolute bottom-3 left-3 z-20 text-[11px] text-black/55">{MAP_CREDIT}</p>}
 

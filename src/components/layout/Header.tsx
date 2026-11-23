@@ -134,7 +134,7 @@ export function Header({ transparentOverHero = false }: HeaderProps) {
               reads as a link to assistive tech. */}
           <Link
             href="/"
-            aria-label={`${siteConfig.name} — home`}
+            aria-label={`${siteConfig.name} home`}
             onClick={(event) => {
               if (pathname !== "/" || event.metaKey || event.ctrlKey || event.shiftKey) return;
               event.preventDefault();

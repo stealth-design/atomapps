@@ -26,22 +26,12 @@ export function mountPhone(
   const camera = new THREE.PerspectiveCamera(15, 1, 0.1, 20);
   camera.position.set(0, 0, 4.6);
 
-  // Cursor in -1..1 from the viewport centre; the pose eases toward it each frame.
-  // Near-upright hero pose: a slight lean right, a sliver of the right edge showing.
-  const BASE = new THREE.Euler(0.05, -0.3, -0.09);
-  const TILT = 0.12; // max lean in radians (~7°)
-  const cursor = { x: 0, y: 0 };
-  const onMove = (e: PointerEvent) => {
-    cursor.x = (e.clientX / innerWidth) * 2 - 1;
-    cursor.y = (e.clientY / innerHeight) * 2 - 1;
-  };
+  // Hero pose: upright and facing straight on, no lean or cursor tilt.
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!still) addEventListener("pointermove", onMove);
   let pose: THREE.Group | undefined;
 
   // The turn about the phone's own long axis that the ring and torch
-  // actions play. Its own group inside the pose, so the lean and the
-  // cursor tilt still apply around it.
+  // actions play. Its own group inside the pose, so the buzz applies around it.
   const spin = new THREE.Group();
 
   // Soft round glow for the flash, drawn once to a canvas.
@@ -84,12 +74,10 @@ export function mountPhone(
   new GLTFLoader().setDRACOLoader(draco).load("/models/phone.glb", ({ scene: phone }) => {
     const box = new THREE.Box3().setFromObject(phone);
     phone.position.sub(box.getCenter(new THREE.Vector3()));
-    // Hero pose: leaning right, turned to show its right edge, top tipped back.
     pose = new THREE.Group();
     spin.add(phone);
     pose.add(spin);
     pose.scale.setScalar(1 / box.getSize(new THREE.Vector3()).y);
-    pose.rotation.copy(BASE);
     scene.add(pose);
     // The flashlight. Its visible surface is the F_effect glass over the
     // recessed LED, so every flash part is lit together. The glow sprite
@@ -164,12 +152,10 @@ export function mountPhone(
     }
 
     if (pose) {
-      pose.rotation.y += (BASE.y + cursor.x * TILT - pose.rotation.y) * 0.06;
-      pose.rotation.x += (BASE.x + cursor.y * TILT - pose.rotation.x) * 0.06;
       // Vibrate: 300ms buzzes with 150ms gaps, a tight shake that dies away.
       const buzz = does === "ring" && !still && age % 450 < 300 ? 1 - age / ACTION_MS : 0;
       pose.position.x = Math.sin(ms * 0.09) * 0.004 * buzz;
-      pose.rotation.z = BASE.z + Math.sin(ms * 0.11) * 0.012 * buzz;
+      pose.rotation.z = Math.sin(ms * 0.11) * 0.012 * buzz;
     }
 
     // Flash: once the back has come round, the LED blinks at 2.5Hz for a
@@ -202,7 +188,6 @@ export function mountPhone(
     ro.disconnect();
     io.disconnect();
     renderer.setAnimationLoop(null);
-    removeEventListener("pointermove", onMove);
     draco.dispose();
     glowTex.dispose();
     shots.forEach((t) => t.dispose());
