@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import Image from "next/image";
 import { ShaderBackground } from "./ShaderBackground";
 import { HeroPhone } from "./HeroPhone";
 import { HeroCalculator } from "./HeroCalculator";
@@ -25,7 +24,9 @@ import { RingCta } from "./RingCta";
 import { SpotlightCarousel } from "./SpotlightCarousel";
 import { StepSlider } from "./StepSlider";
 import { Marquee } from "./Marquee";
+import { ShotSlider } from "./ShotSlider";
 import { LauncherExplorer } from "./LauncherExplorer";
+import { GlowDebugger } from "./GlowDebugger";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FooterParallax } from "@/components/layout/FooterParallax";
@@ -34,7 +35,6 @@ import { Reveal } from "@/components/ui/Reveal";
 import { MoreApps } from "@/components/apps/MoreApps";
 import { Poster } from "@/components/apps/Poster";
 import { StarRating } from "@/components/apps/StarRating";
-import { ICON_RADIUS } from "@/components/folds/fold03/appIcons";
 import { REVIEWS } from "@/components/folds/fold07/testimonials";
 import { LAUNCHER_NOTE, appIconSrc, type AppFeature, type AppPage } from "@/data/apps";
 import { getTemplate } from "@/data/appTemplates";
@@ -63,14 +63,19 @@ export const CARD_BGS = [
 // Static strings so Tailwind sees them; picked by how many cards there are.
 const CARD_COLS = ["", "", "desktop-sm:grid-cols-2", "desktop-sm:grid-cols-3"];
 
-export const H2 = "text-[36px] leading-[1.05] font-semibold tracking-tight tablet:text-[52px]";
-export const SUB = "text-[16px] leading-[1.5] text-black/55 tablet:text-[18px]";
-export const CARD_H3 = "text-[26px] leading-[1.1] font-semibold tracking-tight tablet:text-[32px]";
+// The hero headline's halo (the rating's text shadow, scaled up): white on light heroes, dark on dark ones.
+export const HALO_LIGHT = "[text-shadow:0_0_12px_rgba(255,255,255,0.95),0_0_28px_rgba(255,255,255,0.75)]";
+// Tunable live with ?glow (GlowDebugger); the fallbacks are the shipped values.
+// One soft white glow behind each line of hero copy (headline, summary, rating) — black once the hero goes dark (the flashlight), so the lit print stays off the copy: same strength and blur; each sets its own spread.
+export const GLOW = "before:pointer-events-none before:absolute before:-z-10 before:[filter:blur(var(--gblur,70px))] before:[scale:var(--gscale,1.5)] before:bg-[radial-gradient(closest-side,rgba(255,255,255,var(--g0,1))_0%,rgba(255,255,255,var(--g1,1))_var(--g1p,40%),rgba(255,255,255,var(--g2,0.45))_var(--g2p,70%),transparent)] group-data-[dark=true]/hero:before:bg-[radial-gradient(closest-side,rgba(5,6,8,var(--g0,1))_0%,rgba(5,6,8,var(--g1,1))_var(--g1p,40%),rgba(5,6,8,var(--g2,0.45))_var(--g2p,70%),transparent)]";
+export const HALO_DARK = "[text-shadow:0_0_12px_rgba(5,6,16,0.7),0_0_28px_rgba(5,6,16,0.5)]";
+// Phones: one scale for every heading, so none runs past two lines (h1 24–28px, h2 21–24px, h3 18–20px, a touch smaller on the narrowest phones).
+export const H2 = "text-[clamp(21px,6.2vw,24px)] leading-[1.1] font-semibold tracking-tight tablet:text-[52px] compact:text-[40px]";
+export const SUB = "text-[16px] leading-[1.5] text-black/55 tablet:text-[18px] compact:text-[16px]";
+export const CARD_H3 = "text-[clamp(18px,5.2vw,20px)] leading-[1.15] font-semibold tracking-tight tablet:text-[32px] compact:text-[26px]";
 const CARD_TEXT = "text-[15px] leading-[1.45] text-black/55";
-// On phones it takes the screen less the header and copy (~380px), so the hero fits in one screen.
-const PHONE_SOLID = "mx-auto -mt-2 h-[calc(100svh-380px)] min-h-[260px] w-[min(100vw,60vh)] tablet:h-[60vh] tablet:min-h-[420px]";
-// Most phones fade out at the foot; the alarm's and the flashlight's stay solid (a photo; a screen showing the page behind).
-const PHONE = `${PHONE_SOLID} [mask-image:linear-gradient(180deg,#000_60%,transparent_95%)]`;
+// On phones it takes the screen less the header and copy (~400px), so the hero fits in one screen; the top margin keeps it clear of the rating.
+const PHONE = "mx-auto mt-3 h-[calc(100svh-400px)] min-h-[260px] w-[min(100vw,60vh)] tablet:h-[60vh] tablet:min-h-[420px] tablet:mt-6 short:mt-4 compact:h-[70vh] compact:w-[min(100vw,70vh)] compact:min-h-[460px]";
 
 export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
   const t = getTemplate(app.slug);
@@ -81,14 +86,14 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
   const flat = demo === "calculator" || demo === "notes" || demo === "qr" || demo === "calendar" || demo === "bible" || demo === "ai" || demo === "flashlight";
   const f = app.features;
   const reviews = REVIEWS.filter((r) => r.slug === app.slug);
+  // The marquee loops on -50%, so each half must outrun the widest screen (cards are 344px with their gap).
+  const reviewLoop = reviews.length ? Array.from({ length: Math.ceil(2600 / (reviews.length * 344)) }, () => reviews).flat() : [];
   const count = app.ratingCount < 1000 ? String(app.ratingCount) : `${Math.round(app.ratingCount / 1000)}K`;
 
-  // Portrait posters, 1-based; `pick(k)` wraps so short lists repeat.
+  // Portrait posters, 1-based.
   const portraits = app.screenshots.flatMap((s, i) => (s.height > s.width ? [i + 1] : []));
-  const pick = (k: number) => portraits[k % portraits.length];
   const shotOf = (n: number) => app.screenshots[n - 1];
 
-  const strip = Array.from({ length: Math.max(5, portraits.length) }, (_, i) => pick(i));
 
   const cards: [number, number][] =
     t.features?.cards ?? f.flatMap((x, i): [number, number][] => (x.shot ? [[i, x.shot]] : [])).slice(0, 3);
@@ -100,12 +105,14 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
   const rest = f.map((_, i) => i).filter((i) => i !== first);
   const usps: Pick<AppFeature, "title" | "text">[] = [first, ...rest.filter((i) => !used.has(i)), ...rest.filter((i) => used.has(i))]
     .slice(0, 6)
-    .flatMap((i) => (f[i] ? [{ title: f[i].title, text: f[i].text }] : []));
+    .flatMap((i) => (f[i] ? [{ title: f[i].title, text: f[i].card ?? f[i].text }] : [])); // the short wording, so a slide stays within four lines
 
   return (
     <>
       <Header />
+      <GlowDebugger />
 
+      {/* Every band opens with the same space (pt-24 / tablet:pt-32) and none adds its own below, so the gaps between them match. */}
       <main
         // overflow-x-clip, not overflow-hidden: `hidden` would make main a scroll
         // container, which breaks `position: sticky` for anything inside it.
@@ -130,8 +137,8 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               : "h-[calc(100svh-var(--header-height)-8px)] min-h-[560px] tablet:min-h-[720px]"
           }`}
         >
-          {/* Fades the sky, the shader and the phone's foot into the page's white,
-              so the hero has no bottom edge. Above the phone (z-10), under the copy (z-20).
+          {/* Fades the sky and the shader into the page's white, so the hero has no
+              bottom edge. Under the phone and the copy (z-20), so the phone stays solid.
               The weather map's is shorter, so the map fills the hero, but still ends
               on solid white: its own cloud banks scroll away with the parallax. The
               full-bleed ones (horoscope, AI, alarm) have none: they end in a rounded edge instead. */}
@@ -178,12 +185,26 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
             {/* Each authored line is its own block and may wrap inside itself,
                 so a long line (some headlines run to ~30 characters) can't
                 push past the screen. */}
-            <h1 className="text-[clamp(30px,9vw,40px)] leading-[1.02] font-semibold tracking-tight text-balance transition-colors duration-[600ms] group-data-[dark=true]/hero:text-white tablet:text-[64px] desktop-sm:text-[min(76px,6vw)] short:text-[52px]">
+            {/* A soft halo of the hero's ground round the letters, as on the rating; light heroes also get the rating's wide, blurred white glow behind it — on the headline only. */}
+            <h1 className={`relative text-[clamp(24px,7vw,28px)] leading-[1.08] font-semibold tracking-tight text-balance transition-colors duration-[600ms] group-data-[dark=true]/hero:text-white tablet:text-[52px] desktop-sm:text-[min(72px,5vw)] compact:text-[44px] ${
+              (!dark || demo === "find") && demo !== "notes"
+                ? `${HALO_LIGHT} group-data-[dark=true]/hero:[text-shadow:0_0_12px_rgba(5,6,8,0.7),0_0_28px_rgba(5,6,8,0.5)] ${GLOW} before:-inset-x-24 before:-inset-y-10`
+                : demo === "alarm" || demo === "notes"
+                ? "" // a photo or the notes paper: no halo
+                : HALO_DARK
+            }`}>
               {app.headline.split("\n").map((line) => (
-                <span key={line} className="block desktop-sm:whitespace-nowrap">{line}</span>
+                <span key={line} className="tablet:block desktop-sm:whitespace-nowrap">{line} </span>
               ))}
             </h1>
-            <p className={`mx-auto mt-3 max-w-[480px] ${SUB} transition-colors tablet:mt-4 short:mt-2 short:text-[16px] duration-[600ms] group-data-[dark=true]/hero:text-white/70`}>{app.summary}</p>
+            {/* The headline's treatment, lighter: a soft blurred glow behind it and a halo round the letters. */}
+            <p className={`relative mx-auto mt-3 max-w-[480px] ${SUB} text-black/75 transition-colors tablet:mt-4 short:mt-2 short:text-[16px] duration-[600ms] group-data-[dark=true]/hero:text-white/80 ${
+              (!dark || demo === "find") && demo !== "notes"
+                ? `[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_18px_rgba(255,255,255,0.8)] group-data-[dark=true]/hero:[text-shadow:0_0_8px_rgba(5,6,8,0.8)] ${GLOW} before:-inset-x-16 before:-inset-y-8`
+                : demo === "alarm" || demo === "notes"
+                ? ""
+                : "[text-shadow:0_0_8px_rgba(5,6,16,0.8),0_0_18px_rgba(5,6,16,0.6)]"
+            }`}>{app.summary}</p>
             {/* The hero's call to action: the app's own website. */}
             <div className="mt-5 flex justify-center short:mt-4">
               <RingCta
@@ -198,8 +219,15 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
                 }
               />
             </div>
-            <p className="mt-3 flex items-center justify-center gap-2 text-xs text-black/50 transition-colors duration-[600ms] group-data-[dark=true]/hero:text-white/60">
-              <StarRating rating={app.rating} className="block h-[12px] transition-colors duration-[600ms] group-data-[dark=true]/hero:text-white" />
+            {/* Its own glow: it sits at the foot of the copy's, where that one has faded out. */}
+            <p className={`relative mx-auto mt-3 flex w-max items-center justify-center gap-2 text-xs text-black/60 transition-colors duration-[600ms] group-data-[dark=true]/hero:text-white/70 ${
+              (!dark || demo === "find") && demo !== "notes"
+                ? `${GLOW} before:-inset-x-16 before:-inset-y-8 [text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_18px_rgba(255,255,255,0.8)] group-data-[dark=true]/hero:[text-shadow:0_0_8px_rgba(5,6,8,0.9)]`
+                : demo === "alarm" || demo === "notes"
+                ? ""
+                : "before:pointer-events-none before:absolute before:-z-10 before:-inset-x-10 before:-inset-y-3 before:bg-[radial-gradient(closest-side,rgba(5,6,16,0.6)_40%,transparent)]"
+            }`}>
+              <StarRating rating={app.rating} className={`block h-[12px] transition-colors duration-[600ms] group-data-[dark=true]/hero:text-white ${(!dark || demo === "find") && demo !== "notes" ? "drop-shadow-[0_0_5px_#fff] group-data-[dark=true]/hero:drop-shadow-[0_0_5px_#050608]" : ""}`} />
               {app.rating} / {count} ratings
             </p>
           </div>
@@ -214,7 +242,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
             <div
               // The flat widgets (calculator, weather, QR, calendar, Bible) scroll with the page:
               // lagging like the phone, they'd slide down over the strip.
-              data-depth={flat || demo === "weather" ? "0" : "0.15"} className={`relative ${demo ? "z-20" : "z-10"}`}>
+              data-depth={flat || demo === "weather" ? "0" : "0.15"} className="relative z-20">
               {demo === "calculator" ? (
                 <HeroCalculator />
               ) : demo === "ai" ? (
@@ -224,9 +252,9 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               ) : demo === "volume" ? (
                 <HeroVolume accent={app.accent} className={PHONE} />
               ) : demo === "flashlight" ? (
-                <HeroFlashlight accent={app.accent} className={`${PHONE_SOLID} mb-[150px]`} />
+                <HeroFlashlight accent={app.accent} className={`${PHONE} mb-[150px]`} />
               ) : demo === "alarm" ? (
-                <HeroAlarm accent={app.accent} className={PHONE_SOLID} />
+                <HeroAlarm accent={app.accent} className={PHONE} />
               ) : demo === "qr" ? (
                 <HeroQR />
               ) : demo === "calendar" ? (
@@ -254,7 +282,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
         )}
 
         {/* ================= badges + poster strip ================= */}
-        <section className="pt-16 pb-24 text-center tablet:pt-24">
+        <section className="pt-24 tablet:pt-32 text-center">
           {/* The store's figures as one pill, in the shape of the app pages' highlight chips. */}
           <p className="mx-auto inline-flex items-center gap-4 rounded-full border border-[var(--border)] bg-white py-2 pr-5 pl-4 text-[14px] leading-[20px] text-[var(--foreground)] tablet:text-[15px]">
             <span className="flex items-center gap-2">
@@ -267,35 +295,24 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               <span className="font-semibold">{app.downloads}</span> <span className="text-[#61616a]">downloads</span>
             </span>
           </p>
-          <h2 className="mx-auto mt-8 max-w-[20ch] px-4 text-[36px] leading-[1.08] font-semibold tracking-[-0.02em] tablet:mt-10 tablet:text-[64px]">
-            Join {app.downloads} people {t.socialLine ?? `using ${app.title}`}
+          <h2 className="mx-auto mt-8 px-4 text-balance text-[clamp(21px,6.2vw,24px)] leading-[1.1] font-semibold tracking-[-0.02em] tablet:mt-10 tablet:text-[64px] compact:text-[48px]">
+            {/* Two lines from tablet up, broken before the app's name (or the custom line). */}
+            {t.socialLine ? <>Join {app.downloads} people<br className="hidden tablet:block" /> {t.socialLine}</> : <>Join {app.downloads} people using<br className="hidden tablet:block" /> {app.title}</>}
           </h2>
-          <Marquee
-            label="App screenshots"
-            duration={45}
-            // The edges fade over a quarter of the width each, eased (slow out
-            // of transparent, slow into solid) so there's no visible line.
-            className="mx-auto mt-14 max-w-[1440px] overflow-hidden [mask-image:linear-gradient(90deg,transparent,rgba(0,0,0,0.06)_5%,rgba(0,0,0,0.25)_11%,rgba(0,0,0,0.6)_18%,rgba(0,0,0,0.9)_24%,#000_28%,#000_72%,rgba(0,0,0,0.9)_76%,rgba(0,0,0,0.6)_82%,rgba(0,0,0,0.25)_89%,rgba(0,0,0,0.06)_95%,transparent)] tablet:mt-20"
-          >
-            {[...strip, ...strip].map((n, i) => {
-              const img = shotOf(n);
-              return (
-                <li key={i} className="mr-5 w-[180px] shrink-0 overflow-hidden rounded-[14px] tablet:mr-8 tablet:w-[228px]">
-                  <Image src={img.src} alt="" width={img.width} height={img.height} sizes="228px" className="aspect-[9/16] w-full object-cover" />
-                </li>
-              );
-            })}
-          </Marquee>
+          {/* Four at a time, stepping on one by one (ShotSlider). */}
+          <div className="mt-14 tablet:mt-20">
+            <ShotSlider label="App screenshots" shots={portraits.map(shotOf)} />
+          </div>
         </section>
 
         {/* ================= feature cards ================= */}
         {cards.length > 0 && (
-          <Container as="section" className="pt-28 text-center">
-            <h2 className={`mx-auto max-w-[16ch] ${H2}`}>{t.features?.heading ?? `Inside ${app.title}`}</h2>
+          <Container as="section" className="pt-24 tablet:pt-32 text-center">
+            <h2 className={`mx-auto ${H2} desktop-sm:whitespace-nowrap`}>{t.features?.heading ?? `Inside ${app.title}`}</h2>
             <p className={`mx-auto mt-4 max-w-[52ch] ${SUB}`}>{t.features?.sub ?? app.oneLiner}</p>
             <Reveal variant="stagger" className={`mx-auto mt-12 grid max-w-[1100px] gap-4 text-left ${CARD_COLS[cards.length]}`}>
               {cards.map(([i, shot], c) => (
-                <FeatureCard key={i} app={app} feature={f[i]} shot={shot} bg={CARD_BGS[c % CARD_BGS.length]} />
+                <FeatureCard key={i} app={app} feature={f[i]} shot={shot} bg={CARD_BGS[c % CARD_BGS.length]} wide={cards.length === 2} />
               ))}
             </Reveal>
           </Container>
@@ -307,7 +324,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
             <Reveal>
             <div className="mx-auto grid max-w-[1100px] items-center gap-10 overflow-hidden rounded-[28px] bg-[linear-gradient(160deg,#eef0f8,#d9d6fb)] p-8 tablet:p-12 desktop-sm:grid-cols-2">
               <div>
-                <h3 className={`${CARD_H3} tablet:text-[44px]`}>{f[t.widget.feature].title}</h3>
+                <h3 className={`${CARD_H3} tablet:text-[44px] compact:text-[34px]`}>{f[t.widget.feature].title}</h3>
                 <p className={`mt-3 max-w-[40ch] ${SUB}`}>{f[t.widget.feature].text}</p>
               </div>
               <div className="grid gap-3 tablet:grid-cols-2">
@@ -352,7 +369,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
               ))}
             </div>
             <div className="relative">
-              <h3 className={`${CARD_H3} tablet:text-[44px]`}>One swipe from your home screen</h3>
+              <h3 className={`${CARD_H3} tablet:text-[44px] compact:text-[34px]`}>One swipe from your home screen</h3>
               <p className={`mt-3 max-w-[40ch] ${SUB}`}>{app.launcherBenefits[0]?.text}</p>
             </div>
           </div>
@@ -403,7 +420,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
                     ))}
                   </div>
                 )}
-                <h2 className="text-[30px] leading-[1.05] font-semibold tracking-tight tablet:text-[44px] desktop-sm:text-[48px] short:text-[40px]">
+                <h2 className="text-[clamp(21px,6.2vw,24px)] leading-[1.1] font-semibold tracking-tight tablet:text-[44px] desktop-sm:text-[48px] compact:text-[38px]">
                   <span className="block text-black/40">{t.steps.heading[0]}</span>
                   {t.steps.heading[1]}
                 </h2>
@@ -415,7 +432,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
         {/* ================= and more ================= */}
         {/* An explorer of the launcher's extras beside a phone acting each
             one out — see LauncherExplorer. */}
-        <Container as="section" className="py-28">
+        <Container as="section" className="pt-24 tablet:pt-32">
           <div className="text-center">
             <h2 className={H2}>It&rsquo;s a launcher, too</h2>
             <p className={`mx-auto mt-4 max-w-[52ch] ${SUB}`}>{app.title} also has the following features:</p>
@@ -435,21 +452,11 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
 
         {/* ================= spotlight card ================= */}
         {usps.length > 0 && (
-          <Container as="section">
+          <Container as="section" className="pt-24 tablet:pt-32">
             <Reveal>
               <SpotlightCarousel
                 items={usps}
                 h2={H2}
-                backdrop={
-                  <Image
-                    src={appIconSrc(app)}
-                    alt=""
-                    width={279}
-                    height={280}
-                    className="absolute top-1/2 left-1/2 w-[340px] -translate-1/2 opacity-15 grayscale"
-                    style={{ borderRadius: ICON_RADIUS }}
-                  />
-                }
               />
             </Reveal>
           </Container>
@@ -458,9 +465,9 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
         {/* ================= reviews ================= */}
         {/* The heading, then a marquee of review cards. Only for apps with reviews. */}
         {reviews.length > 0 && (
-          <section className="pt-32 text-center">
+          <section className="pt-24 tablet:pt-32 text-center">
             <div className="mx-auto max-w-[var(--content-max-width)] px-[var(--content-padding)]">
-              <h2 className="relative mx-auto max-w-[560px] px-4 text-[34px] leading-[1.05] font-semibold tracking-[-0.02em] tablet:text-[48px] desktop-sm:text-[52px]">
+              <h2 className="relative mx-auto max-w-[560px] px-4 text-[clamp(21px,6.2vw,24px)] leading-[1.1] font-semibold tracking-[-0.02em] tablet:text-[48px] desktop-sm:text-[52px] compact:text-[40px]">
                 {t.reviewsHeading ?? "Loved on Google Play"}
               </h2>
               <p className={`mx-auto mt-5 max-w-[46ch] px-4 ${SUB}`}>
@@ -468,8 +475,8 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
                 {app.ratingCount.toLocaleString("en-US")} ratings on Google Play.
               </p>
             </div>
-            <Marquee label="Google Play reviews" duration={50} className="mt-14 overflow-hidden pb-4 tablet:mt-20">
-              {[...reviews, ...reviews, ...reviews, ...reviews].map((r, i) => (
+            <Marquee label="Google Play reviews" duration={50} className="edge-fade mt-14 overflow-hidden pb-4 tablet:mt-20">
+              {[...reviewLoop, ...reviewLoop].map((r, i) => (
                 <li key={i} className="mr-4 flex min-h-[220px] w-[280px] shrink-0 flex-col rounded-[24px] bg-[#eef0f8] p-6 text-left tablet:mr-6 tablet:w-[320px] tablet:p-7">
                   <span aria-label="Rated 5 out of 5" className="text-[20px] tracking-[2px] text-[#ff9f0a]">★★★★★</span>
                   <p className="mt-3 text-[15px] font-semibold">Google Play review</p>
@@ -482,10 +489,9 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
         )}
 
         {/* ================= closing ================= */}
-        <section className="pt-32 pb-24 text-center">
+        <section className="pt-24 tablet:pt-32 text-center">
           <Container>
             <h2 className={H2}>{t.closing ?? `Get ${app.title}`}</h2>
-            {app.highlights && <p className={`mx-auto mt-4 max-w-[50ch] ${SUB}`}>{app.highlights.join(" · ")}</p>}
             <div className="mt-6 flex justify-center">
               <RingCta
                 href={app.website}
@@ -504,7 +510,7 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
 
         {/* ================= the rest of the family ================= */}
         {/* Same frame as on /apps/[slug]: MoreApps has no padding of its own. */}
-        <Container className="pt-[72px] pb-[80px] tablet:pt-[112px] tablet:pb-[120px]">
+        <Container className="pt-24 pb-[80px] tablet:pt-32 tablet:pb-[120px]">
           <MoreApps currentSlug={app.slug} />
         </Container>
       </main>
@@ -521,11 +527,20 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
  * to three of text, the space reserved even when shorter — and the poster is
  * pinned at one offset, so a row of cards lines up whatever the copy.
  */
-function FeatureCard({ app, feature, shot, bg }: { app: AppPage; feature: AppFeature; shot: number; bg: string }) {
+function FeatureCard({ app, feature, shot, bg, wide }: { app: AppPage; feature: AppFeature; shot: number; bg: string; wide?: boolean }) {
   return (
-    <div className="relative h-[560px] overflow-hidden rounded-[28px] p-7" style={{ background: bg }}>
-      <h3 className={`${CARD_H3} line-clamp-2 min-h-[2.2em]`}>{feature.title}</h3>
-      <p className={`mt-2 line-clamp-3 min-h-[4.35em] ${CARD_TEXT}`}>{feature.text}</p>
+    <div className="@container relative h-[560px] overflow-hidden rounded-[28px] p-7" style={{ background: bg }}>
+      <h3 className={`${CARD_H3} whitespace-nowrap`}>{feature.cardTitle ?? feature.title}</h3>
+      {/* A fixed measure in em, with the type sized to the card's width (13–17px), so each description wraps
+          to the same three lines at every width and fills the card rather than leaving a gap on the right. */}
+      {/* Two cards side by side (desktop): a wider measure and the fuller wording, to fill the card. */}
+      <p
+        className={`mt-2 line-clamp-3 min-h-[4.35em] max-w-[16.5em] ${CARD_TEXT} text-[clamp(13px,calc(100cqi/16.5),17px)] ${
+          wide ? "desktop-sm:max-w-[28em] desktop-sm:text-[clamp(13px,calc(100cqi/28),17px)]" : ""
+        }`}
+      >
+        {wide ? <><span className="hidden desktop-sm:inline">{feature.text}</span><span className="desktop-sm:hidden">{feature.card ?? feature.text}</span></> : feature.card ?? feature.text}
+      </p>
       <div className="absolute inset-x-0 top-[220px] flex justify-center">
         <Poster app={app} shot={shot} alt={feature.title} sizes="280px" className="w-[64%]" />
       </div>

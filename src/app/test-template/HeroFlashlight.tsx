@@ -26,7 +26,8 @@ const PRINT = [
   "Search apps and the web from anywhere",
 ];
 const CELL = { w: 320, h: 54 }; // each line's share of the page
-const CELL_PHONE = { w: 320, h: 24 }; // phone-width screens: smaller, tighter lines
+const CELL_PHONE = { w: 200, h: 18 }; // phone-width screens: smaller, denser lines
+const CELL_COMPACT = { w: 250, h: 36 }; // small desktops (under 1280 wide, or short): denser than the full grid
 
 /**
  * The flashlight hero, playing on its own. The hero is a dark room with a
@@ -84,11 +85,12 @@ export function HeroFlashlight({ className }: { className?: string; accent?: str
     // neighbours match.
     const printGrid = (g: CanvasRenderingContext2D) => {
       const phoneW = w < 768;
-      const cell = phoneW ? CELL_PHONE : CELL;
-      g.font = `500 ${phoneW ? 9 : 13}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
+      const compact = !phoneW && (innerWidth < 1280 || innerHeight <= 820);
+      const cell = phoneW ? CELL_PHONE : compact ? CELL_COMPACT : CELL;
+      g.font = `${phoneW || compact ? 600 : 500} ${phoneW ? 10 : compact ? 12 : 13}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
       g.textAlign = "center";
       g.textBaseline = "middle";
-      g.fillStyle = "rgba(240,230,210,0.9)";
+      g.fillStyle = phoneW || compact ? "rgba(245,236,218,1)" : "rgba(240,230,210,0.9)";
       const cols = Math.max(2, Math.round(w / cell.w));
       const cw = w / cols;
       const rows = Math.ceil(h / cell.h);
@@ -97,7 +99,7 @@ export function HeroFlashlight({ className }: { className?: string; accent?: str
         const shift = row % 2 ? cw / 2 : 0;
         for (let col = -1; col <= cols; col++) {
           const line = PRINT[(((col + row * 4) % PRINT.length) + PRINT.length) % PRINT.length];
-          g.fillText(line, shift + col * cw + cw / 2, row * ch + ch / 2, cw - 24);
+          g.fillText(line, shift + col * cw + cw / 2, row * ch + ch / 2, cw - (phoneW ? 10 : 24));
         }
       }
     };

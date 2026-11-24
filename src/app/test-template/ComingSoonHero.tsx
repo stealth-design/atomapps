@@ -5,6 +5,7 @@ import { HeroParallax } from "./HeroParallax";
 import { RingCta } from "./RingCta";
 import { ICON_RADIUS } from "@/components/folds/fold03/appIcons";
 import { appIconSrc, type ComingSoonApp } from "@/data/apps";
+import { GLOW, HALO_DARK, HALO_LIGHT } from "./AppTemplate";
 
 /**
  * The hero for an app that isn't on Google Play yet, in the master
@@ -24,6 +25,7 @@ export function ComingSoonHero({ app }: { app: ComingSoonApp }) {
   const night = app.slug === "white-noise";
   return (
     <HeroParallax
+      dark={night}
       className={`group/hero relative mx-2 mt-[calc(var(--header-height)+8px)] h-[calc(100svh-var(--header-height)-8px)] min-h-[720px] overflow-hidden ${
         night ? "rounded-[24px]" : "rounded-t-[24px]"
       }`}
@@ -40,28 +42,34 @@ export function ComingSoonHero({ app }: { app: ComingSoonApp }) {
             night ? "bg-[#07061a]" : "bg-[linear-gradient(180deg,#dfeaf7_0%,#eef2f7_35%,#f5f4f1_70%,#faf6ec_100%)]"
           }`}
         />
-        {/* Steppy's hero is a photo of the penguin in the park, not a shader sky. */}
+        {/* Steppy's hero is a video of the penguin in the park, not a shader sky. */}
         {app.slug === "steppy" ? (
-          <Image src="/images/apps/steppy/hero-bg.png" alt="" fill priority sizes="100vw" className="object-cover" />
+          <>
+            <Image src="/images/apps/steppy/hero-bg.png" alt="" fill priority sizes="100vw" className="object-cover" />
+            {/* The penguin's video over its still (the poster, and what shows under reduced motion). */}
+            <video
+              src="/videos/steppy.mp4"
+              poster="/images/apps/steppy/hero-bg.png"
+              autoPlay
+              muted
+              loop
+              playsInline
+              aria-hidden
+              className="absolute inset-0 size-full object-cover motion-reduce:hidden"
+            />
+          </>
         ) : (
           <ShaderBackground frag={SKIES[app.slug]} className="absolute inset-0 h-full w-full" />
         )}
       </div>
 
       <div data-depth="-0.2" className="relative z-20 mx-auto max-w-[900px] px-4 pt-6 text-center desktop-sm:max-w-[1240px] tablet:pt-10 short:pt-5">
-        <p className="inline-flex items-center gap-2 rounded-full bg-white/75 py-1.5 pr-3.5 pl-3 text-[13px] font-semibold shadow-[0_8px_24px_-14px_rgba(0,0,0,0.3)] ring-1 ring-black/5 backdrop-blur-md">
-          <span className="relative flex size-2">
-            <span className="absolute inset-0 rounded-full bg-[var(--accent)] motion-safe:animate-[tt-ping_1.6s_cubic-bezier(0,0,0.2,1)_infinite]" />
-            <span className="relative size-2 rounded-full bg-[var(--accent)]" />
-          </span>
-          {app.name} · Coming soon
-        </p>
-        <h1 className={`mt-4 text-[clamp(30px,9vw,40px)] leading-[1.02] font-semibold tracking-tight text-balance tablet:text-[64px] desktop-sm:text-[min(76px,6vw)] short:text-[52px] ${night ? "text-white" : ""}`}>
+        <h1 className={`relative ${GLOW} before:-inset-x-24 before:-inset-y-10 ${night ? HALO_DARK : HALO_LIGHT} text-[clamp(24px,7vw,28px)] leading-[1.08] font-semibold tracking-tight text-balance tablet:text-[52px] desktop-sm:text-[min(72px,5vw)] compact:text-[44px] ${night ? "text-white" : ""}`}>
           {app.headline.split("\n").map((line) => (
-            <span key={line} className="block desktop-sm:whitespace-nowrap">{line}</span>
+            <span key={line} className="tablet:block desktop-sm:whitespace-nowrap">{line} </span>
           ))}
         </h1>
-        <p className={`mx-auto mt-3 max-w-[480px] text-[16px] leading-[1.5] tablet:mt-4 tablet:text-[18px] short:mt-2 short:text-[16px] ${night ? "text-white/70" : "text-black/55"}`}>{app.summary}</p>
+        <p className={`relative ${GLOW} before:-inset-x-16 before:-inset-y-8 ${night ? "[text-shadow:0_0_8px_rgba(5,6,16,0.8),0_0_18px_rgba(5,6,16,0.6)]" : "[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_18px_rgba(255,255,255,0.8)]"} mx-auto mt-3 max-w-[480px] text-[16px] leading-[1.5] tablet:mt-4 tablet:text-[18px] short:mt-2 short:text-[16px] ${night ? "text-white/80" : "text-black/75"}`}>{app.summary}</p>
         <div className="mt-5 flex justify-center short:mt-4">
           {/* Not a store button: there's nothing to link to yet. */}
           <RingCta
@@ -114,6 +122,15 @@ export function ComingSoonHero({ app }: { app: ComingSoonApp }) {
         </span>
         )}
       </div>
+
+      {/* Bottom centre, above the foot fade (z-15). */}
+      <p className="absolute bottom-8 left-1/2 z-20 inline-flex w-max -translate-x-1/2 items-center gap-2 rounded-full bg-white/75 py-1.5 pr-3.5 pl-3 text-[13px] font-semibold shadow-[0_8px_24px_-14px_rgba(0,0,0,0.3)] ring-1 ring-black/5 backdrop-blur-md">
+        <span className="relative flex size-2">
+          <span className="absolute inset-0 rounded-full bg-[var(--accent)] motion-safe:animate-[tt-ping_1.6s_cubic-bezier(0,0,0.2,1)_infinite]" />
+          <span className="relative size-2 rounded-full bg-[var(--accent)]" />
+        </span>
+        {app.name} · Coming soon
+      </p>
     </HeroParallax>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Calculator, FileText, Languages, Mic, Paperclip, PenLine, Sparkles } from "lucide-react";
-import { PULSE_EVENT, type Pulse } from "./ShaderBackground";
 import { useReducedMotion } from "./useReducedMotion";
 
 /*
@@ -11,10 +10,8 @@ import { useReducedMotion } from "./useReducedMotion";
  * from the bottom right, both made of slow domain-warped noise, and a thin
  * aurora ribbon drifting across behind the prompt bar.
  *
- * The prompt bar's autoplay drives it through PULSE_EVENT: each typed key,
- * each streamed word and the voice turn send a ring out from the bar (uClicks), which pushes
- * the light aside and glows mint, and every ring surges uFlow, so the aurora
- * runs faster while the reader types or the answer streams in.
+ * It plays on its own; the prompt bar no longer sends ripples into it (the
+ * shader's uClicks rings stay for any future use, but nothing triggers them).
  */
 export const AI_FRAG = `precision highp float;
 uniform vec2 uRes;uniform float uTime;uniform vec2 uMouse;uniform vec4 uClicks[4];uniform float uFlow;
@@ -169,10 +166,6 @@ export function HeroAI() {
     let live = true;
     const set = (next: Partial<typeof play>) => setPlay((p) => ({ ...p, ...next }));
     const wait = (ms: number) => new Promise<boolean>((r) => setTimeout(() => r(live), ms));
-    const pulse = (strength: number) => {
-      const r = bar.current?.getBoundingClientRect();
-      if (r) dispatchEvent(new CustomEvent<Pulse>(PULSE_EVENT, { detail: { x: r.left + r.width / 2, y: r.top + r.height / 2, strength } }));
-    };
     (async () => {
       for (let i = 0; ; i = (i + 1) % CHIPS.length) {
         const { prompt, answer: reply, voice } = CHIPS[i];
@@ -182,7 +175,6 @@ export function HeroAI() {
         set({ phase: voice ? "listening" : "typing" });
         for (let c = 1; c <= prompt.length; c++) {
           set({ text: prompt.slice(0, c) });
-          if (!voice || c % 3 === 0) pulse(voice ? 0.3 + Math.random() * 0.6 : 0.2);
           if (!(await wait(voice ? 50 : 32))) return;
         }
         if (!(await wait(400))) return;
@@ -191,14 +183,12 @@ export function HeroAI() {
         set({ sent: false });
 
         set({ asked: true, text: "", phase: "thinking" });
-        pulse(1.2);
         if (!(await wait(800))) return;
 
         set({ phase: "answering" });
         const words = reply.split(" ");
         for (let w = 1; w <= words.length; w++) {
           set({ answer: words.slice(0, w).join(" ") });
-          if (w % 4 === 0) pulse(0.25);
           if (!(await wait(voice ? 110 : 55))) return;
         }
         set({ phase: "done" });

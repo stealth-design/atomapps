@@ -307,7 +307,7 @@ export const APP_TEMPLATES: Record<string, AppTemplate> = {
         { title: "Find Your Phone Instantly with a Clap or Whistle", text: "Activate detection so your phone hears your clap or whistle.", image: "/images/apps/find-my-phone/steps/step-1.webp" },
         { title: "Enable Permissions for Seamless Phone Detection", text: "Grant microphone & notification permissions for effective tracking.", image: "/images/apps/find-my-phone/steps/step-2.webp" },
         { title: "Your Phone is Just a Clap Away!", text: "Lost your phone? Simply clap or whistle to find it instantly!", image: "/images/apps/find-my-phone/steps/step-3.webp" },
-        { title: "Never Search for Your Phone Again – Let It Call You!", text: "Your phone will respond with a preselected sound, flash, or vibration.", image: "/images/apps/find-my-phone/steps/step-4.webp" },
+        { title: "Never Search for Your Phone Again, Let It Call You!", text: "Your phone will respond with a preselected sound, flash, or vibration.", image: "/images/apps/find-my-phone/steps/step-4.webp" },
         { title: "Customize Your Alerts for a Smarter Phone Finder", text: "Voila! Find your phone easily and customize alert settings just the way you want.", image: "/images/apps/find-my-phone/steps/step-5.webp" },
       ],
     },

@@ -41,7 +41,7 @@ export function LauncherExplorer({ items, app }: { items: { title: string; text:
   }, []);
 
   return (
-    <div className="mx-auto mt-12 grid max-w-[1100px] overflow-hidden rounded-[32px] bg-[#eef0f8] desktop-sm:min-h-[640px] desktop-sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <div className="mx-auto mt-12 grid max-w-[1100px] overflow-hidden rounded-[32px] bg-[#eef0f8] desktop-sm:min-h-[560px] desktop-sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="flex items-center gap-6 p-6 tablet:p-10 desktop-sm:py-14 desktop-sm:pr-0 desktop-sm:pl-8">
         <div className="hidden flex-col gap-4 tablet:flex">
           <Arrow label="Previous feature" disabled={open === 0} onClick={() => select(open - 1)} />
@@ -100,7 +100,9 @@ export function LauncherExplorer({ items, app }: { items: { title: string; text:
         </ul>
       </div>
 
-      <div className="flex items-end justify-center px-6 pt-4 desktop-sm:pt-14">
+      {/* On desktop the card is as tall as the feature list (560px at least): size containment keeps the
+          phone from adding to that height, and it hangs from the top with its foot cropped. */}
+      <div className="flex items-end justify-center px-6 pt-4 desktop-sm:items-start desktop-sm:pt-12 desktop-sm:[contain:size]">
         <LauncherDemo scene={items[open].title} text={items[open].text} app={app} />
       </div>
     </div>

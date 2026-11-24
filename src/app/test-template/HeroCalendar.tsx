@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type PointerEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { useGSAP } from "@gsap/react";
 import { Bell, MapPin } from "lucide-react";
 import { gsap } from "@/lib/gsap";
@@ -85,8 +85,7 @@ const CARD = "rounded-[24px] bg-white/90 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.
 /**
  * The calendar hero: four blocks that fly in from four sides on load — the
  * month grid from the left, today's date from the top, an event card from
- * the right and a reminder chip from below — then drift with the cursor at
- * different depths. Then they play on their own: every few seconds the
+ * the right and a reminder chip from below and then stay put. Then they play on their own: every few seconds the
  * selected day moves on through the month (the date tile, the grid's
  * highlight) and the event card and reminder change to that day's plans.
  * Under reduced motion the blocks are simply there, on today.
@@ -136,14 +135,6 @@ export function HeroCalendar() {
     return () => clearInterval(id);
   }, [still, todayString]);
 
-  // The blocks drift toward the cursor, each at its own depth.
-  const drift = (e: PointerEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty("--mx", String(((e.clientX - r.left) / r.width - 0.5) * 2));
-    e.currentTarget.style.setProperty("--my", String(((e.clientY - r.top) / r.height - 0.5) * 2));
-  };
-  const depth = (px: number) => ({ transform: `translate(calc(var(--mx, 0) * ${px}px), calc(var(--my, 0) * ${px}px))` });
-
   const plan = PLAN[still ? 0 : step];
   const today = todayString ? new Date(todayString) : null;
   today?.setDate(today.getDate() + plan.add); // the selected day, from here on
@@ -156,14 +147,12 @@ export function HeroCalendar() {
       <style>{`@keyframes cal-in{from{opacity:0;transform:translateY(6px)}}`}</style>
       <div
         ref={scope}
-        onPointerMove={drift}
-        onPointerLeave={(e) => (e.currentTarget.style.setProperty("--mx", "0"), e.currentTarget.style.setProperty("--my", "0"))}
         className="relative origin-top-left"
         style={{ width: L.w, height: L.h, transform: `scale(${scale})` }}
       >
         {today && (
           <>
-            <div className="absolute" style={{ ...L.month, ...depth(6) }}>
+            <div className="absolute" style={L.month}>
               <div className={`piece month invisible p-5 ${CARD}`}>
                 <p key={month} className={`mb-3 text-[17px] font-bold ${SWAP}`}>
                   {MONTHS[month]} <span className="font-normal text-black/40">{year}</span>
@@ -171,7 +160,7 @@ export function HeroCalendar() {
                 <MonthGrid year={year} month={month} today={today.getDate()} />
               </div>
             </div>
-            <div className="absolute" style={{ ...L.today, ...depth(14) }}>
+            <div className="absolute" style={L.today}>
               <div className={`piece today invisible grid size-[136px] place-items-center text-center ${CARD}`}>
                 <div key={step} className={SWAP}>
                   <p className="text-[12px] font-semibold tracking-wide text-[var(--accent)] uppercase">{today.toLocaleDateString("en-US", { weekday: "long" })}</p>
@@ -180,7 +169,7 @@ export function HeroCalendar() {
                 </div>
               </div>
             </div>
-            <div className="absolute" style={{ ...L.event, ...depth(18) }}>
+            <div className="absolute" style={L.event}>
               <div className={`piece event invisible p-4 ${CARD}`}>
                 <div key={step} className={SWAP}>
                   <p className="flex items-center gap-2 text-[15px] font-semibold">
@@ -196,7 +185,7 @@ export function HeroCalendar() {
                 </div>
               </div>
             </div>
-            <div className="absolute" style={{ ...L.reminder, ...depth(10) }}>
+            <div className="absolute" style={L.reminder}>
               <div className={`piece reminder invisible flex items-center gap-2 rounded-full bg-[#1d1d1f] py-2.5 pr-5 pl-3 text-[14px] font-semibold text-white shadow-[0_20px_40px_-20px_rgba(0,0,0,0.6)]`}>
                 <Bell aria-hidden className="size-4 text-[#ffd27a]" strokeWidth={2.2} />
                 <span key={step} className={SWAP}>

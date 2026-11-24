@@ -236,7 +236,7 @@ export function HeroVolume({ className }: { className?: string; accent?: string 
       </div>
 
       {/* Bottom right, over the phone's faded foot, on phones; beside the phone from tablet up. */}
-      <div className="absolute right-4 bottom-[18%] z-10 flex flex-col items-center gap-2 tablet:top-[30%] tablet:right-auto tablet:bottom-auto tablet:left-[calc(50%+min(26vw,16vh))]">
+      <div className="absolute right-4 bottom-[18%] z-10 flex flex-col items-center gap-2 tablet:top-[30%] tablet:right-auto tablet:bottom-auto tablet:left-[calc(50%+min(26vw,16vh))] compact:left-[calc(50%+min(30vw,22vh))]">
         <div className="flex flex-col items-center gap-1 rounded-3xl bg-[linear-gradient(#2a2b31,#1a1b20)] p-3 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] ">
         <div
           role="slider"

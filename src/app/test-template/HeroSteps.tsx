@@ -28,7 +28,7 @@ const ICONS = {
 };
 // Each card rises in once, then bobs; reduced motion skips both.
 const CARD =
-  "rounded-2xl bg-white/95 p-2 shadow-[0_24px_48px_-20px_rgba(20,30,80,0.45)] ring-1 ring-black/5 backdrop-blur-md motion-safe:animate-[st-in_0.6s_ease-out_both,st-bob_6s_ease-in-out_0.6s_infinite]";
+  "rounded-2xl bg-white/95 p-2 shadow-[0_24px_48px_-20px_rgba(20,30,80,0.45)] ring-1 ring-black/5 motion-safe:animate-[st-in_0.6s_ease-out_both,st-bob_6s_ease-in-out_0.6s_infinite]";
 
 type Print = { x: number; y: number; a: number; left: boolean; t: number };
 
@@ -130,7 +130,7 @@ export function HeroSteps({ accent }: { accent: string }) {
     const kick = () => (raf ||= requestAnimationFrame(frame));
 
     const resize = () => {
-      const d = devicePixelRatio;
+      const d = Math.min(devicePixelRatio, 1.5);
       cv.width = hero.clientWidth * d;
       cv.height = hero.clientHeight * d;
       ctx.setTransform(d, 0, 0, d, 0, 0);
@@ -193,11 +193,11 @@ export function HeroSteps({ accent }: { accent: string }) {
   const week = [...WEEK, steps];
 
   return (
-    <div ref={cluster} className="relative mx-auto mt-10 mb-36 w-[300px] tablet:mb-44 short:mt-6">
+    <div ref={cluster} className="relative mx-auto mt-14 mb-36 w-[300px] tablet:mb-44 short:mt-12 compact:mt-12">
       <style>{`@keyframes st-in{from{opacity:0;transform:translateY(16px) scale(.96)}}@keyframes st-bob{50%{translate:0 -6px}}`}</style>
 
       {/* The day's card: the ring, then the day. */}
-      <div className="relative z-20 flex flex-col items-center rounded-[32px] bg-white/90 px-6 pt-10 pb-14 shadow-[0_30px_60px_-30px_rgba(20,30,80,0.5)] ring-1 ring-black/5 backdrop-blur-xl motion-safe:animate-[st-in_0.6s_ease-out_both]">
+      <div className="relative z-20 flex flex-col items-center rounded-[32px] bg-white/95 px-6 pt-10 pb-14 shadow-[0_30px_60px_-30px_rgba(20,30,80,0.5)] ring-1 ring-black/5 motion-safe:animate-[st-in_0.6s_ease-out_both]">
         <div
           role="img"
           aria-label={`${steps} of ${GOAL} steps`}
@@ -327,7 +327,8 @@ export function HeroSteps({ accent }: { accent: string }) {
                   <span
                     className="block rounded-t-[4px] transition-[height] duration-300"
                     style={{
-                      height: `${(Math.min(v, 140) / 140) * 90}px`,
+                      // Today's bar stops short of the top, so its count badge (24px above it) stays under the header.
+                      height: `${(Math.min(v, i === 6 ? 80 : 140) / 140) * 90}px`,
                       background: i === 6 ? accent : "#c9d3f5",
                     }}
                   />

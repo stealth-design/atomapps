@@ -27,7 +27,7 @@ export function mountRoom(
   { live, act, liveDirty }: { live: HTMLCanvasElement; act: { current: number | null }; liveDirty: { current: boolean } },
 ) {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // capped like the shaders: the phone is big now, and full 2x fill stalls scrolling on laptop GPUs
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   host.appendChild(renderer.domElement);
   renderer.domElement.style.display = "block";

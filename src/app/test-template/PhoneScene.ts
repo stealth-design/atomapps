@@ -14,7 +14,7 @@ export function mountPhone(
   { screen, live, act, liveDirty }: { screen?: string; live?: HTMLCanvasElement; act: { current?: PhoneAction }; liveDirty: { current: boolean } },
 ) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // capped like the shaders: the phone is big now, and full 2x fill stalls scrolling on laptop GPUs
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   host.appendChild(renderer.domElement);
 
@@ -22,9 +22,9 @@ export function mountPhone(
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   // Narrow lens from far away: a wide fov this close bulges the near edge of the
-  // tilted phone. Phone is normalised to height 1; it fills ~85% of the canvas height.
+  // tilted phone. Phone is normalised to height 1; it fills ~95% of the canvas height.
   const camera = new THREE.PerspectiveCamera(15, 1, 0.1, 20);
-  camera.position.set(0, 0, 4.6);
+  camera.position.set(0, 0, 4.0);
 
   // Hero pose: upright and facing straight on, no lean or cursor tilt.
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;

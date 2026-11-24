@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Clover } from "lucide-react";
 import { PhoneModel, type PhoneAction } from "./PhoneModel";
 
 const W = 630; // the screen canvas, 9:20 like the phone's display
@@ -118,7 +117,22 @@ export function HeroHoroscope({ className }: { className?: string }) {
     };
   }, []);
 
+  // Until the visitor picks one, a new sign lights up every 2s, in zodiac order.
+  const [auto, setAuto] = useState(true);
+  useEffect(() => {
+    if (!auto || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let i = -1;
+    const id = setInterval(() => {
+      i = (i + 1) % SIGNS.length;
+      setPicked(i);
+      setAction((a) => a ?? { at: performance.now(), does: "front", hold: true }); // turn once, then stay front
+      dust(ref.current!.querySelectorAll<HTMLElement>("button[aria-pressed]")[i]);
+    }, 2000);
+    return () => clearInterval(id);
+  }, [auto]);
+
   const pick = (i: number, from: HTMLElement, at: number) => {
+    setAuto(false);
     if (picked === i) {
       setPicked(null);
       setAction(undefined);
@@ -126,8 +140,12 @@ export function HeroHoroscope({ className }: { className?: string }) {
     }
     setPicked(i);
     setAction({ at, does: "front", hold: true });
+    dust(from);
+  };
+
+  /** A burst of star dust from the constellation to the phone. */
+  const dust = (from: HTMLElement) => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // A burst of star dust from the constellation to the phone.
     const box = ref.current!.getBoundingClientRect();
     const a = from.getBoundingClientRect();
     const b = phone.current!.getBoundingClientRect();
@@ -167,7 +185,7 @@ export function HeroHoroscope({ className }: { className?: string }) {
 @media (prefers-reduced-motion:no-preference){.tt-trace{animation:tt-trace ${LOOP}s ease-in-out infinite}.tt-glow{animation:tt-glow ${LOOP}s ease-in-out infinite}.tt-sway{animation:tt-sway ${SPIN}s linear infinite}.group:hover :is(.tt-trace,.tt-glow),.group:focus-visible :is(.tt-trace,.tt-glow){animation:none}}`}</style>
 
       {/* The constellations, round the phone. */}
-      <div className="pointer-events-none absolute top-0 left-1/2 h-[min(62vh,560px)] w-[min(1200px,100vw)] -translate-x-1/2" style={depth(10)}>
+      <div className="pointer-events-none absolute top-0 left-1/2 h-[min(62vh,560px)] w-[min(1200px,100vw)] -translate-x-1/2 [--g:0px] tablet:[--g:calc(16vh+84px)] compact:[--g:calc(18vh+84px)]" style={depth(10)}>
         {SIGNS.map((s, i) => {
           const on = picked === i;
           return (
@@ -178,7 +196,8 @@ export function HeroHoroscope({ className }: { className?: string }) {
               aria-pressed={on}
               onClick={(e) => pick(i, e.currentTarget, performance.now())}
               className="group pointer-events-auto absolute -translate-1/2 rounded-full p-3 focus-visible:outline-2 focus-visible:outline-white/70"
-              style={{ left: `${s.at[0]}%`, top: `${s.at[1]}%` }}
+              // Spread across the two sides only, clear of the phone (--g: its half-width plus a constellation and its label).
+              style={{ left: s.at[0] < 50 ? `calc((50% - var(--g)) * ${s.at[0] / 50})` : `calc(100% - (50% - var(--g)) * ${(100 - s.at[0]) / 50})`, top: `${s.at[1]}%` }}
             >
               <svg
                 viewBox="-6 -6 112 112"
@@ -222,19 +241,6 @@ export function HeroHoroscope({ className }: { className?: string }) {
         <PhoneModel live={live} liveKey={picked} action={action} className={className} />
       </div>
 
-      {/* The two pills stacked at the phone's foot, clear of its reading, the small lucky one on top (reversed, so the status still reads first); higher from tablet up, where the phone runs past the hero and the strip sits lower on it. */}
-      {sign && (
-        <div className="absolute inset-x-0 bottom-[10%] z-20 flex flex-col-reverse items-center gap-2 tablet:bottom-[20%]">
-          <p role="status" className="flex w-max items-center gap-2 rounded-full bg-white px-4 py-2 text-[13px] font-medium text-[#1d1d1f] shadow-lg">
-            <span className="size-2 rounded-full bg-[#e9c46a]" />
-            {sign.name} · Your day ahead
-          </p>
-          <p className="flex w-max items-center gap-2 rounded-full bg-white/90 px-3.5 py-2 text-[13px] font-semibold text-[#1d1d1f] shadow-lg backdrop-blur-md">
-            <Clover aria-hidden className="size-4 text-[#3a9d5d]" strokeWidth={2.2} />
-            {sign.lucky[0]} · {sign.lucky[1]}
-          </p>
-        </div>
-      )}
     </div>
   );
 }

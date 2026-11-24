@@ -11,7 +11,7 @@ import { gsap } from "@/lib/gsap";
  * Scoped here rather than using GlobalParallax, which only scans the page
  * once on first load and so misses this page after a client navigation.
  */
-export function HeroParallax({ className, children }: { className?: string; children: ReactNode }) {
+export function HeroParallax({ className, children, dark }: { className?: string; children: ReactNode; dark?: boolean }) {
   const ref = useRef<HTMLElement>(null);
 
   // --copy-h: where the copy ([data-copy]) ends, from the hero's top. On phones the
@@ -52,7 +52,8 @@ export function HeroParallax({ className, children }: { className?: string; chil
   );
 
   return (
-    <section ref={ref} className={className}>
+    // `dark` starts the hero dark (its copy glows black, see AppTemplate's GLOW); demos can also set it live.
+    <section ref={ref} className={className} data-dark={dark || undefined}>
       {children}
     </section>
   );

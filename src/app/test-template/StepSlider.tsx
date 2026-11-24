@@ -33,10 +33,10 @@ export function StepSlider({ steps, intro, className = "" }: Props) {
               <p className="text-[15px] font-semibold tracking-[-0.01em] text-black/30">
                 {two(i + 1)} / {two(n)}
               </p>
-              <h3 className="mt-3 text-[30px] leading-[1.05] font-semibold tracking-[-0.03em] tablet:text-[44px] desktop-sm:text-[52px]">
+              <h3 className="mt-3 text-[clamp(18px,5.2vw,20px)] leading-[1.15] font-semibold tracking-[-0.02em] tablet:text-[34px] desktop-sm:text-[40px] compact:text-[32px] text-balance">
                 {title}
               </h3>
-              <p className="mt-4 text-[16px] leading-[1.45] text-black/55 tablet:text-[20px]">{text}</p>
+              <p className="mt-4 text-[16px] leading-[1.45] text-black/55 tablet:text-[20px] compact:text-[17px]">{text}</p>
             </div>
             <div className="relative aspect-square w-full overflow-hidden rounded-[24px] desktop-sm:fixed desktop-sm:top-1/2 desktop-sm:right-[max(64px,calc(50%-486px))] desktop-sm:size-[var(--v)] desktop-sm:-translate-y-1/2 desktop-sm:rounded-[28px]">
               <Image

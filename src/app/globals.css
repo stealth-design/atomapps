@@ -27,6 +27,17 @@
    because past that the Fold 05 card is sized by its aspect ratio instead. */
 @custom-variant short (@media (min-width: 768px) and (max-width: 1920px) and (max-height: 820px));
 
+/* Small desktops: narrow laptop windows (768–1279px), or a short one up to 1920 wide (a laptop
+   at 125–150% zoom). The app pages' headings and body copy step down a size here. */
+@custom-variant compact {
+  @media (min-width: 768px) and (max-width: 1279px) {
+    @slot;
+  }
+  @media (min-width: 768px) and (max-width: 1920px) and (max-height: 820px) {
+    @slot;
+  }
+}
+
 /* Big, tall windows (1440x940 and up), where a hero widget sized for a laptop
    looks lost: the app heroes' flat demos grow a step there. */
 @custom-variant roomy (@media (min-width: 1440px) and (min-height: 940px));
@@ -201,9 +212,38 @@
 }
 
 /* Phones: a hero's animated layers (.under-copy) fade out above the end of its copy, so
-   nothing moves behind the headline (--copy-h is set by HeroParallax). */
+   nothing moves behind the headline (--copy-h is set by HeroParallax). Not on short desktops:
+   there the copy's own band (AppTemplate) keeps it legible and the hero's ground shows to its edges. */
 @media (width < 768px) {
   .under-copy {
     mask-image: linear-gradient(180deg, transparent calc(var(--copy-h, 0px) - 16px), #000 calc(var(--copy-h, 0px) + 48px));
+  }
+}
+
+/* The app pages' marquees: each edge fades out over --f of the width, eased (slow out of
+   transparent, slow into solid) so there's no line where the cards start to show. */
+.edge-fade {
+  --f: 10%;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 0, 0, 0.04) calc(var(--f) * 0.15),
+    rgba(0, 0, 0, 0.15) calc(var(--f) * 0.32),
+    rgba(0, 0, 0, 0.35) calc(var(--f) * 0.5),
+    rgba(0, 0, 0, 0.62) calc(var(--f) * 0.68),
+    rgba(0, 0, 0, 0.86) calc(var(--f) * 0.85),
+    #000 var(--f),
+    #000 calc(100% - var(--f)),
+    rgba(0, 0, 0, 0.86) calc(100% - var(--f) * 0.85),
+    rgba(0, 0, 0, 0.62) calc(100% - var(--f) * 0.68),
+    rgba(0, 0, 0, 0.35) calc(100% - var(--f) * 0.5),
+    rgba(0, 0, 0, 0.15) calc(100% - var(--f) * 0.32),
+    rgba(0, 0, 0, 0.04) calc(100% - var(--f) * 0.15),
+    transparent
+  );
+}
+@media (width >= 1024px) {
+  .edge-fade {
+    --f: 15%;
   }
 }

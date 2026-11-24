@@ -3,10 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useReducedMotion } from "./useReducedMotion";
-import { CloudRain, CloudSun, MapPin, Newspaper } from "lucide-react";
+import { CloudRain, MapPin } from "lucide-react";
 import { FlatPhone } from "./FlatPhone";
 import { HOURS } from "./WeatherScene";
-import { Hint } from "./Hint";
 
 // Made-up stories for the demo, one per category.
 const STORIES = [
@@ -115,6 +114,25 @@ function useBreaking() {
   return { pops, banner, reduce };
 }
 
+/** The copy's ink, not its full-width box: the union of its text and the button, in viewport px. */
+function copyBox(hero: HTMLElement) {
+  const copy = hero.querySelector<HTMLElement>("[data-copy]");
+  if (!copy) return null;
+  let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
+  const add = (x: DOMRect) => {
+    if (!x.width) return;
+    l = Math.min(l, x.left); t = Math.min(t, x.top); r = Math.max(r, x.right); b = Math.max(b, x.bottom);
+  };
+  const walk = document.createTreeWalker(copy, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+    range.selectNodeContents(n);
+    add(range.getBoundingClientRect());
+  }
+  copy.querySelectorAll("a").forEach((a) => add(a.getBoundingClientRect()));
+  return l === Infinity ? null : { left: l, top: t, right: r, bottom: b };
+}
+
 type Far = { id: number; x: number; y: number; depth: number; story: number };
 const FAR_EVERY = 420; // ms between alerts popping up in the background
 const FAR_LIFE = 5200;
@@ -137,17 +155,36 @@ function AlertField() {
   );
 
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || !hero) return;
     let id = 0;
     const timers = new Set<number>();
     const add = () => {
+      // Only below the fixed header's current foot, so none pops up under it once the page has scrolled.
+      const r = hero.getBoundingClientRect();
+      const headerFoot = document.querySelector("header")?.getBoundingClientRect().bottom ?? 50;
+      const top = Math.max(3, ((headerFoot + 16 - r.top) / r.height) * 100);
+      if (top > 85) return; // the hero has all but scrolled away
+      // Keep clear of the copy (headline to rating), with a margin: a few tries for a spot outside it.
+      const c = copyBox(hero);
+      let x = 0;
+      let y = 0;
+      for (let tries = 0; ; tries++) {
+        if (tries === 8) return; // no free spot this tick
+        x = 2 + Math.random() * 84;
+        y = top + Math.random() * (85 - top);
+        if (!c) break;
+        const ax = r.left + (x / 100) * r.width;
+        const ay = r.top + (y / 100) * r.height;
+        // An alert is up to 260 x 70px from its top-left corner.
+        const clear = ax > c.right + 24 || ax + 260 < c.left - 24 || ay > c.bottom + 24 || ay + 70 < c.top - 24;
+        if (clear) break;
+      }
       const n = id++;
-      const x = 2 + Math.random() * 84;
-      const middle = x > 26 && x < 62; // over the headline and phone
+      const middle = x > 26 && x < 62; // over the phone
       const a = {
         id: n,
         x,
-        y: 3 + Math.random() * 82,
+        y,
         depth: middle ? 0 : Math.floor(Math.random() * 3),
         story: Math.floor(Math.random() * BREAKING.length),
       };
@@ -164,7 +201,7 @@ function AlertField() {
       timers.forEach(clearTimeout);
       setAlerts([]);
     };
-  }, [reduce]);
+  }, [reduce, hero]);
 
   return (
     <span ref={anchor} hidden>
@@ -335,22 +372,8 @@ const TITLES: Record<Screen, string> = {
  * again goes back to the feed.
  */
 export function HeroNews() {
-  const [screen, setScreen] = useState<Screen>("feed");
-  const buttons = [
-    {
-      id: "top" as const,
-      label: "Top stories",
-      Icon: Newspaper,
-      note: "Updated just now",
-    },
-    {
-      id: "weather" as const,
-      label: "Weather",
-      Icon: CloudSun,
-      note: "Local forecast",
-    },
-  ];
-  const note = buttons.find((b) => b.id === screen)?.note;
+  // The side buttons that switched it to Top stories / Weather are gone; it shows the feed.
+  const [screen] = useState<Screen>("feed");
   const { pops, banner, reduce } = useBreaking();
   const drop = BREAKING[(banner + 3) % BREAKING.length];
 
@@ -401,15 +424,6 @@ export function HeroNews() {
           );
         })}
       </div>
-      {note && (
-        <p
-          role="status"
-          className="absolute -top-4 left-1/2 z-20 flex w-max -translate-x-1/2 items-center gap-2 rounded-full bg-[var(--foreground)] px-4 py-2 text-[13px] font-medium text-white shadow-lg"
-        >
-          <span className="size-2 rounded-full bg-[#3ddc84]" />
-          {note}
-        </p>
-      )}
 
       <FlatPhone>
         {/* The push notification dropping in under the status bar, a new one each loop. */}
@@ -451,24 +465,6 @@ export function HeroNews() {
         </div>
       </FlatPhone>
 
-      {buttons.map(({ id, label, Icon }, i) => (
-        <button
-          key={id}
-          type="button"
-          aria-label={label}
-          aria-pressed={screen === id}
-          onClick={() => setScreen(screen === id ? "feed" : id)}
-          className={`absolute top-[30%] z-10 hidden items-center tablet:flex gap-2 rounded-full bg-white/75 p-3 text-[15px] font-semibold text-[var(--foreground)] shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)] ring-1 backdrop-blur-md transition-transform duration-300 can-hover:hover:scale-105 active:scale-95 tablet:px-5 ${
-            i
-              ? "right-3 tablet:right-auto tablet:left-[calc(50%+min(160px,40vw))]"
-              : "left-3 tablet:right-[calc(50%+min(160px,40vw))] tablet:left-auto"
-          } ${screen === id ? "ring-2 ring-[var(--accent)]" : "ring-black/5"}`}
-        >
-          <Icon aria-hidden className="size-[22px]" strokeWidth={1.8} />
-          <span className="hidden tablet:inline">{label}</span>
-          <Hint />
-        </button>
-      ))}
     </div>
   );
 }

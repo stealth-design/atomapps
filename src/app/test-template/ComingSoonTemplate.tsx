@@ -38,7 +38,7 @@ export function ComingSoonTemplate({ app }: { app: ComingSoonApp }) {
             In development · Android
           </p>
           <Container>
-            <h2 className="mx-auto mt-8 max-w-[20ch] text-[36px] leading-[1.08] font-semibold tracking-[-0.02em] tablet:mt-10 tablet:text-[64px]">
+            <h2 className="mx-auto mt-8 max-w-[20ch] text-[clamp(21px,6.2vw,24px)] leading-[1.1] font-semibold tracking-[-0.02em] tablet:mt-10 tablet:text-[64px]">
               Meet {app.title}
             </h2>
             <div className={`mx-auto mt-6 flex max-w-[60ch] flex-col gap-4 ${SUB}`}>
@@ -55,7 +55,7 @@ export function ComingSoonTemplate({ app }: { app: ComingSoonApp }) {
           <p className={`mx-auto mt-4 max-w-[52ch] ${SUB}`}>{app.summary}</p>
           <Reveal variant="stagger" className="mx-auto mt-12 grid max-w-[1100px] gap-4 text-left desktop-sm:grid-cols-3">
             {app.features.map(({ icon, text }, i) => (
-              <div key={icon} className="relative h-[440px] overflow-hidden rounded-[28px] p-7" style={{ background: CARD_BGS[i % CARD_BGS.length] }}>
+              <div key={icon} className="relative h-[440px] overflow-hidden rounded-[28px] p-5 tablet:p-7" style={{ background: CARD_BGS[i % CARD_BGS.length] }}>
                 <p className="text-[13px] font-semibold tracking-[0.08em] text-[var(--accent)]">{String(i + 1).padStart(2, "0")}</p>
                 <h3 className={`mt-2 ${CARD_H3}`}>{text}</h3>
                 {/* The feature's icon on the launcher card's orbit rings, where a poster would be. */}

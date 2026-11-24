@@ -127,7 +127,7 @@ export const PRIVACY: LegalDoc = {
     },
     { type: "p", text: "In order to establish, exercise, or defend legal claims we may pass on your personal data to law enforcement agencies, where such disclosure is necessary in order to be compliant with a legal obligation, prevent fraudulent activities or protect vital interests of any natural person." },
     { type: "h2", text: "Information Retention and Deletion:" },
-    { type: "p", text: "Any information collected on or through the Services stays with us only for as long as it\u2019s necessary for the purposes mentioned in the above section - \u2018Information Processing\u2019. Any information that we store is laid off once it is no longer needed or upon receiving an explicit written request from you, as and where applicable." },
+    { type: "p", text: "Any information collected on or through the Services stays with us only for as long as it\u2019s necessary for the purposes mentioned in the above section: \u2018Information Processing\u2019. Any information that we store is laid off once it is no longer needed or upon receiving an explicit written request from you, as and where applicable." },
     { type: "h2", text: "Information Security:" },
     { type: "p", text: "The security of your information collected seriously and ensures that reasonable and appropriate technical, physical, and organizational measures are being implemented and maintained in order to prevent any unauthorized access, change, loss, misuse, or destruction of your information collected by us and to protect the confidentiality, integrity, and availability of your personal information. We have complete protection of your information even in the transition stage, we encrypt any information transmitted to or from our web servers using the Secure Socket Layer (\"SSL\") software. However, we cannot ensure 100% security of your information when it is being transmitted to or from our web servers via the internet, due to the inherent risk involved in the transmission of information over the internet." },
     { type: "h2", text: "Transfer of Information" },
@@ -177,21 +177,21 @@ export const PRIVACY: LegalDoc = {
     {
       type: "ul",
       items: [
-        "Google Analytics - www.google.com/policies/privacy/partners/",
+        "Google Analytics: www.google.com/policies/privacy/partners/",
       ],
     },
-    { type: "p", text: "Google Tag Manager - https://policies.google.com/technologies/partner-sites" },
+    { type: "p", text: "Google Tag Manager: https://policies.google.com/technologies/partner-sites" },
     {
       type: "ul",
       items: [
-        "Crazy Egg - https://www.crazyegg.com/privacy",
+        "Crazy Egg: https://www.crazyegg.com/privacy",
       ],
     },
-    { type: "p", text: "Firebase - www.google.com/policies/privacy/partners/" },
+    { type: "p", text: "Firebase: www.google.com/policies/privacy/partners/" },
     {
       type: "ul",
       items: [
-        "Bing SEM - https://about.ads.microsoft.com/en-gb/resources/policies/microsoft-advertising-privacy-policy",
+        "Bing SEM: https://about.ads.microsoft.com/en-gb/resources/policies/microsoft-advertising-privacy-policy",
       ],
     },
     { type: "p", text: "With the help of third-party service providers we offer certain features on the Services. Please be mindful that any third-party service providers may place their own tracking technologies on the Services for data collection and processing of information including, but not limited to, your use of the Services, device information, browsing activities, etc. Please be informed that we do not exercise any kind of control, management, or otherwise administration of the collection and processing of your information by such Analytical Service Providers and other third-party service providers and shall not be held liable for their privacy practices." },
@@ -315,7 +315,7 @@ export const PRIVACY: LegalDoc = {
     {
       type: "ul",
       items: [
-        "Right to restrict processing - In the following cases, you have the right to",
+        "Right to restrict processing: In the following cases, you have the right to",
       ],
     },
     { type: "p", text: "restrict the ways in which your personal information can be used" },
@@ -345,7 +345,7 @@ export const PRIVACY: LegalDoc = {
     {
       type: "ul",
       items: [
-        "Right to object - You have the right to restrict us from processing your personal",
+        "Right to object: You have the right to restrict us from processing your personal",
       ],
     },
     { type: "p", text: "information, if such an objection is based on (a) an activity or task performed by us to execute public interest or in exercise of the official authority vested in us; (b) the legitimate interests pursued by us or by any third party, excluding cases where your fundamental rights or interests, which require the protection of your personal information, disregard such interests; or (c) processing of your personal information to collect profiling data for direct marketing purposes. Where you object to such processing, we will stop processing your personal information unless (i) we can show legitimate grounds for such processing which override your rights, interests, and freedoms; or (ii) the processing of your information is necessary for the establishment, exercise or defense of legal claims." },

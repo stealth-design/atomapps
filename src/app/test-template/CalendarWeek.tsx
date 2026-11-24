@@ -28,7 +28,7 @@ const PINK = "#e8508a";
 // Monday = 0. Times in hours.
 const BOOKED: Ev[] = [
   { day: 0, start: 9, len: 0.5, title: "Team standup", color: BLUE },
-  { day: 0, start: 13, len: 1, title: "Lunch with Priya", color: ORANGE },
+  { day: 0, start: 13, len: 1, title: "Lunch with Emma", color: ORANGE },
   { day: 1, start: 9, len: 0.5, title: "Team standup", color: BLUE },
   { day: 1, start: 10.5, len: 1.5, title: "Design review", color: PURPLE },
   { day: 1, start: 18, len: 1, title: "Gym", color: GREEN },

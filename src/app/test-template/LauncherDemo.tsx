@@ -62,7 +62,7 @@ type Props = { app: App; text: string };
 export function LauncherDemo({ scene, text, app }: { scene: string } & Props) {
   const Scene = { "One-swipe access": Swipe, "Home screen widget": Widget, Wallpaper, "Home screen shortcut": Shortcut, "Multi-touchpoint search": Search }[scene];
   return (
-    <div className="ld relative aspect-[9/19.5] w-[280px] translate-y-12 rounded-[44px] border-[8px] border-[#1d1d1f] bg-[#1d1d1f] shadow-[0_40px_80px_-40px_rgba(0,0,0,0.5)] tablet:w-[320px]">
+    <div className="ld relative aspect-[9/19.5] w-[280px] translate-y-12 desktop-sm:translate-y-0 rounded-[44px] border-[8px] border-[#1d1d1f] bg-[#1d1d1f] shadow-[0_40px_80px_-40px_rgba(0,0,0,0.5)] tablet:w-[320px]">
       <style>{`@keyframes ld-swipe{0%,8%{transform:translateX(0);opacity:0}12%{opacity:1}30%{transform:translateX(170px);opacity:0}to{transform:translateX(170px);opacity:0}}
 @keyframes ld-panel{0%,18%{transform:translateX(-102%)}32%,86%{transform:translateX(0)}to{transform:translateX(-102%)}}
 @keyframes ld-row{0%,30%{opacity:0;transform:translateY(8px)}40%,86%{opacity:1;transform:none}to{opacity:0}}
