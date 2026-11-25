@@ -12,8 +12,9 @@ import { PARTNERS, TEAM } from "@/components/folds/fold08/leadership";
  *
  * Partner strip up top, then the leadership grid. Desktop runs the five logos
  * in one row and the three people at 376x329; mobile wraps the logos to 3 + 2,
- * relabels the section "Leadership / Meet the team", and crops the portraits
- * square at 109px. Logo widths and order both come from `leadership.ts`.
+ * relabels the section "Leadership / Meet the team", and stacks the people one
+ * to a row with full-width square portraits. Logo widths and order both come
+ * from `leadership.ts`.
  */
 export default function Fold08() {
   return (
@@ -65,9 +66,11 @@ export default function Fold08() {
               <span className="hidden tablet:inline">Leadership Team</span>
             </h2>
 
-            <ul className="mt-[32px] flex justify-center gap-[13px] tablet:mt-[54px] tablet:gap-[20px]">
+            {/* Mobile stacks the three one to a row, each portrait the full
+                column less 8px a side (28px from the screen edge in all). */}
+            <ul className="mt-[32px] flex flex-col gap-[28px] px-2 tablet:mt-[54px] tablet:flex-row tablet:justify-center tablet:gap-[20px] tablet:px-0">
               {TEAM.map((member) => (
-                <li key={member.name} className="w-[109px] tablet:w-[376px]">
+                <li key={member.name} className="tablet:w-[376px]">
                   {/* The frame keeps the artboard's crop and corner radius. */}
                   <div className="relative aspect-square overflow-hidden rounded-[12px] tablet:aspect-[376/329] tablet:rounded-[5px]">
                     {/* Flush with the frame, and the drift is gone with it.
@@ -93,26 +96,19 @@ export default function Fold08() {
                         alt={member.name}
                         width={752}
                         height={658}
-                        // Three across on mobile (~105px each) against a 376px
-                        // slot on desktop. Without this the 752px intrinsic
-                        // made Next serve a 1920w variant into a 105px box.
-                        sizes="(min-width: 768px) 380px, 33vw"
+                        // Nearly full width on mobile, a 376px slot on desktop.
+                        sizes="(min-width: 768px) 380px, 100vw"
                         className="h-full w-full object-cover"
                       />
                     </div>
                   </div>
-                  {/* Two lines' worth of room on mobile whether the name needs
-                      it or not. The column is 108px, so the longer two names
-                      wrap and the shortest does not — without a floor the roles
-                      under them sat 24px apart and the row read as misaligned.
-                      `tablet:min-h-0` drops it above the breakpoint, where all
-                      three set on one line. */}
-                  <p className="mt-[18px] min-h-[48px] text-center text-[17.4px] leading-[24px] font-bold text-[#111116] tablet:mt-[25px] tablet:min-h-0 tablet:text-left tablet:text-[24px] tablet:leading-[31px]">
+                  {/* Same type at both breakpoints; mobile centres it under the
+                      portrait and sits it a little closer. */}
+                  <p className="mt-[16px] text-center text-[24px] leading-[31px] font-bold text-[#111116] tablet:mt-[25px] tablet:text-left">
                     {member.name}
                   </p>
-                  <p className="mt-[3px] text-center text-[12px] leading-[16px] text-[#111116] tablet:mt-[4px] tablet:text-left tablet:text-[18px] tablet:leading-[24px] tablet:font-light">
-                    <span className="tablet:hidden">{member.roleMobile ?? member.role}</span>
-                    <span className="hidden tablet:inline">{member.role}</span>
+                  <p className="mt-[2px] text-center text-[18px] leading-[24px] font-light text-[#111116] tablet:mt-[4px] tablet:text-left">
+                    {member.role}
                   </p>
                 </li>
               ))}
