@@ -4,30 +4,24 @@ import { siteConfig } from "@/data/site";
 /**
  * Site footer (Figma 1576:4269, 1440x800).
  *
- * One centred column on the foot of the panel: the AtomApps wordmark running
- * the full width, then the legal links, the trademark notices and the
- * copyright. The rest of the panel is deliberately empty — the block is
- * anchored to the bottom and the space above it is what is left.
+ * One centred column: the AtomApps wordmark running the full width, then the
+ * legal links, the trademark notices and the copyright. The panel is only as
+ * tall as that column plus its paddings. It used to be held at 800px or the
+ * full window under the header, whichever was larger, with the column pinned
+ * to the bottom and empty space above it; that was dropped by request so the
+ * footer reads as a closing band under the last fold, not a page of its own.
  *
  * It used to open with a "Get in touch" call to action and carry the tagline
  * and the contact address under the wordmark, with the copyright pushed to the
  * right of the legal row. All of that is gone by request; the address still
  * lives in `siteConfig.email`, which the legal pages use.
  *
- * The composition is the artboard's; the way it is held together is not. Every
- * block used to sit at its measured offset from the top of a panel fixed at
- * 800px, which only holds at the width those offsets were taken from. The
- * blocks are in flow instead, the panel's height is a floor rather than a cap,
- * and `mt-auto` is what pins the foot — with the paddings below that resolves
- * to the artboard's own numbers (wordmark box top at 428 of 800) at 1440, and
- * gives way rather than clipping above it.
- *
  * Two numbers to be careful with:
  *
  *   - The wordmark asset reserves 19.024% of its own box as transparent space
- *     above the ink (box 4.32 wide to tall, ink 5.34). Nothing here depends on
- *     that, because the block is anchored by its foot, but any change to the
- *     padding above it does.
+ *     above the ink (box 4.32 wide to tall, ink 5.34), so the visible gap
+ *     above the letters is the top padding plus that share of the box. Any
+ *     change to the top padding should allow for it.
  *   - What follows the wordmark is measured to its box, which ends on the
  *     descenders of "pp", so there is no hidden slack in that gap.
  *
@@ -39,19 +33,14 @@ export function Footer() {
   return (
     <footer
       id="contact"
-      // A floor, not a fixed height: it gives way rather than clipping the
-      // wordmark. The value is the artboard's 800px or whatever it takes to
-      // fill the window under the header, whichever is larger — see
-      // `--footer-min-height`, which is what makes the foot of the page land
-      // on the header's edge with no strip of the fold above showing between.
-      className="relative min-h-[var(--footer-min-height)] w-full overflow-hidden bg-[#171717]"
+      // As tall as its content and no taller: at full scroll the fold above
+      // stays in view over the footer's top edge, rather than the footer
+      // filling the window under the header.
+      className="relative w-full overflow-hidden bg-[#171717]"
     >
-      <div className="mx-auto flex min-h-[var(--footer-min-height)] w-full max-w-[var(--content-max-width)] flex-col px-5 pt-[45px] pb-[38px] tablet:px-10 tablet:pt-[62px] tablet:pb-[37px]">
-        {/* ---------- wordmark and legal, on the foot ---------- */}
-        {/* `mt-auto` is what holds the artboard's shape: the call to action
-            stays at the top and these two sit together on the foot however
-            tall the panel ends up. */}
-        <div className="mt-auto">
+      <div className="mx-auto w-full max-w-[var(--content-max-width)] px-5 pt-[45px] pb-[38px] tablet:px-10 tablet:pt-[62px] tablet:pb-[37px]">
+        {/* ---------- wordmark and legal ---------- */}
+        <div>
           {/* The final lockup ships as a single asset with the colour orbit
               drawn into it, so this composes nothing. Light cut, for this
               #171717 panel. */}

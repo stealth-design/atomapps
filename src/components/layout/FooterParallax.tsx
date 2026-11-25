@@ -31,10 +31,9 @@ import { gsap } from "@/lib/gsap";
  *
  * These were a share of the footer's own height — 25% desktop, 16% mobile —
  * which came to 200px and 105px against the artboard heights they were tuned
- * on. The footer now grows to fill the window under the header (see
- * `--footer-min-height`), so a percentage would hand a tall monitor a
- * proportionally longer drift: 287px on a 1200px window, against the 200 this
- * was set at. Pixels keep the reveal reading the same at every window height.
+ * on. The footer's height has changed since (it is now as tall as its
+ * content), and fixed pixels keep the reveal reading the same whatever that
+ * height turns out to be.
  */
 const TRAVEL_DESKTOP = -200;
 const TRAVEL_MOBILE = -105;
