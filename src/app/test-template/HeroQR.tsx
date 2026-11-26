@@ -1,8 +1,8 @@
 "use client";
 
-import { useId, useRef, useState, type PointerEvent } from "react";
+import { useId, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
-import { Link2, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Copy, Share2 } from "lucide-react";
 import { gsap } from "@/lib/gsap";
 import { useReducedMotion } from "./useReducedMotion";
 import { Hint } from "./Hint";
@@ -11,8 +11,7 @@ import { Hint } from "./Hint";
  * The QR scanner hero: a flat illustration of a scan, looping Point → Lock on
  * → Decode → Open on a GSAP timeline, a QR code one loop and a barcode the
  * next. The step labels under it are buttons: one jumps to its stage and
- * pauses there, the same one again resumes. Hovering tilts the scene a few
- * degrees. Under reduced motion the four stages sit side by side, still.
+ * pauses there, the same one again resumes. Under reduced motion the four stages sit side by side, still.
  */
 
 // The app's website (https://qrscanner.com/) as a version 6-M QR code, one
@@ -57,7 +56,7 @@ const BAR_PATH = (() => {
 
 const STAGES = ["Point", "Lock on", "Decode", "Open"];
 const STARTS = [0, 1, 2.4, 3.9];
-const PAUSE_AT = [0.95, 2.35, 3.85, 5.3]; // each stage's finished state
+const PAUSE_AT = [0.95, 2.35, 3.85, 5.15]; // each stage's finished state (Open: card done, confetti still falling)
 const stageAt = (t: number) => STARTS.findLastIndex((s) => t >= s);
 
 // The card's code: N units drawn 200px square at (65, 95).
@@ -71,6 +70,18 @@ const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
   y: CODE.y + 20 + ((i * 97) % 160),
   bit: (i * 7) % 3 ? "1" : "0",
 }));
+
+// The success tick, in the viewfinder above the result sheet.
+const OK = { x: 485, y: 140 };
+// Confetti bursting out from the tick: fanned round it, biased upward, then falling.
+// The app's own palette (store screenshots): its teal and greens, mint, and the icon accents.
+const APP = { teal: "#2D9E94", green: "#1E8E4E", mint: "#7EDBC8", ink: "#1B2A4A", grey: "#6B7280" };
+const PARTY = [APP.teal, APP.green, APP.mint, "#0F3D33", "#F5B301", "#1E5BD8", "#E5484D"];
+const CONFETTI = Array.from({ length: 22 }, (_, i) => {
+  const a = (i / 22) * Math.PI * 2 + (i % 3) * 0.2;
+  const d = 80 + ((i * 37) % 70);
+  return { dx: Math.cos(a) * d * 1.3, dy: Math.sin(a) * d - 40, spin: ((i * 61) % 360) - 180, color: PARTY[i % PARTY.length], round: i % 3 === 0 };
+});
 
 const corners = (x: number, y: number, s: number, l: number) =>
   `M${x} ${y + l}V${y}H${x + l}M${x + s - l} ${y}H${x + s}V${y + l}M${x + s} ${y + s - l}V${y + s}H${x + s - l}M${x + l} ${y + s}H${x}V${y + s - l}`;
@@ -123,13 +134,25 @@ function Scene({ mode, freeze, onDone, onStage, tlRef }: { mode: Mode; freeze?: 
       });
       t.fromTo(q(".buzz"), { opacity: 0 }, { opacity: 1, duration: 0.08, yoyo: true, repeat: 3 }, 3.5);
 
-      // Open: the result rises out of the screen and joins the history behind it.
+      // Open: a camera flash, a green tick pops into the viewfinder, confetti bursts out of the phone,
+      // and the result sheet springs up with its details and button landing one after another.
       t.to(q(".light, .lock, .laser"), { opacity: 0, duration: 0.3 }, 3.9)
-        .fromTo(q(".result"), { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "back.out(1.6)" }, 3.9)
-        .fromTo(q(".history"), { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, stagger: 0.1 }, 4.3);
+        .fromTo(q(".flash"), { opacity: 0 }, { opacity: 0.85, duration: 0.06, yoyo: true, repeat: 1 }, 3.9)
+        .fromTo(q(".ok"), { opacity: 0 }, { opacity: 1, duration: 0.15 }, 3.92)
+        .fromTo(q(".ok-check"), { scale: 0, svgOrigin: `${OK.x} ${OK.y}` }, { scale: 1, duration: 0.45, ease: "back.out(3)" }, 3.95)
+        .fromTo(q(".ok-ring"), { attr: { r: 22 }, opacity: 0.9 }, { attr: { r: 75 }, opacity: 0, duration: 0.7, ease: "power2.out" }, 3.95);
+      q(".confetto").forEach((c, i) => {
+        const { dx, dy, spin } = CONFETTI[i];
+        t.fromTo(c, { x: 0, y: 0, scale: 0, rotation: 0, opacity: 1 }, { x: dx, y: dy, scale: 1, rotation: spin, duration: 0.6, ease: "power3.out" }, 3.95)
+          .to(c, { y: dy + 80, rotation: spin * 2, duration: 1, ease: "power1.in" }, 4.55)
+          .to(c, { opacity: 0, duration: 0.25 }, 5.3);
+      });
+      t.fromTo(q(".result"), { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "back.out(1.4)" }, 4.15)
+        .fromTo(q(".result-line"), { y: 6, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, stagger: 0.08 }, 4.45)
+        .fromTo(q(".cta"), { scale: 0.85, opacity: 0, svgOrigin: "485 323" }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(3)" }, 4.7);
 
       // Then everything clears for the next loop.
-      t.to(q(".phone, .result, .history, .camera"), { opacity: 0, duration: 0.5 }, 5.5);
+      t.to(q(".phone, .camera, .ok"), { opacity: 0, duration: 0.5 }, 5.5);
 
       if (freeze !== undefined) t.seek(PAUSE_AT[freeze]);
       if (tlRef) tlRef.current = t;
@@ -144,6 +167,11 @@ function Scene({ mode, freeze, onDone, onStage, tlRef }: { mode: Mode; freeze?: 
     <svg ref={scope} viewBox="0 0 640 380" className="block h-auto w-full overflow-visible" role="img" aria-label={qr ? "A phone scanning a QR code" : "A phone scanning a barcode"}>
       <defs>
         <path id={`code-${id}`} d={code} />
+        {/* The app's scan glow: teal fading to mint. */}
+        <linearGradient id={`glow-${id}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={APP.teal} />
+          <stop offset="1" stopColor={APP.mint} />
+        </linearGradient>
         <clipPath id={`clip-${id}`}>
           <use href={`#code-${id}`} transform={at(CODE.x, CODE.y, CODE.size)} />
         </clipPath>
@@ -198,19 +226,69 @@ function Scene({ mode, freeze, onDone, onStage, tlRef }: { mode: Mode; freeze?: 
           {qr ? "Point at a QR code" : "Point at a barcode"}
         </text>
 
-        <rect className="history" x="404" y="236" width="162" height="14" rx="7" fill="#fff" opacity="0" fillOpacity="0.14" />
-        <rect className="history" x="412" y="218" width="146" height="12" rx="6" fill="#fff" opacity="0" fillOpacity="0.08" />
-        <g className="result" opacity="0">
-          <rect x="396" y="256" width="178" height="92" rx="16" fill="#fff" />
-          {qr ? <Link2 x="408" y="266" width="18" height="18" className="text-[var(--accent)]" /> : <ShoppingCart x="408" y="266" width="18" height="18" className="text-[var(--accent)]" />}
-          <text x="432" y="280" className="fill-[#1d1d1f] text-[13px] font-semibold">
-            {qr ? "qrscanner.com" : "Oat milk · 1L"}
-          </text>
-          <rect x="408" y="308" width="154" height="28" rx="14" className="fill-[var(--accent)]" />
-          <text x="485" y="327" textAnchor="middle" className="fill-white text-[13px] font-semibold">
-            Open
+        {/* Success: the viewfinder fills with the app's teal glow and a tick, a ring pulsing out of it. */}
+        <g className="ok" opacity="0">
+          <rect x={VIEW.x - 6} y={VIEW.y - 6} width={VIEW.size + 12} height={VIEW.size + 12} rx="10" fill={`url(#glow-${id})`} />
+          <circle className="ok-ring" cx={OK.x} cy={OK.y} r="22" fill="none" stroke="#fff" strokeWidth="3" />
+          <g className="ok-check">
+            <circle cx={OK.x} cy={OK.y} r="22" fill="#fff" />
+            <path d={`M${OK.x - 9} ${OK.y}l6 6l12 -12`} fill="none" stroke={APP.teal} strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
+          </g>
+          <text x={OK.x} y={OK.y + 40} textAnchor="middle" className="fill-white text-[11px] font-semibold">
+            Scanned in 0.2s
           </text>
         </g>
+
+        {/* The result sheet, as the app draws it: a teal title bar with back, copy and share, the
+            decoded value under a teal label, a detail row, and the teal pill button. */}
+        <g className="result" opacity="0">
+          <rect x="392" y="200" width="186" height="152" rx="18" fill="#fff" />
+          <path d="M392 218a18 18 0 0 1 18 -18h150a18 18 0 0 1 18 18v14h-186z" fill={APP.teal} />
+          <ArrowLeft x="402" y="209" width="13" height="13" color="#fff" />
+          <text x="420" y="220" fill="#fff" className="text-[11px] font-semibold">{qr ? "QR Result" : "Barcode Result"}</text>
+          <Copy x="534" y="210" width="11" height="11" color="#fff" />
+          <Share2 x="553" y="210" width="11" height="11" color="#fff" />
+          <g className="result-line">
+            <text x="404" y="252" fill={APP.teal} className="text-[10px] font-medium">{qr ? "URL Link" : "Barcode Result :"}</text>
+            <text x="404" y="269" fill={APP.ink} textDecoration={qr ? "underline" : undefined} className="text-[12px] font-semibold tabular-nums">
+              {qr ? "https://qrscanner.com" : "5012345678900"}
+            </text>
+          </g>
+          <line x1="404" y1="279" x2="566" y2="279" stroke="#E5E7EB" />
+          <g className="result-line">
+            {qr ? (
+              <>
+                <circle cx="408" cy="292" r="3.5" fill={APP.green} />
+                <text x="416" y="296" fill={APP.green} className="text-[10px] font-medium">Verified safe link</text>
+              </>
+            ) : (
+              <>
+                <text x="404" y="296" fill={APP.grey} className="text-[10px]">Category</text>
+                <text x="456" y="296" fill={APP.ink} className="text-[10px]">Beverage › Oat milk</text>
+              </>
+            )}
+          </g>
+          <g className="cta">
+            <rect x="404" y="308" width="162" height="30" rx="15" fill={APP.teal} />
+            <text x="485" y="327" textAnchor="middle" fill="#fff" className="text-[12px] font-semibold">
+              {qr ? "Open link" : "See more details"}
+            </text>
+          </g>
+        </g>
+
+        {/* The camera flash on a successful read. */}
+        <rect className="flash" x="385" y="20" width="200" height="340" rx="30" fill="#fff" opacity="0" />
+      </g>
+
+      {/* Confetti, over the phone so it can fly past its edges. */}
+      <g transform={`translate(${OK.x} ${OK.y})`}>
+        {CONFETTI.map(({ color, round }, i) =>
+          round ? (
+            <circle key={i} className="confetto" r="3.5" fill={color} opacity="0" />
+          ) : (
+            <rect key={i} className="confetto" x="-2.5" y="-5" width="5" height="10" rx="1" fill={color} opacity="0" />
+          ),
+        )}
       </g>
       <path className="buzz stroke-[#1d1d1f]" d="M368 150q-6 10 0 20M360 145q-9 15 0 30M602 150q6 10 0 20M610 145q9 15 0 30" fill="none" strokeWidth="2.5" strokeLinecap="round" opacity="0" />
     </svg>
@@ -223,7 +301,6 @@ export function HeroQR() {
   const [stage, setStage] = useState(0);
   const [paused, setPaused] = useState<number | null>(null);
   const tl = useRef<gsap.core.Timeline | null>(null);
-  const tilt = useRef<HTMLDivElement>(null);
 
   const pick = (i: number) => {
     if (paused === i) {
@@ -234,12 +311,6 @@ export function HeroQR() {
       setPaused(i);
       setStage(i);
     }
-  };
-  const lean = (e: PointerEvent) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    tilt.current!.style.transform = `perspective(1200px) rotateX(${-y * 6}deg) rotateY(${x * 8}deg)`;
   };
 
   if (still) {
@@ -257,11 +328,7 @@ export function HeroQR() {
 
   return (
     <div className="mx-auto mt-8 mb-[150px] w-[min(600px,calc(100vw-32px))] short:mt-4 roomy:w-[720px]">
-      <div onPointerMove={lean} onPointerLeave={() => (tilt.current!.style.transform = "")}>
-        <div ref={tilt} className="transition-transform duration-300 ease-out">
-          <Scene mode={mode} onDone={() => setMode((m) => (m === "qr" ? "bar" : "qr"))} onStage={setStage} tlRef={tl} />
-        </div>
-      </div>
+      <Scene mode={mode} onDone={() => setMode((m) => (m === "qr" ? "bar" : "qr"))} onStage={setStage} tlRef={tl} />
       <div className="relative mt-5 flex justify-center gap-2" role="group" aria-label="Scan stages">
         {STAGES.map((label, i) => (
           <button

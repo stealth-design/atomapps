@@ -70,6 +70,9 @@ const SCROLL_VIEWPORTS = 0.7;
 const HOVER_SCALE = 1.08;
 const HOVER_DURATION = 0.32;
 
+/** Gap between the settled grid's bottom edge and the "tap any app" hint, in px. */
+const HINT_GAP = 14; // ~35px spare under the grid at 768px wide, so keep gap + text below that
+
 /**
  * Smallest gap kept between an icon's start box and the stage edge.
  *
@@ -174,6 +177,12 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
       if (!root || !stage) return;
 
       const heading = root.querySelector<HTMLElement>("[data-f03='heading']");
+      const hint = root.querySelector<HTMLElement>("[data-f03='hint']");
+      // Parks the hint just under the settled grid (its last box is the bottom row).
+      const placeHint = (grid: Box[]) => {
+        const last = grid[grid.length - 1];
+        if (hint && last) hint.style.top = `${last.cy + last.size / 2 + HINT_GAP}px`;
+      };
       const floats = gsap.utils.toArray<HTMLElement>("[data-f03-float]", root);
       const phoneParts = gsap.utils.toArray<HTMLElement>("[data-f03='phone']", root);
       const icons = END_ORDER.map((icon) =>
@@ -291,6 +300,8 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
             gsap.set(phoneParts, { opacity: 0 });
             settled.value = true;
             settled.reduced = true;
+            placeHint(grid);
+            if (hint) gsap.set(hint, { opacity: 1, y: 0 });
             return;
           }
 
@@ -309,12 +320,36 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
           });
 
           let { boxes: grid, headingTop } = endLayout(config, stage, heading);
+          placeHint(grid);
           let starts = icons.map(layoutBox);
 
           const remeasure = () => {
             fitScatter();
             ({ boxes: grid, headingTop } = endLayout(config, stage, heading));
+            placeHint(grid);
             starts = icons.map(layoutBox);
+          };
+
+          // Links on and the clickable cue once the grid has settled; off again as it leaves.
+          const sync = (progress: number) => {
+                // Only touch the DOM when the state actually flips.
+                const done = progress > 0.999;
+                if (done !== settled.value) {
+                  settled.value = done;
+                  if (done) stage.dataset.f03Complete = "true";
+                  else delete stage.dataset.f03Complete;
+                  const arts = hoverPairs.map(({ art }) => art);
+                  // The clickable cue: a flat 360° flip rippling through the grid in reading
+                  // order (no perspective: depth warped the icons), and the hint under it fading in.
+                  gsap.killTweensOf(arts, "rotationY");
+                  if (done) {
+                    gsap.fromTo(arts, { rotationY: 0 }, { rotationY: 360, duration: 0.8, ease: "power2.inOut", stagger: 0.04 });
+                    if (hint) gsap.fromTo(hint, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5, delay: 0.3, ease: "power2.out", overwrite: true });
+                  } else {
+                    gsap.set(arts, { scale: 1, rotationY: 0 });
+                    if (hint) gsap.to(hint, { opacity: 0, y: 8, duration: 0.2, overwrite: true });
+                  }
+                }
           };
 
           const timeline = gsap.timeline({
@@ -337,18 +372,18 @@ export function Fold03Motion({ children }: { children: ReactNode }) {
               scrub: 0.4,
               invalidateOnRefresh: true,
               onRefreshInit: remeasure,
-              onUpdate: (self) => {
-                // Only touch the DOM when the state actually flips.
-                const done = self.progress > 0.985;
-                if (done !== settled.value) {
-                  settled.value = done;
-                  if (done) stage.dataset.f03Complete = "true";
-                  else delete stage.dataset.f03Complete;
-                  if (!done) hoverPairs.forEach(({ art }) => gsap.set(art, { scale: 1 }));
-                }
-              },
+              // A refresh (coming back to the page with the scroll restored past the pin) can set
+              // the timeline straight to its end without firing onUpdate, which left the grid
+              // drawn but its links dead until the reader scrolled back up through the pin.
+              onRefresh: (self) => sync(self.animation?.progress() ?? self.progress),
+              onLeave: (self) => sync(self.animation?.progress() ?? self.progress),
             },
+            // Read the timeline's own progress, not the scroll's: with the
+            // 0.4s scrub the icons are still landing when scroll hits the end,
+            // and the flip started on top of that travel.
+            onUpdate: () => sync(timeline.progress()),
           });
+
 
           // `will-change` is managed on its own trigger, a full viewport clear of
           // the stage at both ends, and deliberately NOT on the pin's own

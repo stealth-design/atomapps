@@ -32,10 +32,6 @@ export function ComingSoonHero({ app }: { app: ComingSoonApp }) {
     >
       <style>{`@keyframes tt-spin{to{transform:rotate(1turn)}}@keyframes tt-unspin{to{transform:rotate(-1turn)}}@keyframes tt-bob{50%{transform:translateY(-10px)}}@keyframes tt-ping{75%,100%{transform:scale(2.4);opacity:0}}`}</style>
 
-      {/* The foot fade, as on the template's hero. */}
-      {!night && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[35%] bg-[linear-gradient(180deg,transparent_0%,rgba(255,255,255,0.6)_45%,#fff_100%)]" />
-      )}
       <div data-depth="0.35" className="absolute inset-0">
         <div
           className={`absolute inset-0 ${
@@ -48,15 +44,17 @@ export function ComingSoonHero({ app }: { app: ComingSoonApp }) {
             <Image src="/images/apps/steppy/hero-bg.png" alt="" fill priority sizes="100vw" className="object-cover" />
             {/* The penguin's video over its still (the poster, and what shows under reduced motion). */}
             <video
-              src="/videos/steppy.mp4"
               poster="/images/apps/steppy/hero-bg.png"
               autoPlay
               muted
-              loop
               playsInline
               aria-hidden
               className="absolute inset-0 size-full object-cover motion-reduce:hidden"
-            />
+            >
+              {/* H.265 (0.5 MB); browsers without HEVC decoding fall back to the H.264 original. */}
+              <source src="/videos/steppy.hevc.mp4" type='video/mp4; codecs="hvc1"' />
+              <source src="/videos/steppy.mp4" type="video/mp4" />
+            </video>
           </>
         ) : (
           <ShaderBackground frag={SKIES[app.slug]} className="absolute inset-0 h-full w-full" />

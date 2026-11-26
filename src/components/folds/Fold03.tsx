@@ -125,6 +125,19 @@ export default function Fold03() {
           {/* ---------- the icons: one element each, start → phone → grid ---------- */}
           <IconScatter />
 
+          {/* ---------- "tap any app" hint: placed under the settled grid and faded in by Fold03Motion ---------- */}
+          <p
+            data-f03="hint"
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 flex -translate-x-1/2 items-center gap-1.5 text-[14px] leading-none whitespace-nowrap text-black/55 opacity-0 tablet:text-[16px]"
+          >
+            <span className="tablet:hidden">Tap any app to explore</span>
+            <span className="hidden tablet:inline">Click any app to explore</span>
+            <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M7 17 17 7M8 7h9v9" />
+            </svg>
+          </p>
+
           {/* ---------- heading (paints above the icons, as in Figma) ---------- */}
           {/* Figma put this at top 215/626 mobile and 209/886 desktop, at
               18/24/30px. It is set larger and higher than that by request, and

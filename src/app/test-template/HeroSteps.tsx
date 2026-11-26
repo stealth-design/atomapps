@@ -32,14 +32,41 @@ const CARD =
 
 type Print = { x: number; y: number; a: number; left: boolean; t: number };
 
-// One foot's sole, pointing up, big toe on the left (a right foot).
-const TOES: [number, number, number][] = [
-  [-4.5, -14, 2.4],
-  [-0.6, -15.6, 2],
-  [2.8, -14.8, 1.7],
-  [5.4, -12.6, 1.5],
-  [7, -9.6, 1.3],
-];
+// One left shoe print, pointing up, traced from the reference art: the sole (toe leaning out,
+// arch dipping in on the right), a slanted gap, then the heel set off to the right.
+const drawShoe = (ctx: CanvasRenderingContext2D) => {
+  ctx.moveTo(-2.49, 6.04);
+  ctx.lineTo(3.94, 4.1);
+  ctx.bezierCurveTo(3.89, 3.82, 3.68, 3, 3.67, 2.42);
+  ctx.bezierCurveTo(3.65, 1.84, 3.73, 1.33, 3.85, 0.61);
+  ctx.bezierCurveTo(3.97, -0.11, 4.22, -0.94, 4.39, -1.88);
+  ctx.bezierCurveTo(4.56, -2.82, 4.8, -3.92, 4.84, -5.05);
+  ctx.bezierCurveTo(4.89, -6.18, 4.87, -7.5, 4.66, -8.67);
+  ctx.bezierCurveTo(4.46, -9.84, 4.13, -11.04, 3.62, -12.06);
+  ctx.bezierCurveTo(3.11, -13.08, 2.38, -14.12, 1.58, -14.78);
+  ctx.bezierCurveTo(0.79, -15.43, -0.26, -15.92, -1.13, -16);
+  ctx.bezierCurveTo(-2, -16.08, -2.88, -15.77, -3.62, -15.23);
+  ctx.bezierCurveTo(-4.36, -14.69, -5.06, -13.76, -5.57, -12.74);
+  ctx.bezierCurveTo(-6.07, -11.72, -6.45, -10.33, -6.65, -9.12);
+  ctx.bezierCurveTo(-6.86, -7.91, -6.86, -6.71, -6.79, -5.5);
+  ctx.bezierCurveTo(-6.71, -4.29, -6.54, -3.16, -6.2, -1.88);
+  ctx.bezierCurveTo(-5.86, -0.6, -5.37, 0.88, -4.75, 2.2);
+  ctx.bezierCurveTo(-4.13, 3.52, -2.87, 5.4, -2.49, 6.04);
+  ctx.closePath();
+  ctx.moveTo(-1.58, 7.63);
+  ctx.lineTo(4.75, 5.91);
+  ctx.bezierCurveTo(4.96, 6.27, 5.66, 7.26, 6.02, 8.08);
+  ctx.bezierCurveTo(6.38, 8.89, 6.77, 9.93, 6.93, 10.79);
+  ctx.bezierCurveTo(7.08, 11.66, 7.1, 12.55, 6.93, 13.28);
+  ctx.bezierCurveTo(6.75, 14.02, 6.4, 14.76, 5.88, 15.23);
+  ctx.bezierCurveTo(5.37, 15.7, 4.6, 16, 3.85, 16.09);
+  ctx.bezierCurveTo(3.09, 16.18, 2.07, 16.05, 1.36, 15.77);
+  ctx.bezierCurveTo(0.64, 15.49, 0, 15.09, -0.45, 14.42);
+  ctx.bezierCurveTo(-0.91, 13.74, -1.15, 12.57, -1.36, 11.7);
+  ctx.bezierCurveTo(-1.56, 10.83, -1.64, 9.89, -1.67, 9.21);
+  ctx.bezierCurveTo(-1.71, 8.53, -1.6, 7.89, -1.58, 7.63);
+  ctx.closePath();
+};
 
 function drawPrint(
   ctx: CanvasRenderingContext2D,
@@ -50,16 +77,11 @@ function drawPrint(
   ctx.save();
   ctx.translate(p.x, p.y);
   ctx.rotate(p.a + Math.PI / 2); // the sole points up; `a` is the heading, 0 = right
-  if (p.left) ctx.scale(-1, 1);
+  if (!p.left) ctx.scale(-1, 1); // the drawn shoe is a left one; mirror it for the right
   ctx.globalAlpha = alpha * 0.55;
   ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.ellipse(0.5, -4, 6.5, 8.5, 0, 0, Math.PI * 2);
-  ctx.ellipse(0, 8.5, 4.6, 5, 0, 0, Math.PI * 2);
-  for (const [x, y, r] of TOES) {
-    ctx.moveTo(x + r, y);
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-  }
+  drawShoe(ctx);
   ctx.fill();
   ctx.restore();
 }

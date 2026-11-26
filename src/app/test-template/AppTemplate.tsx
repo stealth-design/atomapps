@@ -240,15 +240,15 @@ export function AppTemplate({ app, hero }: { app: AppPage; hero?: ReactNode }) {
             <HeroSteps accent={app.accent} />
           ) : demo === "find" ? null : (
             <div
-              // The flat widgets (calculator, weather, QR, calendar, Bible) scroll with the page:
+              // The flat widgets (calculator, QR, calendar, Bible) scroll with the page:
               // lagging like the phone, they'd slide down over the strip.
-              data-depth={flat || demo === "weather" ? "0" : "0.15"} className="relative z-20">
+              data-depth={flat ? "0" : "0.15"} className="relative z-20">
               {demo === "calculator" ? (
                 <HeroCalculator />
               ) : demo === "ai" ? (
                 <HeroAI />
               ) : demo === "weather" ? (
-                <HeroWeather />
+                <HeroWeather accent={app.accent} className={PHONE} />
               ) : demo === "volume" ? (
                 <HeroVolume accent={app.accent} className={PHONE} />
               ) : demo === "flashlight" ? (
